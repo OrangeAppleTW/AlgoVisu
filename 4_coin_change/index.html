@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>硬幣找零問題視覺化</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>硬幣找零問題視覺化</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="greedy">貪婪算法</div>
+            <div class="tab" data-tab="dynamic">動態規劃</div>
+        </div>
+        
+        <!-- 貪婪算法 -->
+        <div id="greedy" class="tab-content active">
+            <h2>貪婪算法 (Greedy Algorithm)</h2>
+            <p>貪婪算法是一種在每一步選擇中都採取當前狀態下最好或最優的選擇，從而希望導致結果是全局最佳的算法。</p>
+            
+            <div class="visualization-container">
+                <div id="greedy-container">
+                    <!-- 硬幣和目標金額的可視化區域 -->
+                </div>
+                <div class="status" id="greedy-status">請點擊「生成問題」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="greedy-structure">
+                <!-- 顯示算法過程 -->
+            </div>
+            
+            <div class="controls">
+                <button id="greedy-generate">生成問題</button>
+                <button id="greedy-start" disabled>開始求解</button>
+                <button id="greedy-pause" disabled>暫停</button>
+                <button id="greedy-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="greedy-speed">速度:</label>
+                <input type="range" id="greedy-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <h3>貪婪算法說明</h3>
+            <p>在硬幣找零問題中，貪婪算法並不總是能得到最少硬幣數量的解。算法步驟如下：</p>
+            <ol>
+                <li>將硬幣按面額從大到小排序</li>
+                <li>從最大面額硬幣開始，盡可能多地使用大面額硬幣</li>
+                <li>當無法再使用當前面額硬幣時，轉向下一種較小面額的硬幣</li>
+                <li>重複上述過程直到湊出指定的金額</li>
+            </ol>
+            
+            <div class="code-view">
+// 貪婪算法解決硬幣找零問題
+function greedyCoinChange(coins, amount) {
+    // 將硬幣按面額從大到小排序
+    coins.sort((a, b) => b.value - a.value);
+    
+    let remainingAmount = amount;
+    const result = [];
+    
+    for (const coin of coins) {
+        // 計算可以使用的此面額硬幣數量
+        const count = Math.floor(remainingAmount / coin.value);
+        
+        if (count > 0) {
+            // 添加使用的硬幣信息
+            result.push({ ...coin, count });
+            
+            // 更新剩餘金額
+            remainingAmount -= count * coin.value;
+        }
+    }
+    
+    return {
+        usedCoins: result,
+        remainingAmount: remainingAmount,
+        success: remainingAmount === 0
+    };
+}
+            </div>
+        </div>
+        
+        <!-- 動態規劃 -->
+        <div id="dynamic" class="tab-content">
+            <h2>動態規劃 (Dynamic Programming)</h2>
+            <p>動態規劃是通過將複雜問題分解為更簡單的子問題來解決的方法，並存儲子問題的解以避免重複計算。</p>
+            
+           
+            
+            <!-- 新增可視化區域 -->
+            <div id="dp-visualization-section"></div>
+            
+            <h3>動態規劃算法說明</h3>
+            <p>動態規劃解決硬幣找零問題的步驟：</p>
+            <ol>
+                <li>創建一個數組 dp，其中 dp[i] 表示湊出金額 i 所需的最少硬幣數</li>
+                <li>初始化 dp[0] = 0，其他位置為無窮大</li>
+                <li>對於每種硬幣面額 c 和每個金額 i，如果 i ≥ c，則 dp[i] = min(dp[i], dp[i-c] + 1)</li>
+                <li>最終 dp[amount] 即為湊出指定金額所需的最少硬幣數</li>
+            </ol>
+            
+            <div class="code-view">
+// 動態規劃解決硬幣找零問題
+function dpCoinChange(coins, amount) {
+    // 初始化 dp 數組，初值為無窮大(表示無解)
+    const dp = Array(amount + 1).fill(Infinity);
+    const coinsUsed = Array(amount + 1).fill(0);
+    const coinChoice = Array(amount + 1).fill(-1);
+    
+    // 湊出 0 元需要 0 個硬幣
+    dp[0] = 0;
+    
+    // 對每個金額進行操作
+    for (let i = 0; i < coins.length; i++) {
+        const coin = coins[i].value;
+        for (let j = coin; j <= amount; j++) {
+            if (dp[j - coin] + 1 < dp[j]) {
+                dp[j] = dp[j - coin] + 1;
+                coinsUsed[j] = coinsUsed[j - coin] + 1;
+                coinChoice[j] = i;
+            }
+        }
+    }
+    
+    // 回溯找出使用的硬幣
+    const result = [];
+    let currentAmount = amount;
+    
+    while (currentAmount > 0 && coinChoice[currentAmount] !== -1) {
+        const coinIndex = coinChoice[currentAmount];
+        const coin = coins[coinIndex];
+        
+        // 檢查結果中是否已經有該面額硬幣
+        let existingCoin = result.find(c => c.value === coin.value);
+        
+        if (existingCoin) {
+            existingCoin.count++;
+        } else {
+            result.push({ ...coin, count: 1 });
+        }
+        
+        currentAmount -= coin.value;
+    }
+    
+    return {
+        usedCoins: result,
+        minCoins: dp[amount],
+        success: dp[amount] !== Infinity
+    };
+}
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="../3_divide_and_conquer/index.html" class="nav-button">上一個：分治法</a>
+            <a href="../5_graph_theory/index.html" class="nav-button">下一個：圖論基礎</a>
+        </div>
+    </div>
+    
+    <script src="utils.js"></script>
+    <script src="greedy.js"></script>
+    <script src="dynamic_programming.js"></script>
+</body>
+</html>

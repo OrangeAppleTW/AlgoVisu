@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分治法視覺化</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        /* 樹節點顏色樣式 */
+        .tree-node-pending { fill: #ecf0f1; stroke: #bdc3c7; stroke-width: 1.5px; }
+        .tree-node-comparing { fill: #f39c12; stroke: #e67e22; stroke-width: 3px; }
+        .tree-node-visited { fill: #3498db; stroke: #2980b9; stroke-width: 2px; }
+        .tree-node-sorted { fill: #2ecc71; stroke: #27ae60; stroke-width: 2px; }
+        .tree-node-returning { fill: #9b59b6; stroke: #8e44ad; stroke-width: 2px; }
+        .tree-node-default { fill: white; stroke: #3498db; stroke-width: 1.5px; }
+        
+        /* 自訂的選擇器樣式 */
+        .custom-select {
+            display: inline-flex;
+            gap: 5px;
+            margin-right: 10px;
+        }
+        
+        .select-btn {
+            padding: 5px 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .select-btn.selected {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>分治法視覺化</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="matrix-multiplication">矩陣乘法</div>
+            <div class="tab" data-tab="tree-traversal">樹的走訪方法</div>
+        </div>
+        
+        <!-- 矩陣乘法 -->
+        <div id="matrix-multiplication" class="tab-content active">
+            <h2>矩陣乘法 (Matrix Multiplication)</h2>
+            <p>矩陣乘法是一個經典的分治法問題。一般矩陣乘法的時間複雜度為O(n³)，但使用Strassen演算法可以降低至O(n^2.81)。</p>
+            
+            <div class="visualization-container">
+                <div id="matrix-container" class="matrix-container">
+                    <!-- 矩陣可視化區域 -->
+                </div>
+                <div class="status" id="matrix-status">請點擊「生成矩陣」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="matrix-structure">
+                <!-- 顯示矩陣計算過程 -->
+            </div>
+            
+            <div class="controls">
+                <button id="matrix-generate">生成矩陣</button>
+                <select id="matrix-size">
+                    <option value="2">2x2矩陣</option>
+                    <option value="4" selected>4x4矩陣</option>
+                    <option value="8">8x8矩陣</option>
+                    <option value="2x3_3x2">2x3 * 3x2矩陣</option>
+                    <option value="3x4_4x2">3x4 * 4x2矩陣</option>
+                    <option value="4x3_3x2">4x3 * 3x2矩陣</option>
+                </select>
+                <select id="matrix-method">
+                    <option value="standard">標準演算法</option>
+                    <option value="strassen">Strassen演算法</option>
+                </select>
+                <button id="matrix-start" disabled>開始計算</button>
+                <button id="matrix-pause" disabled>暫停</button>
+                <button id="matrix-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="matrix-speed">速度:</label>
+                <input type="range" id="matrix-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <h3>演算法說明</h3>
+            <p>標準矩陣乘法算法的時間複雜度為 O(n³)，使用以下公式：</p>
+            <p>對於 n×n 的矩陣 A 和 B，結果矩陣 C 的每個元素計算如下：</p>
+            <p>C[i][j] = Σ(A[i][k] * B[k][j]) for k = 0 to n-1</p>
+            
+            <p>Strassen演算法利用分治法，將矩陣分割為子矩陣，減少乘法運算的次數：</p>
+            <ol>
+                <li>將 n×n 矩陣分割為4個 n/2×n/2 的子矩陣</li>
+                <li>使用7次乘法（而非標準的8次）和18次加減法計算</li>
+                <li>遞迴進行直至處理2×2矩陣</li>
+            </ol>
+            
+            <div class="code-view">
+// 標準矩陣乘法
+function standardMatrixMultiply(A, B) {
+    const n = A.length;
+    const C = Array(n).fill().map(() => Array(n).fill(0));
+    
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            for (let k = 0; k < n; k++) {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+    
+    return C;
+}
+
+// Strassen演算法
+function strassenMultiply(A, B) {
+    const n = A.length;
+    
+    // 基本情況：2x2矩陣
+    if (n === 2) {
+        return standardMatrixMultiply(A, B);
+    }
+    
+    const mid = n / 2;
+    
+    // 分割矩陣
+    const A11 = splitMatrix(A, 0, 0, mid);
+    const A12 = splitMatrix(A, 0, mid, mid);
+    const A21 = splitMatrix(A, mid, 0, mid);
+    const A22 = splitMatrix(A, mid, mid, mid);
+    
+    const B11 = splitMatrix(B, 0, 0, mid);
+    const B12 = splitMatrix(B, 0, mid, mid);
+    const B21 = splitMatrix(B, mid, 0, mid);
+    const B22 = splitMatrix(B, mid, mid, mid);
+    
+    // 計算7個積
+    const M1 = strassenMultiply(addMatrix(A11, A22), addMatrix(B11, B22));
+    const M2 = strassenMultiply(addMatrix(A21, A22), B11);
+    const M3 = strassenMultiply(A11, subtractMatrix(B12, B22));
+    const M4 = strassenMultiply(A22, subtractMatrix(B21, B11));
+    const M5 = strassenMultiply(addMatrix(A11, A12), B22);
+    const M6 = strassenMultiply(subtractMatrix(A21, A11), addMatrix(B11, B12));
+    const M7 = strassenMultiply(subtractMatrix(A12, A22), addMatrix(B21, B22));
+    
+    // 計算結果矩陣的四個部分
+    const C11 = addMatrix(subtractMatrix(addMatrix(M1, M4), M5), M7);
+    const C12 = addMatrix(M3, M5);
+    const C21 = addMatrix(M2, M4);
+    const C22 = addMatrix(subtractMatrix(addMatrix(M1, M3), M2), M6);
+    
+    // 合併結果
+    return combineMatrix(C11, C12, C21, C22);
+}
+            </div>
+        </div>
+        
+        <!-- 樹的走訪方法 -->
+        <div id="tree-traversal" class="tab-content">
+            <h2>樹的走訪方法</h2>
+            <p>樹的走訪是對樹中的節點進行系統性的訪問，主要有前序（Preorder）、中序（Inorder）和後序（Postorder）三種方式。</p>
+            
+            <div class="visualization-container">
+                <div class="tree-container" id="tree-container">
+                    <!-- 樹的可視化區域 -->
+                </div>
+                <div class="status" id="tree-status">請點擊「生成樹」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="tree-structure">
+                <!-- 顯示走訪過程 -->
+            </div>
+            
+            <div class="controls">
+                <button id="tree-generate">生成樹</button>
+                <select id="tree-depth">
+                    <option value="3" selected>深度 3</option>
+                    <option value="4">深度 4</option>
+                    <option value="5">深度 5</option>
+                </select>
+                <!-- 自訂的走訪方法選擇器 -->
+                <div class="custom-select" id="traversal-method-container">
+                    <button class="select-btn selected" data-value="preorder">前序走訪</button>
+                    <button class="select-btn" data-value="inorder">中序走訪</button>
+                    <button class="select-btn" data-value="postorder">後序走訪</button>
+                </div>
+                <input type="hidden" id="tree-traversal" value="preorder">
+                <button id="tree-start" disabled>開始走訪</button>
+                <button id="tree-pause" disabled>暫停</button>
+                <button id="tree-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="tree-speed">速度:</label>
+                <input type="range" id="tree-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ecf0f1;"></div>
+                    <span>尚未訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f39c12;"></div>
+                    <span>當前節點</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3498db;"></div>
+                    <span>已訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2ecc71;"></div>
+                    <span>已加入結果</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #9b59b6;"></div>
+                    <span>回溯中</span>
+                </div>
+            </div>
+            
+            <h3>走訪方法說明</h3>
+            <ul>
+                <li><strong>前序走訪（Preorder）</strong>：根節點 → 左子樹 → 右子樹</li>
+                <li><strong>中序走訪（Inorder）</strong>：左子樹 → 根節點 → 右子樹</li>
+                <li><strong>後序走訪（Postorder）</strong>：左子樹 → 右子樹 → 根節點</li>
+            </ul>
+            
+            <div class="code-view">
+// 前序走訪（Preorder）
+function preorderTraversal(root) {
+    if (!root) return [];
+    
+    const result = [];
+    const stack = [root];
+    
+    while (stack.length > 0) {
+        const node = stack.pop();
+        result.push(node.value);
+        
+        // 先右後左（因為是棧，後進先出）
+        if (node.right) stack.push(node.right);
+        if (node.left) stack.push(node.left);
+    }
+    
+    return result;
+}
+
+// 中序走訪（Inorder）
+function inorderTraversal(root) {
+    if (!root) return [];
+    
+    const result = [];
+    const stack = [];
+    let current = root;
+    
+    while (current || stack.length > 0) {
+        // 遍歷到最左的節點
+        while (current) {
+            stack.push(current);
+            current = current.left;
+        }
+        
+        // 處理節點
+        current = stack.pop();
+        result.push(current.value);
+        
+        // 轉向右子樹
+        current = current.right;
+    }
+    
+    return result;
+}
+
+// 後序走訪（Postorder）
+function postorderTraversal(root) {
+    if (!root) return [];
+    
+    const result = [];
+    const stack1 = [root];
+    const stack2 = [];
+    
+    // 第一步：將節點以根→右→左的順序放入棧2
+    while (stack1.length > 0) {
+        const node = stack1.pop();
+        stack2.push(node);
+        
+        if (node.left) stack1.push(node.left);
+        if (node.right) stack1.push(node.right);
+    }
+    
+    // 第二步：從棧2取出的順序就是後序遍歷
+    while (stack2.length > 0) {
+        result.push(stack2.pop().value);
+    }
+    
+    return result;
+}
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="../2_2d_linked_list/index.html" class="nav-button">上一個：二維鏈表處理</a>
+            <a href="../4_coin_change/index.html" class="nav-button">下一個：找零錢問題</a>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.7.0/d3.min.js"></script>
+    <script src="tabs.js"></script>
+    <script src="matrix_multiplication.js"></script>
+    <script src="tree_traversal.js"></script>
+</body>
+</html>

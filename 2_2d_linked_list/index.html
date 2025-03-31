@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二維鏈表處理視覺化</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>二維鏈表處理視覺化</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="representation">座標表示</div>
+            <div class="tab" data-tab="search">搜尋操作</div>
+            <div class="tab" data-tab="recursive">遞迴搜尋</div>
+        </div>
+        
+        <!-- 座標表示 -->
+        <div id="representation" class="tab-content active">
+            <h2>二維鏈表座標表示</h2>
+            <p>二維鏈表是一種特殊的資料結構，每個節點可以有四個方向（上、下、左、右）的連接。這種結構可以表示二維網格或矩陣。</p>
+            
+            <div class="visualization-container">
+                <div id="grid-representation" class="matrix-container"></div>
+                <div class="status" id="representation-status">點擊「生成網格」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="node-structure">
+                <!-- 顯示節點結構 -->
+            </div>
+            
+            <div class="controls">
+                <button id="representation-generate">生成網格</button>
+                <select id="representation-size">
+                    <option value="3">3x3</option>
+                    <option value="4">4x4</option>
+                    <option value="5" selected>5x5</option>
+                    <option value="6">6x6</option>
+                </select>
+            </div>
+            
+            <h3>二維鏈表節點結構</h3>
+            <div class="code-view">
+class Node {
+    constructor(value, row, col) {
+        this.value = value;    // 節點值
+        this.row = row;        // 行座標
+        this.col = col;        // 列座標
+        this.up = null;        // 上方節點連接
+        this.down = null;      // 下方節點連接
+        this.left = null;      // 左方節點連接
+        this.right = null;     // 右方節點連接
+    }
+}
+            </div>
+            
+            <h3>創建二維鏈表</h3>
+            <div class="code-view">
+function create2DLinkedList(matrix) {
+    const rows = matrix.length;
+    const cols = matrix[0].length;
+    const nodeMatrix = [];
+    
+    // 創建節點
+    for (let i = 0; i < rows; i++) {
+        nodeMatrix[i] = [];
+        for (let j = 0; j < cols; j++) {
+            nodeMatrix[i][j] = new Node(matrix[i][j], i, j);
+        }
+    }
+    
+    // 設置節點之間的連接
+    for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+            // 上方連接
+            if (i > 0) {
+                nodeMatrix[i][j].up = nodeMatrix[i-1][j];
+            }
+            
+            // 下方連接
+            if (i < rows - 1) {
+                nodeMatrix[i][j].down = nodeMatrix[i+1][j];
+            }
+            
+            // 左方連接
+            if (j > 0) {
+                nodeMatrix[i][j].left = nodeMatrix[i][j-1];
+            }
+            
+            // 右方連接
+            if (j < cols - 1) {
+                nodeMatrix[i][j].right = nodeMatrix[i][j+1];
+            }
+        }
+    }
+    
+    return nodeMatrix;
+}
+            </div>
+        </div>
+        
+        <!-- 搜尋操作 -->
+        <div id="search" class="tab-content">
+            <h2>二維鏈表搜尋操作</h2>
+            <p>在二維鏈表中，我們可以通過節點之間的連接進行搜尋，例如找到特定值的節點，或從某個起點到達目標位置。</p>
+            
+            <div class="visualization-container">
+                <div id="grid-search" class="matrix-container"></div>
+                <div class="status" id="search-status">點擊「生成網格」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="search-structure">
+                <!-- 顯示搜尋過程 -->
+            </div>
+            
+            <div class="controls">
+                <button id="search-generate">生成網格</button>
+                <select id="search-size">
+                    <option value="3">3x3</option>
+                    <option value="4">4x4</option>
+                    <option value="5" selected>5x5</option>
+                    <option value="6">6x6</option>
+                </select>
+                <select id="search-method">
+                    <option value="value">搜尋值</option>
+                    <option value="path">尋找路徑</option>
+                </select>
+                <button id="search-start" disabled>開始搜尋</button>
+                <button id="search-pause" disabled>暫停</button>
+                <button id="search-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="search-speed">速度:</label>
+                <input type="range" id="search-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f1f1f1;"></div>
+                    <span>未訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f39c12;"></div>
+                    <span>當前節點</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3498db;"></div>
+                    <span>已訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2ecc71;"></div>
+                    <span>找到目標</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e74c3c;"></div>
+                    <span>路徑</span>
+                </div>
+            </div>
+            
+            <h3>基本搜尋演算法</h3>
+            <div class="code-view">
+// 根據值搜尋節點
+function searchNodeByValue(head, targetValue) {
+    // 從頭節點開始
+    let currentNode = head;
+    let visited = new Set();
+    
+    // 使用隊列進行廣度優先搜尋
+    const queue = [currentNode];
+    visited.add(`${currentNode.row},${currentNode.col}`);
+    
+    while (queue.length > 0) {
+        const node = queue.shift();
+        
+        // 找到目標節點
+        if (node.value === targetValue) {
+            return node;
+        }
+        
+        // 檢查四個方向
+        const directions = [
+            { dir: 'up', nextNode: node.up },
+            { dir: 'right', nextNode: node.right },
+            { dir: 'down', nextNode: node.down },
+            { dir: 'left', nextNode: node.left }
+        ];
+        
+        for (const { dir, nextNode } of directions) {
+            if (nextNode && !visited.has(`${nextNode.row},${nextNode.col}`)) {
+                queue.push(nextNode);
+                visited.add(`${nextNode.row},${nextNode.col}`);
+            }
+        }
+    }
+    
+    // 沒有找到目標節點
+    return null;
+}
+
+// 尋找從起點到終點的路徑
+function findPath(start, end) {
+    const queue = [{ node: start, path: [] }];
+    const visited = new Set([`${start.row},${start.col}`]);
+    
+    while (queue.length > 0) {
+        const { node, path } = queue.shift();
+        
+        if (node === end) {
+            return [...path, node];
+        }
+        
+        const directions = [
+            { dir: 'up', nextNode: node.up },
+            { dir: 'right', nextNode: node.right },
+            { dir: 'down', nextNode: node.down },
+            { dir: 'left', nextNode: node.left }
+        ];
+        
+        for (const { dir, nextNode } of directions) {
+            if (nextNode && !visited.has(`${nextNode.row},${nextNode.col}`)) {
+                queue.push({ node: nextNode, path: [...path, node] });
+                visited.add(`${nextNode.row},${nextNode.col}`);
+            }
+        }
+    }
+    
+    // 沒有找到路徑
+    return null;
+}
+            </div>
+        </div>
+        
+        <!-- 遞迴搜尋 -->
+        <div id="recursive" class="tab-content">
+            <h2>二維鏈表遞迴搜尋</h2>
+            <p>遞迴搜尋是一種利用遞迴函數訪問二維鏈表的方法，特別適合深度優先搜尋（DFS）的應用。</p>
+            
+            <div class="visualization-container">
+                <div id="grid-recursive" class="matrix-container"></div>
+                <div class="status" id="recursive-status">點擊「生成網格」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="recursive-structure">
+                <!-- 顯示遞迴搜尋過程 -->
+            </div>
+            
+            <div class="controls">
+                <button id="recursive-generate">生成網格</button>
+                <select id="recursive-size">
+                    <option value="3">3x3</option>
+                    <option value="4">4x4</option>
+                    <option value="5" selected>5x5</option>
+                    <option value="6">6x6</option>
+                </select>
+                <button id="recursive-start" disabled>開始搜尋</button>
+                <button id="recursive-pause" disabled>暫停</button>
+                <button id="recursive-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="recursive-speed">速度:</label>
+                <input type="range" id="recursive-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f1f1f1;"></div>
+                    <span>未訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f39c12;"></div>
+                    <span>當前節點</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3498db;"></div>
+                    <span>已訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2ecc71;"></div>
+                    <span>找到目標</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e74c3c;"></div>
+                    <span>遞迴返回</span>
+                </div>
+            </div>
+            
+            <h3>遞迴深度優先搜尋</h3>
+            <div class="code-view">
+// 遞迴DFS搜尋值
+function recursiveDFS(node, targetValue, visited = new Set()) {
+    // 基礎情況：節點為null或已訪問
+    if (!node || visited.has(`${node.row},${node.col}`)) {
+        return null;
+    }
+    
+    // 標記為已訪問
+    visited.add(`${node.row},${node.col}`);
+    
+    // 找到目標值
+    if (node.value === targetValue) {
+        return node;
+    }
+    
+    // 遞迴訪問四個方向
+    return recursiveDFS(node.up, targetValue, visited) || 
+           recursiveDFS(node.right, targetValue, visited) || 
+           recursiveDFS(node.down, targetValue, visited) || 
+           recursiveDFS(node.left, targetValue, visited);
+}
+
+// 遞迴查找路徑
+function recursiveFindPath(node, end, path = [], visited = new Set()) {
+    // 基礎情況：節點為null或已訪問
+    if (!node || visited.has(`${node.row},${node.col}`)) {
+        return null;
+    }
+    
+    // 更新路徑和訪問集合
+    path.push(node);
+    visited.add(`${node.row},${node.col}`);
+    
+    // 找到終點
+    if (node === end) {
+        return path;
+    }
+    
+    // 遞迴訪問四個方向
+    const upPath = recursiveFindPath(node.up, end, [...path], new Set(visited));
+    if (upPath) return upPath;
+    
+    const rightPath = recursiveFindPath(node.right, end, [...path], new Set(visited));
+    if (rightPath) return rightPath;
+    
+    const downPath = recursiveFindPath(node.down, end, [...path], new Set(visited));
+    if (downPath) return downPath;
+    
+    const leftPath = recursiveFindPath(node.left, end, [...path], new Set(visited));
+    if (leftPath) return leftPath;
+    
+    // 沒有找到路徑
+    return null;
+}
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="../1_sorting/index.html" class="nav-button">上一個：排序演算法</a>
+            <a href="../3_divide_and_conquer/index.html" class="nav-button">下一個：分治法</a>
+        </div>
+    </div>
+    
+    <script src="2d_linked_list.js"></script>
+    <script src="representation.js"></script>
+    <script src="search.js"></script>
+    <script src="recursive_search.js"></script>
+</body>
+</html>
