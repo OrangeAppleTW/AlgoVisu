@@ -6,7 +6,9 @@ function getRandomArray(length = 15, min = 5, max = 100) {
 function disableButtons(prefix, disabled, exceptReset = false) {
     document.getElementById(`${prefix}-generate`).disabled = disabled;
     document.getElementById(`${prefix}-start`).disabled = disabled;
-    document.getElementById(`${prefix}-pause`).disabled = !disabled;
+    if (document.getElementById(`${prefix}-pause`)) {
+        document.getElementById(`${prefix}-pause`).disabled = !disabled;
+    }
     if (!exceptReset) {
         document.getElementById(`${prefix}-reset`).disabled = disabled;
     }
@@ -479,250 +481,13 @@ function initQuickSort() {
 }
 
 // ----- 合併排序 (Merge Sort) -----
+// 宣告全局變數給 mergesort-new.js 使用
 let mergeArray = [];
-let mergeArrayAux = []; // 用於存儲臨時數組
+let mergeArrayAux = [];
 let mergeSortRunning = false;
-let mergeSortPaused = false;
-
+// 初始化合併排序的空函數，後由 mergesort-new.js 替換
 function initMergeSort() {
-    const container = document.getElementById('merge-array');
-    const structureView = document.getElementById('merge-structure');
-    const generateBtn = document.getElementById('merge-generate');
-    const startBtn = document.getElementById('merge-start');
-    const pauseBtn = document.getElementById('merge-pause');
-    const resetBtn = document.getElementById('merge-reset');
-    const speedSlider = document.getElementById('merge-speed');
-    const statusText = document.getElementById('merge-status');
-    
-    generateBtn.addEventListener('click', generateMergeArray);
-    startBtn.addEventListener('click', startMergeSort);
-    pauseBtn.addEventListener('click', pauseMergeSort);
-    resetBtn.addEventListener('click', resetMergeSort);
-    
-    function generateMergeArray() {
-        resetMergeSort();
-        mergeArray = getRandomArray();
-        mergeArrayAux = [...mergeArray];
-        renderMergeArray();
-        startBtn.disabled = false;
-        resetBtn.disabled = false;
-        statusText.textContent = '數組已生成，點擊「開始排序」按鈕開始';
-        structureView.textContent = `原始數組: [${mergeArray.join(', ')}]`;
-    }
-    
-    function renderMergeArray(highlights = [], merging = [], sorted = []) {
-        container.innerHTML = '';
-        
-        const maxValue = Math.max(...mergeArray);
-        
-        mergeArray.forEach((value, index) => {
-            const bar = document.createElement('div');
-            bar.className = 'array-bar';
-            
-            // 設置高度和顯示值
-            const height = (value / maxValue) * 200;
-            bar.style.height = `${height}px`;
-            bar.textContent = value;
-            
-            // 設置顏色
-            if (merging.includes(index)) {
-                bar.classList.add('swapping');
-            } else if (highlights.includes(index)) {
-                bar.classList.add('comparing');
-            } else if (sorted.includes(index)) {
-                bar.classList.add('sorted');
-            }
-            
-            container.appendChild(bar);
-        });
-    }
-    
-    function updateStructureView(message) {
-        structureView.textContent = message;
-    }
-    
-    async function mergeSortAlgorithm() {
-        const speed = 101 - speedSlider.value;
-        const aux = [...mergeArray];
-        const n = mergeArray.length;
-        
-        // 顯示分治過程
-        await splitAndMerge(0, n - 1);
-        
-        // 分割並合併子數組
-        async function splitAndMerge(left, right) {
-            if (left >= right) return;
-            
-            if (mergeSortPaused) {
-                // 暫停時不覆蓋狀態文字，直接返回
-                return;
-            }
-            
-            const mid = Math.floor((left + right) / 2);
-            
-            // 可視化分割過程
-            const leftPart = mergeArray.slice(left, mid + 1);
-            const rightPart = mergeArray.slice(mid + 1, right + 1);
-            
-            statusText.textContent = `分割區間 [${left}...${right}] 為 [${left}...${mid}] 和 [${mid+1}...${right}]`;
-            
-            const highlightRange = Array.from({ length: right - left + 1 }, (_, i) => left + i);
-            renderMergeArray(highlightRange);
-            
-            let structureMessage = `分割: [${mergeArray.slice(left, right + 1).join(', ')}]\n`;
-            structureMessage += `左半部分: [${leftPart.join(', ')}]\n`;
-            structureMessage += `右半部分: [${rightPart.join(', ')}]`;
-            updateStructureView(structureMessage);
-            
-            await sleep(speed * 10);
-            
-            // 遞迴分割左右兩部分
-            await splitAndMerge(left, mid);
-            await splitAndMerge(mid + 1, right);
-            
-            // 合併兩個已排序的子數組
-            await merge(left, mid, right);
-        }
-        
-        // 合併兩個已排序的子數組
-        async function merge(left, mid, right) {
-            if (mergeSortPaused) {
-                // 暫停時不覆蓋狀態文字，直接返回
-                return;
-            }
-            
-            const leftPart = mergeArray.slice(left, mid + 1);
-            const rightPart = mergeArray.slice(mid + 1, right + 1);
-            
-            statusText.textContent = `合併區間 [${left}...${mid}] 和 [${mid+1}...${right}]`;
-            
-            let structureMessage = `合併: \n`;
-            structureMessage += `左半部分: [${leftPart.join(', ')}]\n`;
-            structureMessage += `右半部分: [${rightPart.join(', ')}]\n`;
-            updateStructureView(structureMessage);
-            
-            let i = left;
-            let j = mid + 1;
-            let k = left;
-            
-            const mergingIndices = Array.from({ length: right - left + 1 }, (_, i) => left + i);
-            renderMergeArray([], mergingIndices);
-            await sleep(speed * 10);
-            
-            while (i <= mid && j <= right) {
-                if (mergeSortPaused) {
-                    // 暫停時不覆蓋狀態文字，直接返回
-                    return;
-                }
-                
-                statusText.textContent = `比較: ${mergeArray[i]} 和 ${mergeArray[j]}`;
-                renderMergeArray([i, j], mergingIndices);
-                await sleep(speed * 10);
-                
-                if (mergeArray[i] <= mergeArray[j]) {
-                    aux[k] = mergeArray[i];
-                    i++;
-                } else {
-                    aux[k] = mergeArray[j];
-                    j++;
-                }
-                k++;
-                
-                // 更新當前合併狀態
-                structureMessage = `合併中: [${aux.slice(left, k).join(', ')}]`;
-                updateStructureView(structureMessage);
-            }
-            
-            // 複製剩餘元素
-            while (i <= mid) {
-                if (mergeSortPaused) {
-                    // 暫停時不覆蓋狀態文字，直接返回
-                    return;
-                }
-                
-                aux[k] = mergeArray[i];
-                i++;
-                k++;
-                
-                structureMessage = `合併中: [${aux.slice(left, k).join(', ')}]`;
-                updateStructureView(structureMessage);
-            }
-            
-            while (j <= right) {
-                if (mergeSortPaused) {
-                    // 暫停時不覆蓋狀態文字，直接返回
-                    return;
-                }
-                
-                aux[k] = mergeArray[j];
-                j++;
-                k++;
-                
-                structureMessage = `合併中: [${aux.slice(left, k).join(', ')}]`;
-                updateStructureView(structureMessage);
-            }
-            
-            // 將合併結果複製回原數組
-            for (let m = left; m <= right; m++) {
-                if (mergeSortPaused) {
-                    // 暫停時不覆蓋狀態文字，直接返回
-                    return;
-                }
-                
-                mergeArray[m] = aux[m];
-            }
-            
-            // 顯示合併後的結果
-            structureMessage = `合併完成: [${mergeArray.slice(left, right + 1).join(', ')}]`;
-            updateStructureView(structureMessage);
-            
-            const sortedIndices = Array.from({ length: right - left + 1 }, (_, i) => left + i);
-            renderMergeArray([], [], sortedIndices);
-            await sleep(speed * 10);
-        }
-        
-        // 顯示更詳細的完成訊息
-        statusText.textContent = `合併排序完成！最終數組: [${mergeArray.join(', ')}]`;
-        updateStructureView(`排序完成: [${mergeArray.join(', ')}]`);
-        renderMergeArray([], [], Array.from({ length: n }, (_, i) => i));
-        mergeSortRunning = false;
-        disableButtons('merge', false);
-    }
-    
-    function startMergeSort() {
-        if (!mergeSortRunning) {
-            mergeSortRunning = true;
-            mergeSortPaused = false;
-            disableButtons('merge', true);
-            mergeSortAlgorithm();
-        } else if (mergeSortPaused) {
-            mergeSortPaused = false;
-            disableButtons('merge', true);
-            mergeSortAlgorithm();
-        }
-    }
-    
-    function pauseMergeSort() {
-        mergeSortPaused = true;
-        // 不覆蓋原狀態文字，只在文字後面添加暫停提示
-        statusText.textContent = statusText.textContent + ' (已暫停)';
-        disableButtons('merge', false);
-    }
-    
-    function resetMergeSort() {
-        if (mergeSortRunning) {
-            mergeSortPaused = true;
-            mergeSortRunning = false;
-        }
-        mergeArray = [];
-        mergeArrayAux = [];
-        container.innerHTML = '';
-        structureView.textContent = '';
-        disableButtons('merge', false, true);
-        document.getElementById('merge-start').disabled = true;
-        document.getElementById('merge-reset').disabled = true;
-        statusText.textContent = '請點擊「生成數組」按鈕開始';
-    }
+    // 空函數，將由 mergesort-new.js 中的新實現替換
 }
 
 // 頁簽切換功能
@@ -765,90 +530,12 @@ function initCodeTabs() {
     });
 }
 
-// 確保暫停修復
-function fixPauseIssue() {
-    // 為 mergeSort 添加安全機制
-    const originalPauseMergeSort = pauseMergeSort;
-    if (typeof window.originalMergeSortAlgorithm === 'undefined') {
-        window.originalMergeSortAlgorithm = mergeSortAlgorithm;
-        
-        mergeSortAlgorithm = async function() {
-            const speed = 101 - speedSlider.value;
-            const aux = [...mergeArray];
-            const n = mergeArray.length;
-            let sortCompleted = false;
-            
-            try {
-                await splitAndMerge(0, n - 1);
-                
-                if (!mergeSortPaused) {
-                    sortCompleted = true;
-                    statusText.textContent = `合併排序完成！最終數組: [${mergeArray.join(', ')}]`;
-                    updateStructureView(`排序完成: [${mergeArray.join(', ')}]`);
-                    renderMergeArray([], [], Array.from({ length: n }, (_, i) => i));
-                }
-            } catch (e) {
-                console.error('排序錯誤:', e);
-            } finally {
-                if (sortCompleted && !mergeSortPaused) {
-                    mergeSortRunning = false;
-                    disableButtons('merge', false);
-                } else if (mergeSortPaused) {
-                    // 如果是暫停狀態，不改變排序運行狀態
-                    disableButtons('merge', false);
-                }
-            }
-            
-            async function splitAndMerge(left, right) {
-                if (left >= right) return;
-                
-                if (mergeSortPaused) {
-                    return; // 暫停時立即返回
-                }
-                
-                // 原有的分割邏輯
-                // ...
-            }
-            
-            async function merge(left, mid, right) {
-                if (mergeSortPaused) {
-                    return; // 暫停時立即返回
-                }
-                
-                // 原有的合併邏輯
-                // ...
-            }
-        };
-    }
-}
-
-// 導入修復合併排序暫停需題的功能
-function applyMergeSortFix() {
-    // 讀取修復後的程式碼
-    const script = document.createElement('script');
-    script.src = 'mergesort-fix.js'; // 確保這個檔案可存取
-    script.onload = function() {
-        // 替換原始的 initMergeSort 函數
-        if (typeof fixedInitMergeSort !== 'undefined') {
-            // 如果修復後的函數存在，將其覆蓋原函數
-            initMergeSort = fixedInitMergeSort;
-            
-            // 重新初始化合併排序的元素
-            initMergeSort();
-            console.log('合併排序暫停功能已修復');
-        }
-    };
-    document.head.appendChild(script);
-}
-
 // 頁面加載時初始化所有排序算法
 document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initBubbleSort();
     initInsertionSort();
     initQuickSort();
-    initMergeSort();
+    initMergeSort(); // 初始化合併排序，會由 mergesort-new.js 提供的新實現替換
     initCodeTabs(); // 初始化程式碼選項卡功能
-    // fixPauseIssue(); // 修復暫停問題
-    applyMergeSortFix(); // 應用合併排序暫停問題修復
 });

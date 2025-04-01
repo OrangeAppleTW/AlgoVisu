@@ -216,7 +216,7 @@ button:disabled {
     font-family: monospace;
     overflow-x: auto;
     overflow-y: auto;
-    max-height: 400px;
+    max-height: 600px; /* 增大高度以適應更多內容 */
     line-height: 1.4;
     font-size: 14px;
 }

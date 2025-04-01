@@ -601,7 +601,6 @@ void quickSort(int arr[], int low, int high) {
             <div class="controls">
                 <button id="merge-generate">生成數組</button>
                 <button id="merge-start" disabled>開始排序</button>
-                <button id="merge-pause" disabled>暫停</button>
                 <button id="merge-reset" disabled>重置</button>
             </div>
             
@@ -893,6 +892,36 @@ void mergeSort(int arr[], int n) {
         </div>
     </div>
     
+    <script>
+        // 先清除任何可能的寫入完成事件
+        window.addEventListener('DOMContentLoaded', function() {
+            try {
+                // 刪除已不存在的暫停按鈕的引用
+                const pauseBtn = document.getElementById('merge-pause');
+                if (pauseBtn) {
+                    pauseBtn.parentNode.removeChild(pauseBtn);
+                }
+                
+                // 確保 merge-structure 元素存在
+                const structureView = document.getElementById('merge-structure');
+                if (!structureView) {
+                    const mergeTabContent = document.getElementById('merge');
+                    if (mergeTabContent) {
+                        const newStructureView = document.createElement('div');
+                        newStructureView.id = 'merge-structure';
+                        newStructureView.className = 'structure-view';
+                        const arrayContainer = document.getElementById('merge-array');
+                        if (arrayContainer && arrayContainer.parentNode) {
+                            arrayContainer.parentNode.insertBefore(newStructureView, arrayContainer.nextSibling);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('預處理合併排序元素時發生錯誤:', e);
+            }
+        });
+    </script>
     <script src="sorting.js"></script>
+    <script src="mergesort.js"></script>
 </body>
 </html>
