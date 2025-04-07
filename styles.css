@@ -212,13 +212,113 @@ button:disabled {
     padding: 15px;
     margin-top: 20px;
     background-color: white;
-    white-space: pre;
-    font-family: monospace;
     overflow-x: auto;
     overflow-y: auto;
     max-height: 600px; /* 增大高度以適應更多內容 */
-    line-height: 1.4;
     font-size: 14px;
+}
+
+/* 快速排序樹狀結構視圖的樣式 */
+.divide-title {
+    text-align: center;
+    margin: 15px 0 5px;
+    color: #333;
+    font-size: 1.3em;
+}
+
+.depth-container {
+    margin: 40px 0;
+    position: relative;
+    border: 1px solid #eee;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.depth-label {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+    background-color: #e1f5fe;
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 16px;
+}
+
+.subarrays-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.subarray {
+    padding: 10px;
+    border-radius: 5px;
+    position: relative;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.array-content {
+    font-family: monospace;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: auto;
+    max-width: 100%;
+    padding: 5px;
+    text-align: center;
+}
+
+.root-subarray {
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+}
+
+.completed-subarray {
+    background-color: #e8f5e9;
+    border: 1px solid #c8e6c9;
+}
+
+.pending-subarray {
+    background-color: #e3f2fd;
+    border: 1px solid #bbdefb;
+}
+
+.single-element {
+    background-color: #f3e5f5;
+    border: 1px solid #e1bee7;
+}
+
+.pivot-mark {
+    position: absolute;
+    bottom: -25px;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #e74c3c;
+    text-align: center;
+    line-height: 1.2;
+    font-weight: bold;
+}
+
+.current-step {
+    box-shadow: 0 0 8px #3498db;
+    border-color: #3498db;
+    z-index: 10;
+    transform: scale(1.05);
+}
+
+.left-partition {
+    box-shadow: 0 0 5px #2ecc71;
+    border-color: #2ecc71;
+}
+
+.right-partition {
+    box-shadow: 0 0 5px #f39c12;
+    border-color: #f39c12;
 }
 
 /* 程式碼容器和選項卡樣式 */

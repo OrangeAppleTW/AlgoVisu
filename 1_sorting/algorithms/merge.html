@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合併排序 - 排序演算法視覺化</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="../module-styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>排序演算法視覺化</h1>
+        
+        <div class="tabs">
+            <div class="tab" data-tab="bubble">氣泡排序</div>
+            <div class="tab" data-tab="insertion">插入排序</div>
+            <div class="tab" data-tab="quick">快速排序</div>
+            <div class="tab active" data-tab="merge">合併排序</div>
+        </div>
+        
+        <div id="merge" class="tab-content active">
+            <h2>合併排序 (Merge Sort)</h2>
+            <p>合併排序是一種分治法的排序演算法，它將數組分成兩半，遞迴地對它們進行排序，然後將排序後的子數組合併。</p>
+            
+            <div class="visualization-container">
+                <div class="array-container" id="merge-array"></div>
+                <div class="status" id="merge-status">請點擊「生成數組」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="merge-structure">
+                <!-- 顯示合併排序過程中的子數組和合併過程 -->
+            </div>
+            
+            <div class="controls">
+                <button id="merge-generate">生成數組</button>
+                <button id="merge-start" disabled>開始排序</button>
+                <button id="merge-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="merge-speed">速度:</label>
+                <input type="range" id="merge-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #3498db;"></div>
+                    <span>未排序</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f39c12;"></div>
+                    <span>當前處理</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #9b59b6;"></div>
+                    <span>合併中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2ecc71;"></div>
+                    <span>已排序</span>
+                </div>
+            </div>
+            
+            <h3>演算法說明</h3>
+            <p>合併排序是一種穩定的排序算法，基於分治法的思想。它的基本步驟是：</p>
+            <ol>
+                <li>將數組分成兩半</li>
+                <li>遞迴排序左半部分和右半部分</li>
+                <li>合併兩個已排序的部分</li>
+            </ol>
+            
+            <h3>時間複雜度</h3>
+            <ul>
+                <li>最壞情況: O(n log n)</li>
+                <li>平均情況: O(n log n)</li>
+                <li>最好情況: O(n log n)</li>
+            </ul>
+            
+            <h3>空間複雜度</h3>
+            <p>O(n) - 需要額外的空間來存儲合併時的臨時數組</p>
+            
+            <div class="code-container">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-code="pseudo-merge">演算法</div>
+                    <div class="code-tab" data-code="python-merge">Python</div>
+                    <div class="code-tab" data-code="cpp-merge">C++</div>
+                    <div class="code-tab" data-code="c-merge">C</div>
+                    <div class="code-tab" data-code="js-merge">JavaScript</div>
+                </div>
+                
+                <div class="code-view" id="js-merge">
+function mergeSort(arr) {
+    if (arr.length <= 1) {
+        return arr;
+    }
+    
+    // 將數組分成兩半
+    const mid = Math.floor(arr.length / 2);
+    const left = arr.slice(0, mid);
+    const right = arr.slice(mid);
+    
+    // 遞迴排序左右兩部分
+    return merge(mergeSort(left), mergeSort(right));
+}
+
+function merge(left, right) {
+    let result = [];
+    let leftIndex = 0;
+    let rightIndex = 0;
+    
+    // 比較左右兩部分的元素，將較小的放入結果數組
+    while (leftIndex < left.length && rightIndex < right.length) {
+        if (left[leftIndex] < right[rightIndex]) {
+            result.push(left[leftIndex]);
+            leftIndex++;
+        } else {
+            result.push(right[rightIndex]);
+            rightIndex++;
+        }
+    }
+    
+    // 將剩餘元素加入結果數組
+    return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
+}
+                </div>
+                
+                <div class="code-view" id="python-merge">
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+        
+    # 將數組分成兩半
+    mid = len(arr) // 2
+    left = arr[:mid]
+    right = arr[mid:]
+    
+    # 遞迴排序左右兩部分
+    left = merge_sort(left)
+    right = merge_sort(right)
+    
+    # 合併已排序的兩部分
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    left_index = right_index = 0
+    
+    # 比較左右兩部分的元素，將較小的放入結果數組
+    while left_index < len(left) and right_index < len(right):
+        if left[left_index] < right[right_index]:
+            result.append(left[left_index])
+            left_index += 1
+        else:
+            result.append(right[right_index])
+            right_index += 1
+    
+    # 將剩餘元素加入結果數組
+    result.extend(left[left_index:])
+    result.extend(right[right_index:])
+    
+    return result
+                </div>
+                
+                <div class="code-view" id="cpp-merge">
+#include <vector>
+
+std::vector<int> merge(const std::vector<int>& left, const std::vector<int>& right) {
+    std::vector<int> result;
+    size_t leftIndex = 0, rightIndex = 0;
+    
+    // 比較左右兩部分的元素，將較小的放入結果數組
+    while (leftIndex < left.size() && rightIndex < right.size()) {
+        if (left[leftIndex] < right[rightIndex]) {
+            result.push_back(left[leftIndex]);
+            leftIndex++;
+        } else {
+            result.push_back(right[rightIndex]);
+            rightIndex++;
+        }
+    }
+    
+    // 將剩餘元素加入結果數組
+    while (leftIndex < left.size()) {
+        result.push_back(left[leftIndex]);
+        leftIndex++;
+    }
+    
+    while (rightIndex < right.size()) {
+        result.push_back(right[rightIndex]);
+        rightIndex++;
+    }
+    
+    return result;
+}
+
+std::vector<int> mergeSort(std::vector<int> arr) {
+    if (arr.size() <= 1) {
+        return arr;
+    }
+    
+    // 將數組分成兩半
+    size_t mid = arr.size() / 2;
+    std::vector<int> left(arr.begin(), arr.begin() + mid);
+    std::vector<int> right(arr.begin() + mid, arr.end());
+    
+    // 遞迴排序左右兩部分
+    left = mergeSort(left);
+    right = mergeSort(right);
+    
+    // 合併已排序的兩部分
+    return merge(left, right);
+}
+                </div>
+                
+                <div class="code-view" id="c-merge">
+#include <stdlib.h>
+
+// 合併兩個已排序的子數組
+ void merge(int arr[], int left, int mid, int right) {
+    int i, j, k;
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+    
+    // 創建臨時數組
+    int* L = (int*)malloc(n1 * sizeof(int));
+    int* R = (int*)malloc(n2 * sizeof(int));
+    
+    // 複製數據到臨時數組
+    for (i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+    
+    // 合併臨時數組回到arr[left..right]
+    i = 0;
+    j = 0;
+    k = left;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+    
+    // 複製剩餘元素
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+    
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+    
+    // 釋放臨時數組
+    free(L);
+    free(R);
+}
+
+void mergeSortHelper(int arr[], int left, int right) {
+    if (left < right) {
+        // 找到中間點
+        int mid = left + (right - left) / 2;
+        
+        // 遞迴排序兩半
+        mergeSortHelper(arr, left, mid);
+        mergeSortHelper(arr, mid + 1, right);
+        
+        // 合併兩半
+        merge(arr, left, mid, right);
+    }
+}
+
+void mergeSort(int arr[], int n) {
+    mergeSortHelper(arr, 0, n - 1);
+}
+                </div>
+                
+                <div class="code-view active" id="pseudo-merge">
+## 合併排序算法
+
+輸入: 一個數組 array
+輸出: 排序後的數組
+
+### 主要函數 mergeSort(array):
+1. 如果數組長度小於等於 1，直接返回數組
+2. 找到中間點: mid = 數組長度 / 2 (取整)
+3. 將數組分割為兩個子數組:
+   - 左子數組 = array[0...mid-1]
+   - 右子數組 = array[mid...n-1]
+4. 遞迴對左右子數組進行排序:
+   - 左子數組 = mergeSort(左子數組)
+   - 右子數組 = mergeSort(右子數組)
+5. 合併兩個已排序的子數組: 返回 merge(左子數組, 右子數組)
+
+### 合併函數 merge(left, right):
+1. 創建空的結果數組 result
+2. 初始化左右子數組的索引: leftIndex = 0, rightIndex = 0
+3. 比較兩個子數組的元素，將較小的放入結果數組:
+   - 當 leftIndex < 左子數組長度 且 rightIndex < 右子數組長度 時:
+     a. 如果 left[leftIndex] < right[rightIndex]:
+        - 將 left[leftIndex] 加入 result
+        - leftIndex 增加 1
+     b. 否則:
+        - 將 right[rightIndex] 加入 result
+        - rightIndex 增加 1
+4. 將剩餘元素加入結果數組:
+   - 將 left 中剩餘元素加入 result
+   - 將 right 中剩餘元素加入 result
+5. 返回結果數組 result
+                </div>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="../index.html" class="nav-button">返回選擇畫面</a>
+            <a href="../../index.html" class="nav-button">返回主頁</a>
+        </div>
+    </div>
+    
+    <!-- 載入所需的腳本檔案 -->
+    <script src="../sorting.js"></script>
+    <script src="../mergesort.js"></script>
+    <script>
+        // 頁簽切換功能（簡化版，僅用於直接導航）
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化合併排序
+            initMergeSort();
+            initCodeTabs();
+            
+            // 確保合併排序的結構視圖正確顯示
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    let structureView = document.getElementById('merge-structure');
+                    if (structureView) {
+                        structureView.style.display = 'block';
+                    }
+                }, 500);
+            });
+            
+            // 頁簽點擊事件 - 導航到對應頁面
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const algorithmName = this.getAttribute('data-tab');
+                    if (algorithmName !== 'merge') {
+                        window.location.href = `${algorithmName}.html`;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
