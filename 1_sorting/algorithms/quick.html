@@ -6,6 +6,30 @@
     <title>快速排序 - 排序演算法視覺化</title>
     <link rel="stylesheet" href="../../styles.css">
     <link rel="stylesheet" href="../module-styles.css">
+    <!-- 引入D3.js庫 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .info-panel {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .info-panel h4 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+        
+        .info-panel p {
+            margin: 8px 0;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -23,12 +47,16 @@
             <p>快速排序是一種分治法的排序演算法，它選擇一個元素作為基準，然後將數組分為兩部分，一部分小於基準，另一部分大於基準。</p>
             
             <div class="visualization-container">
-                <div class="array-container" id="quick-array"></div>
+                <!-- D3.js 視覺化區域 -->
+                <svg id="quick-svg" width="100%" height="280"></svg>
                 <div class="status" id="quick-status">請點擊「生成數組」按鈕開始</div>
-            </div>
-            
-            <div class="structure-view" id="quick-structure">
-                <!-- 顯示快速排序過程中的分治過程 -->
+                <div class="info-panel">
+                    <h4>快速排序分區過程說明</h4>
+                    <p><span style="color: #e74c3c; font-weight: bold;">i</span>: 小於等於基準的元素區域的邊界指針 (初始為 low-1)</p>
+                    <p><span style="color: #3498db; font-weight: bold;">j</span>: 遍歷數組的指針 (從 low 到 high-1)</p>
+                    <p><span style="color: #e74c3c; font-weight: bold;">基準元素</span>: 選擇最右側元素作為基準，排序後會放在 i+1 位置</p>
+                    <p>算法核心: 每當找到小於等於基準的元素，就增加 i 並交換元素，確保 i 左側的元素都小於等於基準</p>
+                </div>
             </div>
             
             <div class="controls">
@@ -262,25 +290,12 @@ void quickSort(int arr[], int low, int high) {
     </div>
     
     <!-- 載入所需的腳本檔案 -->
-    <script src="../sorting.js"></script>
-    <script src="../quicksort.js"></script>
+    <script src="../quick-sort-d3.js"></script>
     <script>
         // 頁簽切換功能（簡化版，僅用於直接導航）
         document.addEventListener('DOMContentLoaded', function() {
-            // 初始化快速排序
-            initQuickSort();
+            // 初始化程式碼選項卡功能
             initCodeTabs();
-            
-            // 確保快速排序結構視圖正確顯示
-            window.addEventListener('load', function() {
-                setTimeout(function() {
-                    let structureView = document.getElementById('quick-structure');
-                    if (structureView) {
-                        structureView.style.display = 'block';
-                        structureView.style.minHeight = '150px';
-                    }
-                }, 500);
-            });
             
             // 頁簽點擊事件 - 導航到對應頁面
             const tabs = document.querySelectorAll('.tab');
@@ -293,6 +308,26 @@ void quickSort(int arr[], int low, int high) {
                 });
             });
         });
+        
+        // 程式碼選項卡切換功能
+        function initCodeTabs() {
+            const codeTabs = document.querySelectorAll('.code-tab');
+            
+            codeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const codeId = tab.getAttribute('data-code');
+                    const parentContainer = tab.closest('.code-container');
+                    
+                    // 移除該容器內所有活動狀態
+                    parentContainer.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+                    parentContainer.querySelectorAll('.code-view').forEach(view => view.classList.remove('active'));
+                    
+                    // 設置活動狀態
+                    tab.classList.add('active');
+                    document.getElementById(codeId).classList.add('active');
+                });
+            });
+        }
     </script>
 </body>
 </html>

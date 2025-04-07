@@ -33,6 +33,12 @@ function initBubbleSort() {
     const speedSlider = document.getElementById('bubble-speed');
     const statusText = document.getElementById('bubble-status');
     
+    // 確保所有必要的元素都存在
+    if (!container || !generateBtn || !startBtn || !pauseBtn || !resetBtn || !speedSlider || !statusText) {
+        console.warn('氣泡排序初始化失敗: 缺少必要的 DOM 元素');
+        return;
+    }
+    
     generateBtn.addEventListener('click', generateBubbleArray);
     startBtn.addEventListener('click', startBubbleSort);
     pauseBtn.addEventListener('click', pauseBubbleSort);
@@ -172,6 +178,12 @@ function initInsertionSort() {
     const resetBtn = document.getElementById('insertion-reset');
     const speedSlider = document.getElementById('insertion-speed');
     const statusText = document.getElementById('insertion-status');
+    
+    // 確保所有必要的元素都存在
+    if (!container || !generateBtn || !startBtn || !pauseBtn || !resetBtn || !speedSlider || !statusText) {
+        console.warn('插入排序初始化失敗: 缺少必要的 DOM 元素');
+        return;
+    }
     
     generateBtn.addEventListener('click', generateInsertionArray);
     startBtn.addEventListener('click', startInsertionSort);
@@ -317,6 +329,12 @@ function initQuickSort() {
     const speedSlider = document.getElementById('quick-speed');
     const statusText = document.getElementById('quick-status');
     
+    // 確保所有必要的元素都存在
+    if (!container || !generateBtn || !startBtn || !pauseBtn || !resetBtn || !speedSlider || !statusText) {
+        console.warn('快速排序初始化失敗: 缺少必要的 DOM 元素');
+        return;
+    }
+    
     generateBtn.addEventListener('click', generateQuickArray);
     startBtn.addEventListener('click', startQuickSort);
     pauseBtn.addEventListener('click', pauseQuickSort);
@@ -324,35 +342,47 @@ function initQuickSort() {
     
     function generateQuickArray() {
         resetQuickSort();
-        quickArray = getRandomArray();
+        // 創建帶有位置和ID信息的數組
+        quickArray = getRandomArray().map((value, index) => ({
+            id: index,
+            value: value,
+            position: index,
+            state: 'unsorted'
+        }));
         renderQuickArray();
         startBtn.disabled = false;
         resetBtn.disabled = false;
         statusText.textContent = '數組已生成，點擊「開始排序」按鈕開始';
     }
     
-    function renderQuickArray(pivot = -1, comparing = -1, swapping = -1, sorted = []) {
+    function renderQuickArray(comparingPos = [], swappingPos = [], pivotPos = -1, sortedPos = []) {
         container.innerHTML = '';
         
-        const maxValue = Math.max(...quickArray);
+        // 獲取數值
+        const values = quickArray.map(item => item.value);
+        const maxValue = Math.max(...values);
         
-        quickArray.forEach((value, index) => {
+        // 按position排序來確保渲染順序正確
+        const sortedByPosition = [...quickArray].sort((a, b) => a.position - b.position);
+        
+        sortedByPosition.forEach((item) => {
             const bar = document.createElement('div');
             bar.className = 'array-bar';
+            bar.id = `quick-bar-${item.id}`;
             
             // 設置高度和顯示值
-            const height = (value / maxValue) * 200;
+            const height = (item.value / maxValue) * 200;
             bar.style.height = `${height}px`;
-            bar.textContent = value;
+            bar.textContent = item.value;
             
             // 設置顏色
-            if (index === pivot) {
+            if (pivotPos !== -1 && item.position === pivotPos) {
                 bar.classList.add('pivot');
-            } else if (index === comparing) {
+            } else if (comparingPos.includes(item.position)) {
                 bar.classList.add('comparing');
-            } else if (index === swapping) {
+            } else if (swappingPos.includes(item.position)) {
                 bar.classList.add('swapping');
-            } else if (sorted.includes(index)) {
+            } else if (sortedPos.includes(item.position)) {
                 bar.classList.add('sorted');
             }
             
@@ -362,9 +392,12 @@ function initQuickSort() {
     
     async function quickSortAlgorithm(low = 0, high = quickArray.length - 1, sorted = []) {
         if (low >= high) {
-            if (low >= 0 && low < quickArray.length && !sorted.includes(low)) {
-                sorted.push(low);
-                renderQuickArray(-1, -1, -1, sorted);
+            if (low >= 0 && low < quickArray.length) {
+                const posToCheck = quickArray.findIndex(item => item.position === low);
+                if (posToCheck !== -1 && !sorted.includes(low)) {
+                    sorted.push(low);
+                    renderQuickArray([], [], -1, sorted);
+                }
             }
             return;
         }
@@ -377,11 +410,12 @@ function initQuickSort() {
         const speed = 101 - speedSlider.value;
         
         // 選擇基準元素
-        const pivotIndex = high;
-        const pivot = quickArray[pivotIndex];
+        const pivotPos = high;
+        const pivotItem = quickArray.find(item => item.position === pivotPos);
+        const pivotValue = pivotItem ? pivotItem.value : null;
         
-        statusText.textContent = `選擇基準元素: ${pivot}`;
-        renderQuickArray(pivotIndex, -1, -1, sorted);
+        statusText.textContent = `選擇基準元素: ${pivotValue}`;
+        renderQuickArray([], [], pivotPos, sorted);
         await sleep(speed * 15);
         
         let i = low - 1;
@@ -392,40 +426,59 @@ function initQuickSort() {
                 return;
             }
             
+            // 找到在position j的元素
+            const currentItem = quickArray.find(item => item.position === j);
+            if (!currentItem || !pivotItem) continue;
+            
             // 顯示正在比較的元素
-            statusText.textContent = `比較元素 ${quickArray[j]} 和基準 ${pivot}`;
-            renderQuickArray(pivotIndex, j, -1, sorted);
+            statusText.textContent = `比較元素 ${currentItem.value} 和基準 ${pivotValue}`;
+            renderQuickArray([j], [], pivotPos, sorted);
             await sleep(speed * 10);
             
-            if (quickArray[j] <= pivot) {
+            if (currentItem.value <= pivotValue) {
                 i++;
                 
+                // 找到在position i的元素
+                const iItem = quickArray.find(item => item.position === i);
+                if (!iItem) continue;
+                
                 // 顯示交換過程
-                statusText.textContent = `交換元素 ${quickArray[i]} 和 ${quickArray[j]}`;
-                renderQuickArray(pivotIndex, -1, j, sorted);
+                statusText.textContent = `交換元素 ${iItem.value} 和 ${currentItem.value}`;
+                renderQuickArray([], [i, j], pivotPos, sorted);
                 await sleep(speed * 10);
                 
-                [quickArray[i], quickArray[j]] = [quickArray[j], quickArray[i]];
-                renderQuickArray(pivotIndex, -1, -1, sorted);
+                // 交換位置（而不是值）
+                const tempPosition = iItem.position;
+                iItem.position = currentItem.position;
+                currentItem.position = tempPosition;
+                
+                renderQuickArray([], [], pivotPos, sorted);
                 await sleep(speed * 5);
             }
         }
         
         // 將基準元素放到正確位置
-        statusText.textContent = `將基準元素 ${pivot} 放到最終位置`;
-        renderQuickArray(pivotIndex, -1, i + 1, sorted);
+        const newPivotPos = i + 1;
+        const newPivotItem = quickArray.find(item => item.position === newPivotPos);
+        
+        statusText.textContent = `將基準元素 ${pivotValue} 放到最終位置`;
+        renderQuickArray([], [newPivotPos, pivotPos], pivotPos, sorted);
         await sleep(speed * 10);
         
-        [quickArray[i + 1], quickArray[high]] = [quickArray[high], quickArray[i + 1]];
+        // 交換位置（而不是值）
+        if (newPivotItem && pivotItem) {
+            const tempPosition = newPivotItem.position;
+            newPivotItem.position = pivotItem.position;
+            pivotItem.position = tempPosition;
+        }
         
-        const newPivotIndex = i + 1;
-        sorted.push(newPivotIndex);
-        renderQuickArray(-1, -1, -1, sorted);
+        sorted.push(newPivotPos);
+        renderQuickArray([], [], -1, sorted);
         await sleep(speed * 10);
         
         // 遞迴排序基準元素的左右兩部分
-        await quickSortAlgorithm(low, newPivotIndex - 1, sorted);
-        await quickSortAlgorithm(newPivotIndex + 1, high, sorted);
+        await quickSortAlgorithm(low, newPivotPos - 1, sorted);
+        await quickSortAlgorithm(newPivotPos + 1, high, sorted);
         
         return;
     }
@@ -441,7 +494,7 @@ function initQuickSort() {
             
             if (!quickSortPaused) {
                 statusText.textContent = '排序完成！';
-                renderQuickArray(-1, -1, -1, Array.from({ length: quickArray.length }, (_, i) => i));
+                renderQuickArray([], [], -1, Array.from({ length: quickArray.length }, (_, i) => i));
                 quickSortRunning = false;
                 disableButtons('quick', false);
             }
@@ -452,7 +505,7 @@ function initQuickSort() {
             
             if (!quickSortPaused) {
                 statusText.textContent = '排序完成！';
-                renderQuickArray(-1, -1, -1, Array.from({ length: quickArray.length }, (_, i) => i));
+                renderQuickArray([], [], -1, Array.from({ length: quickArray.length }, (_, i) => i));
                 quickSortRunning = false;
                 disableButtons('quick', false);
             }
@@ -533,9 +586,23 @@ function initCodeTabs() {
 // 頁面加載時初始化所有排序算法
 document.addEventListener('DOMContentLoaded', () => {
     initTabs();
-    initBubbleSort();
-    initInsertionSort();
-    initQuickSort();
-    initMergeSort(); // 初始化合併排序，會由 mergesort-new.js 提供的新實現替換
+    
+    // 只在元素存在時才初始化對應的排序算法
+    if (document.getElementById('bubble-array')) {
+        initBubbleSort();
+    }
+    
+    if (document.getElementById('insertion-array')) {
+        initInsertionSort();
+    }
+    
+    if (document.getElementById('quick-array')) {
+        initQuickSort();
+    }
+    
+    if (document.getElementById('merge-array')) {
+        initMergeSort(); // 初始化合併排序，會由 mergesort-new.js 提供的新實現替換
+    }
+    
     initCodeTabs(); // 初始化程式碼選項卡功能
 });
