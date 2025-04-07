@@ -6,6 +6,8 @@
     <title>插入排序 - 排序演算法視覺化</title>
     <link rel="stylesheet" href="../../styles.css">
     <link rel="stylesheet" href="../module-styles.css">
+    <!-- 引入D3.js庫 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -23,7 +25,8 @@
             <p>插入排序是一種簡單且高效的排序演算法，它通過構建有序序列，對於未排序數據，在已排序序列中從後向前掃描，找到相應位置並插入。</p>
             
             <div class="visualization-container">
-                <div class="array-container" id="insertion-array"></div>
+                <!-- D3.js 視覺化區域 -->
+                <svg id="insertion-svg" width="100%" height="240"></svg>
                 <div class="status" id="insertion-status">請點擊「生成數組」按鈕開始</div>
             </div>
             
@@ -191,12 +194,11 @@ void insertionSort(int arr[], int n) {
     </div>
     
     <!-- 載入所需的腳本檔案 -->
-    <script src="../sorting.js"></script>
+    <script src="../insertion-sort-d3.js"></script>
     <script>
         // 頁簽切換功能（簡化版，僅用於直接導航）
         document.addEventListener('DOMContentLoaded', function() {
-            // 初始化插入排序
-            initInsertionSort();
+            // 初始化程式碼選項卡
             initCodeTabs();
             
             // 頁簽點擊事件 - 導航到對應頁面
@@ -210,6 +212,26 @@ void insertionSort(int arr[], int n) {
                 });
             });
         });
+
+        // 程式碼選項卡切換功能
+        function initCodeTabs() {
+            const codeTabs = document.querySelectorAll('.code-tab');
+            
+            codeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const codeId = tab.getAttribute('data-code');
+                    const parentContainer = tab.closest('.code-container');
+                    
+                    // 移除該容器內所有活動狀態
+                    parentContainer.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+                    parentContainer.querySelectorAll('.code-view').forEach(view => view.classList.remove('active'));
+                    
+                    // 設置活動狀態
+                    tab.classList.add('active');
+                    document.getElementById(codeId).classList.add('active');
+                });
+            });
+        }
     </script>
 </body>
 </html>
