@@ -194,7 +194,7 @@ void insertionSort(int arr[], int n) {
     </div>
     
     <!-- 載入所需的腳本檔案 -->
-    <script src="../insertion-sort-d3.js"></script>
+    <script src="insertion-sort-d3.js"></script>
     <script>
         // 頁簽切換功能（簡化版，僅用於直接導航）
         document.addEventListener('DOMContentLoaded', function() {
@@ -207,7 +207,7 @@ void insertionSort(int arr[], int n) {
                 tab.addEventListener('click', function() {
                     const algorithmName = this.getAttribute('data-tab');
                     if (algorithmName !== 'insertion') {
-                        window.location.href = `${algorithmName}.html`;
+                        window.location.href = `../${algorithmName}-sort/${algorithmName}.html`;
                     }
                 });
             });

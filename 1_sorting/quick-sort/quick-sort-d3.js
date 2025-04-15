@@ -37,10 +37,10 @@ function initSvg() {
     d3.select('#quick-svg').selectAll('*').remove();
     
     // 設置邊界 - 足夠的邊距讓視覺效果美觀
-    const margin = { top: 30, right: 80, bottom: 70, left: 80 }; // 增加底部邊距以顯示指針
+    const margin = { top: 30, right: 80, bottom: 140, left: 80 }; // 大幅增加底部邊距
     const svg = d3.select('#quick-svg');
     const width = parseInt(svg.style('width')) || 800;
-    const height = parseInt(svg.style('height')) || 280;
+    const height = parseInt(svg.style('height')) || 400;
     
     // 添加一個圖形容器，用於繪製柱狀圖
     svg.append('g')
@@ -50,7 +50,7 @@ function initSvg() {
     // 添加一個容器用於顯示指針
     svg.append('g')
        .attr('class', 'pointers-container')
-       .attr('transform', `translate(${margin.left}, ${height - margin.bottom + 20})`);
+       .attr('transform', `translate(${margin.left}, ${height - margin.bottom + 30})`);
 }
 
 // 生成隨機數組
@@ -83,9 +83,9 @@ function renderQuickArray(comparingPos = [], swappingPos = [], pivotPos = -1, so
     
     // 設置SVG基本參數
     const svg = d3.select('#quick-svg');
-    const margin = { top: 30, right: 80, bottom: 70, left: 80 }; // 增加底部邊距以顯示指針
+    const margin = { top: 30, right: 80, bottom: 140, left: 80 }; // 大幅增加底部邊距
     const width = parseInt(svg.style('width')) || 800;
-    const height = parseInt(svg.style('height')) || 280;
+    const height = parseInt(svg.style('height')) || 400;
     const contentWidth = width - margin.left - margin.right;
     const contentHeight = height - margin.top - margin.bottom;
     
@@ -193,22 +193,35 @@ function renderPointers(xScale, centerOffset, i, j) {
     // 如果 i 或 j 不在範圍內，不渲染
     if (i < -1 && j < 0) return;
     
+    // 安全地計算xScale的範圍
+    const domainRange = xScale.domain();
+    const domainMin = Math.min(...domainRange);
+    const domainMax = Math.max(...domainRange);
+    
     // 繪製 i 指針 (圓形)
     if (i >= -1) {
         // 計算指針位置
         let iPos = i;
+        let iPosX;
+        
         if (i === -1) {
             // 如果 i 是 -1，將指針放在左邊緣前方
-            iPos = -0.5;
+            iPosX = centerOffset; // 在第一個柱子的左邊
+        } else if (i >= domainMin && i <= domainMax) {
+            // 正常情況，iPos在範圍內
+            iPosX = centerOffset + xScale(i) + xScale.bandwidth() / 2;
+        } else {
+            // iPos超出範圍，放在左邊或右邊
+            iPosX = (i < domainMin) ? 
+                    centerOffset : 
+                    centerOffset + xScale(domainMax) + xScale.bandwidth();
         }
-        
-        const iPosX = centerOffset + xScale(iPos) + xScale.bandwidth() / 2;
         
         // 繪製指針背景
         pointersContainer.append('circle')
             .attr('cx', iPosX)
-            .attr('cy', 15)  // 第一行
-            .attr('r', 12)
+            .attr('cy', 20)  // Y坐標不變
+            .attr('r', 15)  // 圓形半徑
             .attr('fill', 'white')
             .attr('stroke', '#e74c3c')
             .attr('stroke-width', 2);
@@ -217,60 +230,64 @@ function renderPointers(xScale, centerOffset, i, j) {
         pointersContainer.append('text')
             .attr('class', 'pointer-text')
             .attr('x', iPosX)
-            .attr('y', 19)  // 第一行
+            .attr('y', 25)  // Y坐標不變
             .attr('text-anchor', 'middle')
             .attr('font-weight', 'bold')
             .attr('fill', '#e74c3c')
-            .attr('font-size', '14px')
+            .attr('font-size', '16px')
             .text('i');
             
         // 添加位置標籤
         pointersContainer.append('text')
             .attr('x', iPosX)
-            .attr('y', 35)  // 第一行下方
+            .attr('y', 45)  // Y坐標不變
             .attr('text-anchor', 'middle')
             .attr('fill', '#555')
-            .attr('font-size', '10px')
+            .attr('font-size', '12px')
             .text(`(${i})`);
     }
     
-    // 繪製 j 指針 (三角形)
+    // 繪製 j 指針 (圓形)
     if (j >= 0) {
-        const jPosX = centerOffset + xScale(j) + xScale.bandwidth() / 2;
+        let jPosX;
         
-        // 繪製三角形指針
-        const triangleSize = 10;
-        const trianglePoints = [
-            `${jPosX},${45 - triangleSize}`, // 頂點
-            `${jPosX - triangleSize},${45}`,  // 左下角
-            `${jPosX + triangleSize},${45}`   // 右下角
-        ].join(' ');
+        if (j >= domainMin && j <= domainMax) {
+            // 正常情況，jPos在範圍內
+            jPosX = centerOffset + xScale(j) + xScale.bandwidth() / 2;
+        } else {
+            // jPos超出範圍，放在左邊或右邊
+            jPosX = (j < domainMin) ? 
+                    centerOffset : 
+                    centerOffset + xScale(domainMax) + xScale.bandwidth();
+        }
         
-        // 繪製三角形背景
-        pointersContainer.append('polygon')
-            .attr('points', trianglePoints)
+        // 繪製圓形指針
+        pointersContainer.append('circle')
+            .attr('cx', jPosX)
+            .attr('cy', 85)  // 增加了距離，距離i指針更遠
+            .attr('r', 15)  // 圓形半徑
             .attr('fill', 'white')
-            .attr('stroke', '#3498db')
+            .attr('stroke', '#3498db')  // 藍色邊框
             .attr('stroke-width', 2);
         
         // 添加 j 指針文字
         pointersContainer.append('text')
             .attr('class', 'pointer-text')
             .attr('x', jPosX)
-            .attr('y', 50)  // 第二行
+            .attr('y', 90)  // 調整Y坐標以匹配新的圓形位置
             .attr('text-anchor', 'middle')
             .attr('font-weight', 'bold')
             .attr('fill', '#3498db')
-            .attr('font-size', '14px')
+            .attr('font-size', '16px')
             .text('j');
             
         // 添加位置標籤
         pointersContainer.append('text')
             .attr('x', jPosX)
-            .attr('y', 65)  // 第二行下方
+            .attr('y', 110)  // 增加Y坐標以確保在下方完全可見
             .attr('text-anchor', 'middle')
             .attr('fill', '#555')
-            .attr('font-size', '10px')
+            .attr('font-size', '12px')
             .text(`(${j})`);
     }
 }
@@ -288,6 +305,17 @@ function getBarColor(state) {
 
 // 設置柱子狀態
 function setBarStates(comparingPos = [], swappingPos = [], pivotPos = -1, sortedPos = [], i = -2, j = -2) {
+    // 安全檢查，確保位置索引是有效的
+    comparingPos = comparingPos.filter(pos => pos >= 0 && pos < quickArray.length);
+    swappingPos = swappingPos.filter(pos => pos >= 0 && pos < quickArray.length);
+    sortedPos = sortedPos.filter(pos => pos >= 0 && pos < quickArray.length);
+    
+    // 確保 pivotPos 是有效的
+    if (pivotPos < 0 || pivotPos >= quickArray.length) {
+        pivotPos = -1;
+    }
+    
+    // 設置每個柱子的狀態
     quickArray.forEach(bar => {
         if (pivotPos !== -1 && bar.position === pivotPos) {
             bar.state = 'pivot';
@@ -558,15 +586,20 @@ async function quickSortAlgorithm(low = 0, high = quickArray.length - 1, sortedP
     
     // 基本情況：如果子數組只有一個元素或已經排序
     if (low >= high) {
-        if (low >= 0 && low < quickArray.length && !sortedPos.includes(low)) {
-            const statusText = document.getElementById('quick-status');
-            statusText.textContent = `位置 ${low} 上的元素已經排序好`;
-            sortedPos.push(low);
-            setBarStates([], [], -1, sortedPos);
-            
-            await new Promise(resolve => {
-                quickSortAnimationTimer = setTimeout(resolve, (101 - document.getElementById('quick-speed').value) * 5);
-            });
+        // 確保单個元素也被標記為已排序
+        if (low >= 0 && low < quickArray.length) {
+            if (!sortedPos.includes(low)) {
+                const statusText = document.getElementById('quick-status');
+                statusText.textContent = `位置 ${low} 上的元素已經排序好`;
+                sortedPos.push(low);
+                
+                // 確保 high 也被加入已排序列表（如果它與low相等）
+                setBarStates([], [], -1, sortedPos);
+                
+                await new Promise(resolve => {
+                    quickSortAnimationTimer = setTimeout(resolve, (101 - document.getElementById('quick-speed').value) * 5);
+                });
+            }
         }
         return;
     }
@@ -587,15 +620,18 @@ async function quickSortAlgorithm(low = 0, high = quickArray.length - 1, sortedP
     if (pivotPos === -1 || quickSortPaused) return; // 如果分區過程中暫停了
     
     // 標記基準元素為已排序
-    sortedPos.push(pivotPos);
-    statusText.textContent = `基準元素已排序，開始遞迴處理左右子數組`;
-    setBarStates([], [], -1, sortedPos);
-    
-    await new Promise(resolve => {
-        quickSortAnimationTimer = setTimeout(resolve, (101 - document.getElementById('quick-speed').value) * 10);
-    });
-    
-    if (quickSortPaused) return;
+    if (pivotPos >= 0 && pivotPos < quickArray.length) {
+        sortedPos.push(pivotPos);
+        
+        statusText.textContent = `基準元素已排序，開始遞迴處理左右子數組`;
+        setBarStates([], [], -1, sortedPos);
+        
+        await new Promise(resolve => {
+            quickSortAnimationTimer = setTimeout(resolve, (101 - document.getElementById('quick-speed').value) * 10);
+        });
+        
+        if (quickSortPaused) return;
+    }
     
     // 遞迴排序左子數組
     if (low < pivotPos - 1) {
@@ -621,8 +657,26 @@ async function quickSortAlgorithm(low = 0, high = quickArray.length - 1, sortedP
     
     // 檢查是否完成整個排序
     if (low === 0 && high === quickArray.length - 1 && !quickSortPaused) {
+        // 確保所有元素都被標記為已排序
+        const allPositions = Array.from({length: quickArray.length}, (_, i) => i);
+        const unsortedPositions = allPositions.filter(pos => !sortedPos.includes(pos));
+        
+        // 如果還有未排序的元素，將它們加入已排序列表
+        if (unsortedPositions.length > 0) {
+            const statusText = document.getElementById('quick-status');
+            statusText.textContent = '標記所有元素為已排序';
+            
+            // 將所有未排序的元素加入已排序列表
+            sortedPos.push(...unsortedPositions);
+            setBarStates([], [], -1, sortedPos);
+            
+            await new Promise(resolve => {
+                quickSortAnimationTimer = setTimeout(resolve, (101 - document.getElementById('quick-speed').value) * 10);
+            });
+        }
+        
         statusText.textContent = '排序完成！';
-        setBarStates([], [], -1, Array.from({length: quickArray.length}, (_, i) => i));
+        setBarStates([], [], -1, allPositions);
         quickSortRunning = false;
         updateButtonStatus();
     }

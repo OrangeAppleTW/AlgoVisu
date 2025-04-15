@@ -48,7 +48,7 @@
             
             <div class="visualization-container">
                 <!-- D3.js 視覺化區域 -->
-                <svg id="quick-svg" width="100%" height="280"></svg>
+                <svg id="quick-svg" width="100%" height="400"></svg>
                 <div class="status" id="quick-status">請點擊「生成數組」按鈕開始</div>
                 <div class="info-panel">
                     <h4>快速排序分區過程說明</h4>
@@ -290,7 +290,7 @@ void quickSort(int arr[], int low, int high) {
     </div>
     
     <!-- 載入所需的腳本檔案 -->
-    <script src="../quick-sort-d3.js"></script>
+    <script src="quick-sort-d3.js"></script>
     <script>
         // 頁簽切換功能（簡化版，僅用於直接導航）
         document.addEventListener('DOMContentLoaded', function() {
@@ -303,7 +303,7 @@ void quickSort(int arr[], int low, int high) {
                 tab.addEventListener('click', function() {
                     const algorithmName = this.getAttribute('data-tab');
                     if (algorithmName !== 'quick') {
-                        window.location.href = `${algorithmName}.html`;
+                        window.location.href = `../${algorithmName}-sort/${algorithmName}.html`;
                     }
                 });
             });
