@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>插入排序 - 排序演算法視覺化</title>
+    <title>選擇排序 - 排序演算法視覺化</title>
     <link rel="stylesheet" href="../../styles.css">
     <link rel="stylesheet" href="../module-styles.css">
     <!-- 引入D3.js庫 -->
@@ -30,32 +30,32 @@
         
         <div class="tabs">
             <div class="tab" data-tab="bubble">氣泡排序</div>
-            <div class="tab active" data-tab="insertion">插入排序</div>
-            <div class="tab" data-tab="selection">選擇排序</div>
+            <div class="tab" data-tab="insertion">插入排序</div>
+            <div class="tab active" data-tab="selection">選擇排序</div>
             <div class="tab" data-tab="quick">快速排序</div>
             <div class="tab" data-tab="merge">合併排序</div>
         </div>
         
-        <div id="insertion" class="tab-content active">
-            <h2>插入排序 (Insertion Sort)</h2>
-            <p>插入排序是一種簡單且高效的排序演算法，它通過構建有序序列，對於未排序數據，在已排序序列中從後向前掃描，找到相應位置並插入。</p>
+        <div id="selection" class="tab-content active">
+            <h2>選擇排序 (Selection Sort)</h2>
+            <p>選擇排序是一種簡單直觀的排序演算法，它通過不斷從未排序的部分中尋找最小（或最大）元素，並將其放到已排序部分的末尾。</p>
             
             <div class="visualization-container">
                 <!-- D3.js 視覺化區域 -->
-                <svg id="insertion-svg" width="100%" height="240"></svg>
-                <div class="status" id="insertion-status">請點擊「生成數組」按鈕開始</div>
+                <svg id="selection-svg" width="100%" height="240"></svg>
+                <div class="status" id="selection-status">請點擊「生成數組」按鈕開始</div>
             </div>
             
             <div class="controls">
-                <button id="insertion-generate">生成數組</button>
-                <button id="insertion-start" disabled>開始排序</button>
-                <button id="insertion-pause" disabled>暫停</button>
-                <button id="insertion-reset" disabled>重置</button>
+                <button id="selection-generate">生成數組</button>
+                <button id="selection-start" disabled>開始排序</button>
+                <button id="selection-pause" disabled>暫停</button>
+                <button id="selection-reset" disabled>重置</button>
             </div>
             
             <div class="slider-container">
-                <label for="insertion-speed">速度:</label>
-                <input type="range" id="insertion-speed" class="slider" min="1" max="100" value="50">
+                <label for="selection-speed">速度:</label>
+                <input type="range" id="selection-speed" class="slider" min="1" max="100" value="50">
             </div>
             
             <div class="legend">
@@ -65,11 +65,11 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #f39c12;"></div>
-                    <span>當前元素</span>
+                    <span>當前掃描元素</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #9b59b6;"></div>
-                    <span>正在移動</span>
+                    <span>當前最小值</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background-color: #2ecc71;"></div>
@@ -78,13 +78,13 @@
             </div>
             
             <h3>演算法說明</h3>
-            <p>插入排序的工作原理是，對於每個未排序的元素，在已排序序列中從後向前掃描，找到合適的位置並插入。</p>
+            <p>選擇排序的工作原理是，在每一輪中找到未排序部分中的最小元素，然後將其與未排序部分的第一個元素交換位置，從而擴大已排序部分。</p>
             
             <h3>時間複雜度</h3>
             <ul>
                 <li>最壞情況: O(n²)</li>
                 <li>平均情況: O(n²)</li>
-                <li>最好情況: O(n) - 當數組已經排序時</li>
+                <li>最好情況: O(n²) - 即使數組已經排序，選擇排序仍需要執行完整的比較過程</li>
             </ul>
             
             <h3>空間複雜度</h3>
@@ -92,112 +92,125 @@
             
             <div class="code-container">
                 <div class="code-tabs">
-                    <div class="code-tab active" data-code="pseudo-insertion">演算法</div>
-                    <div class="code-tab" data-code="python-insertion">Python</div>
-                    <div class="code-tab" data-code="cpp-insertion">C++</div>
-                    <div class="code-tab" data-code="c-insertion">C</div>
-                    <div class="code-tab" data-code="js-insertion">JavaScript</div>
+                    <div class="code-tab active" data-code="pseudo-selection">演算法</div>
+                    <div class="code-tab" data-code="python-selection">Python</div>
+                    <div class="code-tab" data-code="cpp-selection">C++</div>
+                    <div class="code-tab" data-code="c-selection">C</div>
+                    <div class="code-tab" data-code="js-selection">JavaScript</div>
                 </div>
                 
-                <div class="code-view" id="js-insertion">
-function insertionSort(arr) {
+                <div class="code-view" id="js-selection">
+function selectionSort(arr) {
     const n = arr.length;
     
-    for (let i = 1; i < n; i++) {
-        // 保存當前元素
-        let key = arr[i];
-        let j = i - 1;
+    for (let i = 0; i < n - 1; i++) {
+        // 找到未排序部分中的最小元素的索引
+        let minIndex = i;
         
-        // 將大於key的元素向右移動
-        while (j >= 0 && arr[j] > key) {
-            arr[j + 1] = arr[j];
-            j--;
+        for (let j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIndex]) {
+                minIndex = j;
+            }
         }
         
-        // 插入key到正確位置
-        arr[j + 1] = key;
+        // 如果找到了更小的元素，則交換
+        if (minIndex !== i) {
+            // 交換 arr[i] 和 arr[minIndex]
+            let temp = arr[i];
+            arr[i] = arr[minIndex];
+            arr[minIndex] = temp;
+        }
     }
     
     return arr;
 }
                 </div>
                 
-                <div class="code-view" id="python-insertion">
-def insertion_sort(arr):
-    for i in range(1, len(arr)):
-        # 保存當前元素
-        key = arr[i]
-        j = i - 1
+                <div class="code-view" id="python-selection">
+def selection_sort(arr):
+    n = len(arr)
+    
+    for i in range(n - 1):
+        # 找到未排序部分中的最小元素的索引
+        min_index = i
         
-        # 將大於 key 的元素向右移動
-        while j >= 0 and arr[j] > key:
-            arr[j + 1] = arr[j]
-            j -= 1
-            
-        # 插入 key 到正確位置
-        arr[j + 1] = key
+        for j in range(i + 1, n):
+            if arr[j] < arr[min_index]:
+                min_index = j
         
+        # 如果找到了更小的元素，則交換
+        if min_index != i:
+            # 交換 arr[i] 和 arr[min_index]
+            arr[i], arr[min_index] = arr[min_index], arr[i]
+    
     return arr
                 </div>
                 
-                <div class="code-view" id="cpp-insertion">
+                <div class="code-view" id="cpp-selection">
 #include <vector>
 
-std::vector<int> insertionSort(std::vector<int> arr) {
+std::vector<int> selectionSort(std::vector<int> arr) {
     int n = arr.size();
     
-    for (int i = 1; i < n; i++) {
-        // 保存當前元素
-        int key = arr[i];
-        int j = i - 1;
+    for (int i = 0; i < n - 1; i++) {
+        // 找到未排序部分中的最小元素的索引
+        int minIndex = i;
         
-        // 將大於 key 的元素向右移動
-        while (j >= 0 && arr[j] > key) {
-            arr[j + 1] = arr[j];
-            j--;
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIndex]) {
+                minIndex = j;
+            }
         }
         
-        // 插入 key 到正確位置
-        arr[j + 1] = key;
+        // 如果找到了更小的元素，則交換
+        if (minIndex != i) {
+            // 交換 arr[i] 和 arr[minIndex]
+            int temp = arr[i];
+            arr[i] = arr[minIndex];
+            arr[minIndex] = temp;
+        }
     }
     
     return arr;
 }
                 </div>
                 
-                <div class="code-view" id="c-insertion">
-void insertionSort(int arr[], int n) {
-    for (int i = 1; i < n; i++) {
-        // 保存當前元素
-        int key = arr[i];
-        int j = i - 1;
+                <div class="code-view" id="c-selection">
+void selectionSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        // 找到未排序部分中的最小元素的索引
+        int minIndex = i;
         
-        // 將大於 key 的元素向右移動
-        while (j >= 0 && arr[j] > key) {
-            arr[j + 1] = arr[j];
-            j--;
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIndex]) {
+                minIndex = j;
+            }
         }
         
-        // 插入 key 到正確位置
-        arr[j + 1] = key;
+        // 如果找到了更小的元素，則交換
+        if (minIndex != i) {
+            // 交換 arr[i] 和 arr[minIndex]
+            int temp = arr[i];
+            arr[i] = arr[minIndex];
+            arr[minIndex] = temp;
+        }
     }
 }
                 </div>
                 
-                <div class="code-view active" id="pseudo-insertion">
-## 插入排序算法
+                <div class="code-view active" id="pseudo-selection">
+## 選擇排序算法
 
 輸入: 一個數組 array
 輸出: 排序後的數組
 
 1. 取得數組長度 n
-2. 從索引 1 遍歷到 n-1 (第二個元素到最後一個元素):
-   a. 將當前元素 array[i] 存為 key
-   b. 設置 j = i - 1 (前一個元素的索引)
-   c. 當 j 大於等於 0 且 array[j] 大於 key 時:
-      i. 將 array[j] 往右移動到 array[j+1]
-      ii. j 減少 1 (繼續往左比較)
-   d. 將 key 放入 array[j+1] 的位置
+2. 從索引 0 遍歷到 n-2:
+   a. 將當前索引 i 設為 minIndex (假設當前位置的元素是最小的)
+   b. 從索引 i+1 遍歷到 n-1:
+      i. 如果 array[j] < array[minIndex]，更新 minIndex = j
+   c. 如果 minIndex != i:
+      i. 交換 array[i] 和 array[minIndex]
 3. 返回排序後的數組
                 </div>
             </div>
@@ -210,7 +223,7 @@ void insertionSort(int arr[], int n) {
     </div>
     
     <!-- 載入所需的腳本檔案 -->
-    <script src="insertion-sort-d3.js"></script>
+    <script src="selection-sort-d3.js"></script>
     <script src="../../navbar.js"></script>
     <script>
         // 頁簽切換功能（簡化版，僅用於直接導航）
@@ -223,7 +236,7 @@ void insertionSort(int arr[], int n) {
             tabs.forEach(tab => {
                 tab.addEventListener('click', function() {
                     const algorithmName = this.getAttribute('data-tab');
-                    if (algorithmName !== 'insertion') {
+                    if (algorithmName !== 'selection') {
                         window.location.href = `../${algorithmName}-sort/${algorithmName}.html`;
                     }
                 });
