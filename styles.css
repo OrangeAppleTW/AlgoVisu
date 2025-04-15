@@ -52,12 +52,85 @@
     transition: background-color 0.3s, color 0.3s, font-weight 0.3s;
 }
 
+/* 導覽列樣式 */
+.navbar {
+    background-color: black;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    position: fixed; /* 固定在最上方 */
+    top: 0;
+    left: 0; /* 確保從左側開始 */
+    right: 0; /* 確保延伸到右側 */
+    z-index: 1000;
+    width: 100%;
+    padding: 0; /* 移除內部填充，以便我們自己控制高度 */
+    height: 60px; /* 再增加一點高度，配合更大的文字 */
+}
+
+.navbar-container {
+    width: 100%; /* 占滿整個寬度 */
+    margin: 0;
+    display: flex;
+    justify-content: flex-start; /* 從左向右對齊 */
+    align-items: stretch; /* 讓元素垂直方向伸展填滿空間 */
+    height: 100%; /* 高度跟導覽列相同 */
+    padding: 0 20px;
+    gap: 0; /* 移除組件之間的間距 */
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center; /* logo 垂直居中 */
+    text-decoration: none;
+    margin-right: 20px; /* 與導覽鈕保持一定間距 */
+    padding: 0 10px; /* 增加左右填充 */
+    height: 100%; /* 使其高度與導覽列相同 */
+}
+
+.logo-img {
+    height: 45px; /* 增加 logo 高度，配合更高的導覽列和更大的文字 */
+    width: auto;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: stretch; /* 讓元素垂直伸展 */
+    height: 100%; /* 高度跟導覽列相同 */
+    margin-left: 0; /* 沒有額外的左邊距 */
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0 15px; /* 只保留左右填充 */
+    background-color: transparent; /* 透明背景 */
+    display: flex;
+    align-items: flex-end; /* 文字靠下對齊 */
+    padding-bottom: 12px; /* 增加底部留白，確保文字靠下 */
+    transition: color 0.3s, border-color 0.3s;
+    height: 100%; /* 使高度與容器相同 */
+    font-size: 18px; /* 更大的字體大小 */
+}
+
+.nav-link:hover {
+    background-color: transparent; /* 透明背景 */
+    color: #f8f8f8; /* 輕微增亮文字 */
+}
+
+.nav-link.active {
+    background-color: transparent; /* 保持透明 */
+    color: #ffffff; /* 白色文字 */
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5); /* 半透明的底部邊框 */
+    box-shadow: none; /* 移除陰影 */
+}
+
 /* Common styles for all algorithm visualizations */
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 20px;
+    padding-top: 80px; /* 為更高的導覽列預留空間 */
     color: #333;
     background-color: #f8f9fa;
 }

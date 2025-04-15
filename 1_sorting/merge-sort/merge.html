@@ -10,6 +10,21 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
 <body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="../../index.html" class="navbar-logo">
+                <img src="../../picture/OA_logo2.png" alt="OA Logo" class="logo-img">
+            </a>
+            <div class="navbar-links">
+                <a href="../../1_sorting/index.html" class="nav-link">排序演算法</a>
+                <a href="../../2_2d_linked_list/index.html" class="nav-link">二維鏈表</a>
+                <a href="../../3_divide_and_conquer/index.html" class="nav-link">分治法</a>
+                <a href="../../4_coin_change/index.html" class="nav-link">找零錢問題</a>
+                <a href="../../5_graph_theory/index.html" class="nav-link">圖論基礎</a>
+                <a href="../../6_shortest_path/index.html" class="nav-link">最短路徑</a>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <h1>排序演算法視覺化</h1>
         
@@ -370,6 +385,7 @@ void mergeSort(int arr[], int n) {
     <script src="../sorting.js"></script>
     <!-- 載入D3.js合併排序視覺化 (使用ES模塊) -->
     <script type="module" src="merge-sort-d3.js"></script>
+    <script src="../../navbar.js"></script>
     <script>
         // 頁簽切換功能
         document.addEventListener('DOMContentLoaded', function() {
