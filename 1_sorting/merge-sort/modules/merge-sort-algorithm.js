@@ -10,14 +10,73 @@ import {
 import { renderMergeArray } from './merge-sort-visualization.js';
 import { updateMergeRecursionVisual } from './merge-sort-recursion-visual.js';
 
-// 默認顏色定義，用於突出顯示某些元素
+// 黑白簡約風格的顏色定義
 const COLORS = {
-    COMPARING: '#f39c12',      // 比較中
-    ACTIVE: '#FF5733',         // 當前活躍元素
-    SORTED: '#2ecc71',         // 已排序
-    MERGING: '#e74c3c',        // 合併中
-    DIVIDING: '#9b59b6'        // 分割中
+    COMPARING: '#4A5568',      // 比較中 - 深灰色
+    ACTIVE: '#2B6CB0',         // 當前活躍元素 - 深藍色
+    SORTED: '#2C5282',         // 已排序 - 藍色
+    MERGING: '#1A365D',        // 合併中 - 深藍色
+    DIVIDING: '#805AD5'        // 分割中 - 紫色
 };
+
+// 繪製分割線
+async function drawDivideLine(mid) {
+    const svg = d3.select('#merge-svg');
+    const margin = { top: 30, right: 80, bottom: 30, left: 80 };
+    const width = parseInt(svg.style('width')) || 800;
+    const height = parseInt(svg.style('height')) || 300;
+    const contentWidth = width - margin.left - margin.right;
+    const contentHeight = height - margin.top - margin.bottom;
+    
+    // 計算分割線的位置
+    const xScale = d3.scaleBand()
+        .domain(d3.range(MergeState.array.length))
+        .range([0, contentWidth * 0.8])
+        .padding(0.25);
+    
+    // 計算中心偏移，讓柱子居中
+    const centerOffset = (contentWidth - xScale.range()[1]) / 2;
+    
+    // 計算分割線的X座標
+    const midX = centerOffset + xScale(mid) + xScale.bandwidth();
+    
+    // 繪製新的分割線，並加上唯一的ID以便後續識別
+    svg.append('line')
+        .attr('class', 'divide-line')
+        .attr('data-mid', mid) // 添加屬性以記錄中間點
+        .attr('x1', margin.left + midX)
+        .attr('y1', margin.top)
+        .attr('x2', margin.left + midX)
+        .attr('y2', margin.top + contentHeight)
+        .attr('stroke', '#222')
+        .attr('stroke-width', 1)
+        .attr('stroke-dasharray', '5,5')
+        .attr('opacity', 0)
+        .transition()
+        .duration(300)
+        .attr('opacity', 1);
+}
+
+// 清除特定的分割線
+function removeDivideLine(mid) {
+    // 只刪除特定中間點的分割線
+    d3.select('#merge-svg')
+        .selectAll('.divide-line[data-mid="' + mid + '"]')
+        .transition()
+        .duration(300)
+        .attr('opacity', 0)
+        .remove();
+}
+
+// 清除所有分割線
+function removeAllDivideLines() {
+    d3.select('#merge-svg')
+        .selectAll('.divide-line')
+        .transition()
+        .duration(300)
+        .attr('opacity', 0)
+        .remove();
+}
 
 // 計算當前遞迴深度的輔助函數
 function calculateDepth(low, high) {
@@ -93,10 +152,13 @@ async function startMergeSortAlgorithm() {
         // 更新視覺化
         updateMergeRecursionVisual(MergeState.array, window.recursionSteps);
         
-        // 最終效果：綠色波浪由左至右
+        // 最後清除所有分割線
+        removeAllDivideLines();
+        
+        // 最終效果：藍色波浪由左至右
         for (let i = 0; i < MergeState.array.length; i++) {
-            await renderMergeArray([{ index: i, color: '#27ae60' }]);
-            await sleep(speed / 4);
+            await renderMergeArray([{ index: i, color: '#2C5282' }]);
+            await sleep(speed);
         }
         
         if (statusText) statusText.textContent = '排序完成！';
@@ -120,6 +182,9 @@ async function startMergeSortAlgorithm() {
         
         // 顯示分割過程
         if (statusText) statusText.textContent = `分割: [${low}..${high}] 為 [${low}..${mid}] 和 [${mid+1}..${high}]`;
+        
+        // 繪製分割線
+        await drawDivideLine(mid);
         
         // 突出顯示當前處理的分區
         const highlights = [];
@@ -156,6 +221,9 @@ async function startMergeSortAlgorithm() {
         // 合併兩個已排序的子數組
         if (statusText) statusText.textContent = `合併: [${low}..${mid}] 和 [${mid+1}..${high}]`;
         
+        // 移除分割線，代表兩區要合併
+        removeDivideLine(mid);
+        
         // 更新遞迴視覺化 - 記錄合併步驟
         const mergingStep = {
             level: calculateDepth(low, high),
@@ -187,17 +255,17 @@ async function startMergeSortAlgorithm() {
         // 使用不同顏色標記左右子數組
         const leftHighlights = [];
         for (let k = low; k <= mid; k++) {
-            leftHighlights.push({ index: k, color: '#9b59b6' }); // 左側紫色
+            leftHighlights.push({ index: k, color: '#805AD5' }); // 左側紫色
         }
         await renderMergeArray(leftHighlights);
-        await sleep(speed / 2);
+        await sleep(speed);
         
         const rightHighlights = [];
         for (let k = mid + 1; k <= high; k++) {
-            rightHighlights.push({ index: k, color: '#3498db' }); // 右側藍色
+            rightHighlights.push({ index: k, color: '#2B6CB0' }); // 右側藍色
         }
         await renderMergeArray(rightHighlights);
-        await sleep(speed / 2);
+        await sleep(speed);
         
         // 合併開始時高亮顯示
         const mergeHighlights = [];
@@ -230,42 +298,31 @@ async function startMergeSortAlgorithm() {
                     { index: j, color: COLORS.ACTIVE }
                 ];
                 await renderMergeArray(highlights);
-                await sleep(speed / 2);
+                await sleep(speed);
                 
                 // 獲取右側子數組中的元素
                 const elementToMove = auxArray[j];
                 
-                // 更新元素狀態和位置 - 更線性動畫效果
+                // 更新元素狀態和位置 - 美覺式動畫
                 const targetElement = MergeState.array.find(item => item.id === elementToMove.id);
                 if (targetElement) {
                     // 先高亮顯示當前處理的元素
                     targetElement.state = 'activeComparing';
-                    await renderMergeArray([
-                        { index: targetElement.position, color: COLORS.ACTIVE }
-                    ]);
-                    await sleep(speed / 3);
-                    
-                    // 顯示元素移動到新位置的效果
-                    // 裝填苗頭動畫：在原位置和新位置之間顯示移動路徑
-                    const originalPosition = targetElement.position;
-                    // 加入移動記錄到體驗值
-                    MergeState.swapCount++;
-                    updateMergePerformanceMetrics();
+                    await renderMergeArray([{ index: targetElement.position, color: COLORS.ACTIVE }]);
+                    await sleep(speed);
                     
                     // 更新位置後立即渲染
                     targetElement.position = k;
                     targetElement.state = 'merging';
                     
                     // 顯示新位置的效果
-                    await renderMergeArray([
-                        { index: k, color: COLORS.MERGING }
-                    ]);
-                    await sleep(speed / 4);
+                    await renderMergeArray([{ index: k, color: COLORS.MERGING }]);
+                    await sleep(speed);
                 }
                 
                 j++;
                 await renderMergeArray();
-                await sleep(speed / 4);
+                await sleep(speed);
             }
             // 右子數組已用完，取左子數組的元素
             else if (j > high) {
@@ -274,7 +331,7 @@ async function startMergeSortAlgorithm() {
                     { index: i, color: COLORS.ACTIVE }
                 ];
                 await renderMergeArray(highlights);
-                await sleep(speed / 2);
+                await sleep(speed);
                 
                 // 獲取左側子數組中的元素
                 const elementToMove = auxArray[i];
@@ -284,10 +341,8 @@ async function startMergeSortAlgorithm() {
                 if (targetElement) {
                     // 先更新狀態為「正在移動」
                     targetElement.state = 'merging';
-                    await renderMergeArray([
-                        { index: targetElement.position, color: COLORS.ACTIVE }
-                    ]);
-                    await sleep(speed / 3);
+                    await renderMergeArray([{ index: targetElement.position, color: COLORS.ACTIVE }]);
+                    await sleep(speed);
                     
                     // 再更新位置
                     targetElement.position = k;
@@ -295,7 +350,7 @@ async function startMergeSortAlgorithm() {
                 
                 i++;
                 await renderMergeArray();
-                await sleep(speed / 4);
+                await sleep(speed);
             }
             // 比較兩個子數組的元素，取較小者
             else if (auxArray[i].value <= auxArray[j].value) {
@@ -311,7 +366,7 @@ async function startMergeSortAlgorithm() {
                 updateMergePerformanceMetrics();
                 
                 if (statusText) statusText.textContent = `比較: ${auxArray[i].value} <= ${auxArray[j].value}`;
-                await sleep(speed / 2);
+                await sleep(speed);
                 
                 // 獲取左側子數組中的元素
                 const elementToMove = auxArray[i];
@@ -321,10 +376,8 @@ async function startMergeSortAlgorithm() {
                 if (targetElement) {
                     // 先更新狀態為「正在移動」
                     targetElement.state = 'merging';
-                    await renderMergeArray([
-                        { index: targetElement.position, color: COLORS.ACTIVE }
-                    ]);
-                    await sleep(speed / 3);
+                    await renderMergeArray([{ index: targetElement.position, color: COLORS.ACTIVE }]);
+                    await sleep(speed);
                     
                     // 再更新位置
                     targetElement.position = k;
@@ -332,7 +385,7 @@ async function startMergeSortAlgorithm() {
                 
                 i++;
                 await renderMergeArray();
-                await sleep(speed / 4);
+                await sleep(speed);
             }
             else {
                 // 高亮顯示正在比較的兩個元素
@@ -349,7 +402,7 @@ async function startMergeSortAlgorithm() {
                 updateMergePerformanceMetrics();
                 
                 if (statusText) statusText.textContent = `比較: ${auxArray[i].value} > ${auxArray[j].value}`;
-                await sleep(speed / 2);
+                await sleep(speed);
                 
                 // 獲取右側子數組中的元素
                 const elementToMove = auxArray[j];
@@ -359,10 +412,8 @@ async function startMergeSortAlgorithm() {
                 if (targetElement) {
                     // 先更新狀態為「正在移動」
                     targetElement.state = 'merging';
-                    await renderMergeArray([
-                        { index: targetElement.position, color: COLORS.ACTIVE }
-                    ]);
-                    await sleep(speed / 3);
+                    await renderMergeArray([{ index: targetElement.position, color: COLORS.ACTIVE }]);
+                    await sleep(speed);
                     
                     // 再更新位置
                     targetElement.position = k;
@@ -370,7 +421,7 @@ async function startMergeSortAlgorithm() {
                 
                 j++;
                 await renderMergeArray();
-                await sleep(speed / 4);
+                await sleep(speed);
             }
         }
         

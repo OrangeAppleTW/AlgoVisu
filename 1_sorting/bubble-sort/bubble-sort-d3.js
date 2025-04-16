@@ -162,10 +162,10 @@ function renderBubbleArray() {
 // 根據柱子狀態獲取顏色
 function getBarColor(state) {
     switch (state) {
-        case 'comparing': return '#f39c12'; // 正在比較
-        case 'swapping': return '#9b59b6';  // 正在交換
-        case 'sorted': return '#2ecc71';    // 已排序
-        default: return '#3498db';          // 未排序
+        case 'comparing': return '#4A5568'; // 正在比較 - 深藍灰色
+        case 'swapping': return '#2B6CB0';  // 正在交換 - 深藍色
+        case 'sorted': return '#1A365D';    // 已排序 - 深藏青色
+        default: return '#A0AEC0';          // 未排序 - 冷調灰藍色
     }
 }
 

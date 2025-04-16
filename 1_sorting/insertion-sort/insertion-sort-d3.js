@@ -4,6 +4,11 @@ let insertionSortRunning = false;
 let insertionSortPaused = false;
 let insertionAnimationTimer = null;
 
+// 用來追蹤當前元素和比較元素的索引
+let currentElementIndex = -1;
+let comparingElementIndex = -1;
+let sortedPositions = [];
+
 // 初始化插入排序視覺化
 document.addEventListener('DOMContentLoaded', function() {
     // DOM 元素
@@ -22,6 +27,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 初始化SVG
     initSvg();
+    
+    // 為進度條添加滑塊拖曳效果
+    function updateSliderProgress(slider) {
+        const percent = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+        slider.style.setProperty('--progress-percent', `${percent}%`);
+    }
+    
+    // 初始更新進度
+    updateSliderProgress(speedSlider);
+    
+    // 監聽值變化
+    speedSlider.addEventListener('input', function() {
+        updateSliderProgress(this);
+    });
     
     // 監聽窗口大小改變事件，以便重新繪製SVG
     window.addEventListener('resize', function() {
@@ -60,8 +79,13 @@ function generateInsertionArray() {
         id: i,  // 唯一標識符
         value: Math.floor(Math.random() * (max - min + 1)) + min,
         position: i,  // 初始位置 = 索引
-        state: 'unsorted'  // 狀態: unsorted, current, moving, sorted
+        sorted: false  // 初始狀態：未排序
     }));
+    
+    // 重置狀態變量
+    currentElementIndex = -1;
+    comparingElementIndex = -1;
+    sortedPositions = [];
     
     // 渲染數組
     renderInsertionArray();
@@ -73,23 +97,24 @@ function generateInsertionArray() {
 }
 
 // 根據柱子狀態獲取顏色
-function getBarColor(state, inFrame = false) {
-    // 如果在框架內，增加一個復合狀態
-    if (inFrame) {
-        switch (state) {
-            case 'current': return '#e74c3c'; // 強調當前元素
-            case 'moving': return '#d35400';  // 強調正在移動
-            case 'sorted': return '#27ae60';  // 已排序但在框內
-            default: return '#2980b9';        // 在框內的未排序
-        }
-    } else {
-        switch (state) {
-            case 'current': return '#f39c12'; // 當前元素
-            case 'moving': return '#9b59b6';  // 正在移動
-            case 'sorted': return '#2ecc71';  // 已排序
-            default: return '#3498db';        // 未排序
-        }
+function getBarColor(barPosition) {
+    // 檢查是否是當前元素
+    if (barPosition === currentElementIndex) {
+        return '#4A5568'; // 當前元素 - 中藍色
     }
+    
+    // 檢查是否是正在比較的元素
+    if (barPosition === comparingElementIndex) {
+        return '#2B6CB0'; // 正在比較 - 亮藍色
+    }
+    
+    // 檢查是否是已排序元素
+    if (sortedPositions.includes(barPosition)) {
+        return '#1A365D'; // 已排序 - 深藍色
+    }
+    
+    // 剩下的都是未排序元素
+    return '#A0AEC0'; // 未排序 - 灰色
 }
 
 // 使用D3.js渲染數組
@@ -146,13 +171,7 @@ function renderInsertionArray(frameRange = null) {
         .attr('y', d => yScale(d.value))
         .attr('width', xScale.bandwidth())
         .attr('height', d => contentHeight - yScale(d.value))
-        .attr('fill', d => {
-            // 檢查是否在框架範圍內
-            const inFrame = frameRange && 
-                            d.position >= frameRange.start && 
-                            d.position <= frameRange.end;
-            return getBarColor(d.state, inFrame);
-        })
+        .attr('fill', d => getBarColor(d.position))
         .attr('rx', 0) // 無圓角
         .attr('ry', 0);
     
@@ -198,13 +217,7 @@ function renderInsertionArray(frameRange = null) {
     bars.select('rect')
         .transition()
         .duration(duration)
-        .attr('fill', d => {
-            // 檢查是否在框架範圍內
-            const inFrame = frameRange && 
-                            d.position >= frameRange.start && 
-                            d.position <= frameRange.end;
-            return getBarColor(d.state, inFrame);
-        })
+        .attr('fill', d => getBarColor(d.position))
         .attr('y', d => yScale(d.value))
         .attr('height', d => contentHeight - yScale(d.value));
     
@@ -215,44 +228,23 @@ function renderInsertionArray(frameRange = null) {
         .attr('y', d => yScale(d.value) - 5);
 }
 
-// 移除不再使用的函數
-// function updateBarState(position, newState) {
-//     const bar = insertionArray.find(bar => bar.position === position);
-//     if (bar) bar.state = newState;
-// }
-
-// 設置柱子狀態，並可選擇性地顯示框架
-function setBarStates(current = -1, moving = -1, sorted = [], frameRange = null) {
-    // 簡化邏輯 - 確保 current 元素左邊的所有元素都是已排序
-    insertionArray.forEach(bar => {
-        // 判斷柱子的狀態
-        if (bar.position === current) {
-            bar.state = 'current';
-        } else if (bar.position === moving) {
-            bar.state = 'moving';
-        } else if (bar.position < current || sorted.includes(bar.position)) {
-            // 如果是 current 左邊的元素或已指定為已排序，則設置為已排序
-            bar.state = 'sorted';
-        } else {
-            bar.state = 'unsorted';
-        }
-    });
-    
-    // 渲染更新
-    renderInsertionArray(frameRange);
-}
-
 // 執行插入排序的一步
-async function insertionSortStep(currentIndex, sortedPositions) {
+async function insertionSortStep(index) {
     const statusText = document.getElementById('insertion-status');
     
     // 獲取當前要插入的元素
-    const currentBar = insertionArray.find(bar => bar.position === currentIndex);
+    const currentBar = insertionArray.find(bar => bar.position === index);
     if (!currentBar) return;
     
     const key = currentBar.value;
     statusText.textContent = `選取元素 ${key} 進行插入`;
-    setBarStates(currentIndex, -1, sortedPositions);
+    
+    // 設置當前元素
+    currentElementIndex = index;
+    comparingElementIndex = -1;
+    
+    // 渲染更新
+    renderInsertionArray();
     
     // 等待一段時間以便觀察
     await new Promise(resolve => {
@@ -261,32 +253,21 @@ async function insertionSortStep(currentIndex, sortedPositions) {
     
     if (insertionSortPaused) return;
     
-    let j = currentIndex - 1;
-    let insertPos = currentIndex;
-    let needToMove = false;
+    let j = index - 1;
     
-    // 從右到左比較找到插入位置
+    // 從右到左比較並逐步交換位置
     while (j >= 0) {
         if (insertionSortPaused) return;
         
         const compareBar = insertionArray.find(bar => bar.position === j);
         if (!compareBar) break;
         
-        // 顯示正在比較的元素，並用框架標記可能需要移動的範圍
-        statusText.textContent = `比較 ${compareBar.value} > ${key}`;
-        let frameRange = needToMove ? {start: insertPos, end: currentIndex} : null;
+        // 設置比較元素
+        comparingElementIndex = j;
         
-        // 如果是已排序的元素，先將其標記為移動中而不是比較元素
-        // 這樣可以避免已排序的元素變回未排序的顏色
-        if (sortedPositions.includes(j)) {
-            // 直接設置特定元素的狀態而不是用 setBarStates 以避免重設已排序元素
-            currentBar.state = 'current';
-            // 將所有其他元素保持不變
-            renderInsertionArray(frameRange);
-        } else {
-            // 如果不是已排序元素，則正常顯示比較狀態
-            setBarStates(currentIndex, j, sortedPositions, frameRange);
-        }
+        // 顯示正在比較的元素
+        statusText.textContent = `比較 ${compareBar.value} > ${key}`;
+        renderInsertionArray();
         
         // 等待一段時間以便觀察
         await new Promise(resolve => {
@@ -296,14 +277,12 @@ async function insertionSortStep(currentIndex, sortedPositions) {
         if (insertionSortPaused) return;
         
         if (compareBar.value > key) {
-            // 如果當前元素大於待插入元素，需要向右移動
-            statusText.textContent = `${compareBar.value} > ${key}，需要向右移動`;
-            needToMove = true;
-            insertPos = j;
+            // 如果當前比較的元素大於待插入元素，交換位置
+            statusText.textContent = `${compareBar.value} > ${key}，交換位置`;
             
-            // 顯示框架範圍
-            frameRange = {start: insertPos, end: currentIndex};
-            setBarStates(currentIndex, -1, sortedPositions, frameRange);
+            // 聲明要交換元素
+            statusText.textContent = `交換 ${compareBar.value} 和 ${key}`;
+            renderInsertionArray();
             
             // 等待一段時間以便觀察
             await new Promise(resolve => {
@@ -311,61 +290,61 @@ async function insertionSortStep(currentIndex, sortedPositions) {
             });
             
             if (insertionSortPaused) return;
-            j--;
+            
+            // 交換位置
+            compareBar.position += 1;
+            currentBar.position = j;
+            
+            // 更新當前元素索引
+            currentElementIndex = j;
+            
+            // 更新比較元素索引（不再比較）
+            comparingElementIndex = -1;
+            
+            // 將比較過的元素添加到已排序列表
+            if (!sortedPositions.includes(j+1)) {
+                sortedPositions.push(j+1);
+            }
+            
+            // 重新渲染以顯示交換效果
+            renderInsertionArray();
+            
+            // 等待一段時間以便觀察
+            await new Promise(resolve => {
+                insertionAnimationTimer = setTimeout(resolve, (101 - document.getElementById('insertion-speed').value) * 8);
+            });
+            
+            if (insertionSortPaused) return;
+            
+            j--; // 繼續向左比較
         } else {
-            // 找到插入位置
-            insertPos = j + 1;
+            // 找到適當位置，不需要再交換
+            statusText.textContent = `${compareBar.value} <= ${key}，保持位置`;
+            
+            // 等待一段時間以便觀察
+            await new Promise(resolve => {
+                insertionAnimationTimer = setTimeout(resolve, (101 - document.getElementById('insertion-speed').value) * 8);
+            });
+            
+            if (insertionSortPaused) return;
             break;
         }
     }
     
-    // 當找到插入位置後
-    if (needToMove && insertPos < currentIndex) {
-        // 顯示將要一次性移動的所有元素
-        statusText.textContent = `將位置 ${insertPos} 到 ${currentIndex-1} 的元素同時向右移動`;
-        const frameRange = {start: insertPos, end: currentIndex};
-        setBarStates(-1, -1, sortedPositions, frameRange);
-        
-        // 等待一段時間以便觀察
-        await new Promise(resolve => {
-            insertionAnimationTimer = setTimeout(resolve, (101 - document.getElementById('insertion-speed').value) * 10);
-        });
-        
-        if (insertionSortPaused) return;
-        
-        // 將所有中間元素向右移動一位
-        for (let pos = currentIndex - 1; pos >= insertPos; pos--) {
-            const bar = insertionArray.find(b => b.position === pos);
-            if (bar) {
-                bar.position += 1;
-            }
-        }
-        
-        // 將當前元素插入到正確位置
-        statusText.textContent = `將元素 ${key} 插入到位置 ${insertPos}`;
-        currentBar.position = insertPos;
-        
-        // 更新並渲染，確保已排序元素的狀態保持
-        setBarStates(-1, -1, sortedPositions);
-        
-        // 等待一段時間以便觀察
-        await new Promise(resolve => {
-            insertionAnimationTimer = setTimeout(resolve, (101 - document.getElementById('insertion-speed').value) * 10);
-        });
-    }
-    
     if (insertionSortPaused) return;
     
-    // 更新已排序範圍
-    if (!sortedPositions.includes(insertPos)) {
-        sortedPositions.push(insertPos);
+    // 將當前元素添加到已排序位置列表
+    const finalPosition = currentBar.position;
+    if (!sortedPositions.includes(finalPosition)) {
+        sortedPositions.push(finalPosition);
     }
     
-    // 對新的排序部分進行排序，確保位置是正確的
-    sortedPositions.sort((a, b) => a - b);
+    // 重置當前元素和比較元素索引
+    currentElementIndex = -1;
+    comparingElementIndex = -1;
     
     // 顯示已排序的元素
-    setBarStates(-1, -1, sortedPositions);
+    renderInsertionArray();
     
     // 等待一段時間以便觀察
     await new Promise(resolve => {
@@ -378,6 +357,9 @@ function startInsertionSort() {
     if (!insertionSortRunning) {
         insertionSortRunning = true;
         insertionSortPaused = false;
+        
+        // 設置第一個元素為已排序
+        sortedPositions = [0];
         
         // 更新按鈕狀態
         updateButtonStatus();
@@ -435,6 +417,9 @@ function resetInsertionSort() {
     insertionSortRunning = false;
     insertionSortPaused = false;
     insertionArray = [];
+    currentElementIndex = -1;
+    comparingElementIndex = -1;
+    sortedPositions = [];
     
     // 清空視覺化區域
     initSvg();
@@ -455,14 +440,13 @@ async function insertionSortAlgorithm() {
     
     const statusText = document.getElementById('insertion-status');
     const n = insertionArray.length;
-    const sortedPositions = [0]; // 第一個元素已排序
     
     // 執行插入排序
     for (let i = 1; i < n; i++) {
         if (insertionSortPaused) return;
         
         // 執行一步排序（選擇當前元素並插入到已排序部分）
-        await insertionSortStep(i, sortedPositions);
+        await insertionSortStep(i);
         
         if (insertionSortPaused) return;
         
@@ -477,10 +461,6 @@ async function insertionSortAlgorithm() {
     
     // 排序完成
     statusText.textContent = '排序完成！';
-    
-    // 將所有元素標記為已排序
-    const allPositions = Array.from({ length: n }, (_, i) => i);
-    setBarStates(-1, -1, allPositions);
     
     insertionSortRunning = false;
     updateButtonStatus();

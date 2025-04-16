@@ -39,7 +39,8 @@
             display: block; /* 讓整個卡片都可點擊 */
             cursor: pointer;
             height: 100%; /* 確保所有卡片高度一致 */
-            min-height: 280px; /* 增加最小高度，確保複雜度能完整顯示 */
+            min-height: 260px; /* 減小最小高度以符合截圖 */
+            position: relative; /* 添加相對定位 */
         }
         
         .algorithm-card:hover {
@@ -68,8 +69,8 @@
             color: #333;
             line-height: 1.5; /* 增加行高 */
             font-size: 0.95em;
-            min-height: 70px; /* 設定最小高度，但減少一些 */
-            margin-bottom: 10px; /* 減少底部間距 */
+            flex-grow: 1; /* 讓描述區域自動填充空間 */
+            margin-bottom: 10px; /* 保持較小的底部間距 */
         }
         
         .complexity {
@@ -77,9 +78,10 @@
             padding: 12px; /* 增加填充 */
             border-radius: 3px;
             border-left: 3px solid #ddd;
+            margin-top: auto; /* 保留此設定，讓複雜度區域推到底部 */
+            margin-bottom: 30px; /* 添加底部間距，使其向上移動 */
             position: relative; /* 添加相對定位 */
-            bottom: 0; /* 確保在底部 */
-            margin-bottom: 5px; /* 添加一點底部間距 */
+            bottom: 30px; /* 向上移動30px */
         }
         
         .complexity p {
@@ -254,10 +256,7 @@
             </div>
         </div>
         
-        <div class="navigation">
-            <a href="../index.html" class="nav-button">返回主頁</a>
-            <a href="../2_2d_linked_list/index.html" class="nav-button">下一個：二維鏈表處理</a>
-        </div>
+
     </div>
     <script src="error-handler.js"></script>
     <script src="../navbar.js"></script>

@@ -23,6 +23,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // 初始化SVG
     initSvg();
     
+    // 為進度條添加滑塊拖曳效果
+    function updateSliderProgress(slider) {
+        const percent = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+        slider.style.setProperty('--progress-percent', `${percent}%`);
+    }
+    
+    // 初始更新進度
+    updateSliderProgress(speedSlider);
+    
+    // 監聽值變化
+    speedSlider.addEventListener('input', function() {
+        updateSliderProgress(this);
+    });
+    
     // 監聽窗口大小改變事件，以便重新繪製SVG
     window.addEventListener('resize', function() {
         if (selectionArray.length > 0) {
@@ -75,10 +89,10 @@ function generateSelectionArray() {
 // 根據柱子狀態獲取顏色
 function getBarColor(state) {
     switch (state) {
-        case 'current': return '#f39c12'; // 當前掃描元素
-        case 'min': return '#9b59b6';     // 當前最小值
-        case 'sorted': return '#2ecc71';  // 已排序
-        default: return '#3498db';        // 未排序
+        case 'current': return '#4A5568'; // 當前探索元素 - 深藍灰色
+        case 'min': return '#2B6CB0';     // 當前最小值 - 深藍色
+        case 'sorted': return '#1A365D';  // 已排序 - 深藏青色
+        default: return '#A0AEC0';        // 未排序 - 冷調灰藍色
     }
 }
 

@@ -133,11 +133,11 @@ function renderMergeArray(highlightIndices = []) {
         const speedValue = speedSlider ? parseInt(speedSlider.value) : 50;
         const duration = 1000 - (speedValue * 8); // 速度越快，動畫時間越短
         
-        // 使用transform移動整個組，這樣更流暢，加入彈跳效果
+        // 使用transform移動整個組，這樣更流暢
         barGroups.transition()
             .duration(duration)
             .attr('transform', d => `translate(${centerOffset + xScale(d.position)}, 0)`)
-            .ease(d3.easeBounce); // 添加彈跳效果模擬物理運動
+            .ease(d3.easeLinear); // 使用線性運動，無回彈效果
         
         // 更新矩形顏色
         barGroups.select('rect')

@@ -54,15 +54,15 @@ export const MergeState = {
     }
 };
 
-// 顏色定義
+// 顏色定義 (黑白簡約風格)
 export const MERGE_COLORS = {
-    UNSORTED: '#3498db',      // 未排序
-    COMPARING: '#f39c12',     // 正在比較
-    DIVIDING: '#9b59b6',      // 正在分割
-    MERGING: '#e74c3c',       // 正在合併
-    SORTED: '#2ecc71',        // 已排序
-    ACTIVE_COMPARING: '#FF5733', // 活躍比較元素
-    COMPLETED: '#27ae60'      // 完成排序（深綠色）
+    UNSORTED: '#A0AEC0',      // 未排序 - 淺灰色
+    COMPARING: '#4A5568',     // 正在比較 - 深灰色
+    DIVIDING: '#805AD5',      // 正在分割 - 紫色
+    MERGING: '#1A365D',       // 正在合併 - 深藍色
+    SORTED: '#2C5282',        // 已排序 - 藍色
+    ACTIVE_COMPARING: '#2B6CB0', // 活躍比較元素 - 深藍色
+    COMPLETED: '#1A365D'      // 完成排序 (深藍色)
 };
 
 // 根據柱子狀態獲取顏色

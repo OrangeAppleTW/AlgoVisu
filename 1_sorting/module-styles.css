@@ -183,11 +183,12 @@
 /* 快速排序的分治視圖 */
 #quick-structure {
     min-height: 150px;
-    border: 2px solid #3498db;
+    border: 2px solid #222;
     padding: 15px;
     margin-top: 20px;
     background-color: #fff;
-    border-radius: 5px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* 回應式調整 */

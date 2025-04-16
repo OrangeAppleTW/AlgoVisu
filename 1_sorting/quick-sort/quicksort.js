@@ -109,7 +109,7 @@
                     structureView.innerHTML = '<div style="text-align: center; padding: 20px;">模擬中，請稍候...</div>';
                     // 確保它可見
                     structureView.style.display = 'block';
-                    structureView.style.border = '2px solid #3498db';
+                    structureView.style.border = '2px solid #222';
                     structureView.style.backgroundColor = '#fff';
                     structureView.style.minHeight = '200px';
                     structureView.style.padding = '15px';
@@ -447,7 +447,7 @@
         // 强制顯示元素
         structureView.style.display = 'block';
         structureView.style.minHeight = '200px';
-        structureView.style.border = '2px solid #3498db';
+        structureView.style.border = '2px solid #222';
         structureView.style.backgroundColor = '#fff';
         structureView.style.margin = '20px 0';
         structureView.style.padding = '20px';
@@ -489,8 +489,8 @@
             depthLabel.style.fontWeight = 'bold';
             depthLabel.style.margin = '0 0 15px 0';
             depthLabel.style.padding = '8px';
-            depthLabel.style.backgroundColor = '#e1f5fe';
-            depthLabel.style.color = '#01579b';
+            depthLabel.style.backgroundColor = '#f5f5f5';
+            depthLabel.style.color = '#333';
             depthLabel.style.borderRadius = '4px';
             depthLabel.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
             depthLabel.style.fontSize = '16px';
@@ -529,20 +529,20 @@
                 // 設置顏色
                 if (depth === 0) {
                     subarrayElem.classList.add('root-subarray');
-                    subarrayElem.style.backgroundColor = '#ffebee';
-                    subarrayElem.style.border = '2px solid #ffcdd2';
+                    subarrayElem.style.backgroundColor = '#f8f9fa';
+                    subarrayElem.style.border = '2px solid #e9ecef';
                 } else if (subarray.isSingleElement) {
                     subarrayElem.classList.add('single-element');
-                    subarrayElem.style.backgroundColor = '#f3e5f5';
-                    subarrayElem.style.border = '2px solid #e1bee7';
+                    subarrayElem.style.backgroundColor = '#f1f3f5';
+                    subarrayElem.style.border = '2px solid #dee2e6';
                 } else if (subarray.completed) {
                     subarrayElem.classList.add('completed-subarray');
-                    subarrayElem.style.backgroundColor = '#e8f5e9';
-                    subarrayElem.style.border = '2px solid #c8e6c9';
+                    subarrayElem.style.backgroundColor = '#e9ecef';
+                    subarrayElem.style.border = '2px solid #ced4da';
                 } else {
                     subarrayElem.classList.add('pending-subarray');
-                    subarrayElem.style.backgroundColor = '#e3f2fd';
-                    subarrayElem.style.border = '2px solid #bbdefb';
+                    subarrayElem.style.backgroundColor = '#f8f9fa';
+                    subarrayElem.style.border = '2px solid #e9ecef';
                 }
                 
                 // 創建數組內容
@@ -569,7 +569,7 @@
                     pivotMark.style.bottom = '-28px';
                     pivotMark.style.transform = 'translateX(-50%)';
                     pivotMark.style.fontSize = '12px';
-                    pivotMark.style.color = '#e74c3c';
+                    pivotMark.style.color = '#222';
                     pivotMark.style.fontWeight = 'bold';
                     pivotMark.style.textAlign = 'center';
                     pivotMark.style.lineHeight = '1.2';
@@ -680,26 +680,26 @@
                 bottom: -25px;
                 transform: translateX(-50%);
                 font-size: 12px;
-                color: #e74c3c;
+                color: #222;
                 text-align: center;
                 line-height: 1.2;
             }
             
             .current-step {
-                box-shadow: 0 0 8px #3498db;
-                border-color: #3498db;
+                box-shadow: 0 0 8px #222;
+                border-color: #222;
                 z-index: 10;
                 transform: scale(1.05);
             }
             
             .left-partition {
-                box-shadow: 0 0 5px #2ecc71;
-                border-color: #2ecc71;
+                box-shadow: 0 0 5px #444;
+                border-color: #444;
             }
             
             .right-partition {
-                box-shadow: 0 0 5px #f39c12;
-                border-color: #f39c12;
+                box-shadow: 0 0 5px #666;
+                border-color: #666;
             }
         `;
         document.head.appendChild(style);

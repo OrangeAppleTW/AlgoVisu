@@ -223,7 +223,7 @@ function renderPointers(xScale, centerOffset, i, j) {
             .attr('cy', 20)  // Y坐標不變
             .attr('r', 15)  // 圓形半徑
             .attr('fill', 'white')
-            .attr('stroke', '#e74c3c')
+            .attr('stroke', '#222')
             .attr('stroke-width', 2);
         
         // 添加 i 指針文字
@@ -233,7 +233,7 @@ function renderPointers(xScale, centerOffset, i, j) {
             .attr('y', 25)  // Y坐標不變
             .attr('text-anchor', 'middle')
             .attr('font-weight', 'bold')
-            .attr('fill', '#e74c3c')
+            .attr('fill', '#222')
             .attr('font-size', '16px')
             .text('i');
             
@@ -267,7 +267,7 @@ function renderPointers(xScale, centerOffset, i, j) {
             .attr('cy', 85)  // 增加了距離，距離i指針更遠
             .attr('r', 15)  // 圓形半徑
             .attr('fill', 'white')
-            .attr('stroke', '#3498db')  // 藍色邊框
+            .attr('stroke', '#444')  // 深灰色邊框
             .attr('stroke-width', 2);
         
         // 添加 j 指針文字
@@ -277,7 +277,7 @@ function renderPointers(xScale, centerOffset, i, j) {
             .attr('y', 90)  // 調整Y坐標以匹配新的圓形位置
             .attr('text-anchor', 'middle')
             .attr('font-weight', 'bold')
-            .attr('fill', '#3498db')
+            .attr('fill', '#444')
             .attr('font-size', '16px')
             .text('j');
             
@@ -292,14 +292,14 @@ function renderPointers(xScale, centerOffset, i, j) {
     }
 }
 
-// 根據柱子狀態獲取顏色
+// 根據柱子狀態獲取顏色 (黑白簡約風格)
 function getBarColor(state) {
     switch (state) {
-        case 'pivot': return '#e74c3c';   // 基準元素 - 紅色
-        case 'comparing': return '#f39c12'; // 正在比較 - 橙色
-        case 'swapping': return '#9b59b6';  // 正在交換 - 紫色
-        case 'sorted': return '#2ecc71';    // 已排序 - 綠色
-        default: return '#3498db';          // 未排序 - 藍色
+        case 'pivot': return '#4A5568';   // 基準元素 - 深灰色
+        case 'comparing': return '#2B6CB0'; // 正在比較 - 深藍色
+        case 'swapping': return '#805AD5';  // 正在交換 - 紫色
+        case 'sorted': return '#1A365D';    // 已排序 - 深藍色
+        default: return '#A0AEC0';          // 未排序 - 淺灰色
     }
 }
 

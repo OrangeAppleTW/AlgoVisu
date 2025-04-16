@@ -8,6 +8,242 @@
     <link rel="stylesheet" href="../module-styles.css">
     <!-- 引入D3.js庫 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* 黑白簡約風格 */
+        h2 {
+            color: #222;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .visualization-container {
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin: 30px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        
+        button {
+            background-color: #222;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        
+        button:hover {
+            background-color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .slider-container {
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+            justify-content: center;
+        }
+        
+        .slider {
+            flex-grow: 1;
+            max-width: 250px;
+            -webkit-appearance: none;
+            height: 5px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        /* 添加進度條效果 */
+        .slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #222 0%, #222 var(--progress-percent, 50%), #ddd var(--progress-percent, 50%), #ddd 100%);
+            border-radius: 5px;
+            cursor: pointer;
+            /* 調整軌道位置 */
+            position: relative;
+            top: 0px;
+        }
+        
+        .slider::-moz-range-track {
+            width: 100%;
+            height: 5px;
+            background: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-progress {
+            height: 5px;
+            background-color: #222;
+            border-radius: 5px;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #222;
+            cursor: pointer;
+            margin-top: -5px; /* 讓滑動點垂直置中 */
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #222;
+            cursor: pointer;
+            border: none;
+            margin-top: -5px; /* 讓滑動點垂直置中 */
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: transparent;
+            border-radius: 3px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 代碼展示區域 */
+        .code-container {
+            margin: 30px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .code-tabs {
+            display: flex;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .code-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-right: 1px solid #e0e0e0;
+            transition: background-color 0.2s;
+        }
+        
+        .code-tab:hover {
+            background-color: #eaeaea;
+        }
+        
+        .code-tab.active {
+            background-color: #222;
+            color: white;
+        }
+        
+        .code-view {
+            display: none;
+            padding: 15px;
+            background-color: #f8f8f8;
+            white-space: pre-wrap;
+            font-family: monospace;
+            line-height: 1.5;
+            font-size: 0.95em;
+            color: #333;
+        }
+        
+        .code-view.active {
+            display: block;
+        }
+        
+        /* 複雜度區域的樣式 */
+        h3 {
+            font-size: 1.1em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        /* SVG區域樣式 */
+        svg {
+            background-color: #f8f8f8;
+            border: 1px solid #eee;
+            border-radius: 3px;
+        }
+        
+        /* Tab樣式 */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .tab:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid #222;
+            color: #222;
+        }
+        
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #f8f8f8;
+            border-radius: 3px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -26,12 +262,10 @@
         </div>
     </nav>
     <div class="container">
-        <h1>排序演算法視覺化</h1>
-        
         <div class="tabs">
             <div class="tab" data-tab="bubble">氣泡排序</div>
-            <div class="tab" data-tab="insertion">插入排序</div>
             <div class="tab active" data-tab="selection">選擇排序</div>
+            <div class="tab" data-tab="insertion">插入排序</div>
             <div class="tab" data-tab="quick">快速排序</div>
             <div class="tab" data-tab="merge">合併排序</div>
         </div>
@@ -60,19 +294,19 @@
             
             <div class="legend">
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #3498db;"></div>
+                    <div class="legend-color" style="background-color: #A0AEC0;"></div>
                     <span>未排序</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #f39c12;"></div>
+                    <div class="legend-color" style="background-color: #4A5568;"></div>
                     <span>當前掃描元素</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #9b59b6;"></div>
+                    <div class="legend-color" style="background-color: #2B6CB0;"></div>
                     <span>當前最小值</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #2ecc71;"></div>
+                    <div class="legend-color" style="background-color: #1A365D;"></div>
                     <span>已排序</span>
                 </div>
             </div>
@@ -215,11 +449,6 @@ void selectionSort(int arr[], int n) {
                 </div>
             </div>
         </div>
-        
-        <div class="navigation">
-            <a href="../index.html" class="nav-button">返回選擇畫面</a>
-            <a href="../../index.html" class="nav-button">返回主頁</a>
-        </div>
     </div>
     
     <!-- 載入所需的腳本檔案 -->
@@ -240,6 +469,22 @@ void selectionSort(int arr[], int n) {
                         window.location.href = `../${algorithmName}-sort/${algorithmName}.html`;
                     }
                 });
+            });
+            
+            // 為進度條添加滑塊拖曳效果
+            const speedSlider = document.getElementById('selection-speed');
+            
+            function updateSliderProgress(slider) {
+                const percent = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+                slider.style.setProperty('--progress-percent', `${percent}%`);
+            }
+            
+            // 初始更新進度
+            updateSliderProgress(speedSlider);
+            
+            // 監聽值變化
+            speedSlider.addEventListener('input', function() {
+                updateSliderProgress(this);
             });
         });
 
