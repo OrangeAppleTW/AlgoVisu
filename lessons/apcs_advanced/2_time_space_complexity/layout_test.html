@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>布局測試 - 修復驗證</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .test-container {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            height: 300px;
+            overflow: hidden;
+            position: relative;
+        }
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 12px;
+        }
+        button:hover { background: #555; }
+        h3 { margin-top: 0; color: #333; }
+        h4 { color: #666; margin-bottom: 10px; }
+        .responsive-test {
+            border: 2px dashed #007acc;
+            padding: 15px;
+            margin: 10px 0;
+            resize: horizontal;
+            overflow: auto;
+            min-width: 300px;
+            max-width: 100%;
+        }
+        .width-indicator {
+            background: #007acc;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 布局修復測試</h1>
+        <p>測試兩個主要修復：1) 移除重複的視覺化區塊；2) 響應式布局調整</p>
+        
+        <div class="test-section">
+            <h3>1. 視覺化區塊重複問題測試</h3>
+            <p>測試 SVG 是否正確渲染，沒有重複的元素或溢出問題</p>
+            
+            <div class="test-container">
+                <h4>單一 SVG 測試</h4>
+                <div id="single-svg-test"></div>
+                <button onclick="testSingleSVG()">測試單一 SVG</button>
+                <button onclick="testMultipleReplace()">測試多次替換</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. 響應式布局測試</h3>
+            <p>拖動下方藍色邊框來模擬不同螢幕寬度</p>
+            
+            <div class="responsive-test" id="responsive-container">
+                <div class="width-indicator" id="width-indicator">寬度: 檢測中...</div>
+                
+                <!-- 模擬主要布局 -->
+                <div style="display: grid; grid-template-columns: 1fr 300px; gap: 20px; transition: all 0.3s ease;" id="layout-grid">
+                    <div style="background: #e8f4f8; padding: 15px; border-radius: 4px; min-height: 200px;">
+                        <h4>主要內容區域</h4>
+                        <div style="background: #fafafa; border: 1px solid #e0e0e0; border-radius: 4px; padding: 10px; height: 150px;">
+                            <div id="responsive-viz-test"></div>
+                        </div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; border: 1px solid #e0e0e0;">
+                        <h4>統計面板</h4>
+                        <div style="background: white; padding: 10px; border-radius: 4px; margin: 5px 0;">📊 比較次數: 15</div>
+                        <div style="background: white; padding: 10px; border-radius: 4px; margin: 5px 0;">🔄 交換次數: 8</div>
+                        <div style="background: white; padding: 10px; border-radius: 4px; margin: 5px 0;">🔁 完成輪次: 3</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <button onclick="setWidth(1200)">🖥️ 桌面 (1200px)</button>
+                <button onclick="setWidth(900)">💻 平板 (900px)</button>
+                <button onclick="setWidth(600)">📱 手機 (600px)</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. 修復前後對比</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4>❌ 修復前問題</h4>
+                    <ul>
+                        <li>視覺化區域可能有重複的 SVG 元素</li>
+                        <li>小螢幕時統計面板在視覺化上方</li>
+                        <li>可能出現內容溢出問題</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>✅ 修復後效果</h4>
+                    <ul>
+                        <li>確保只有一個乾淨的 SVG</li>
+                        <li>小螢幕時統計面板移到下方</li>
+                        <li>固定高度防止溢出</li>
+                        <li>響應式布局更合理</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="scripts/bubble_sort.js"></script>
+    <script>
+        let testVisualizer;
+        
+        function testSingleSVG() {
+            const container = document.getElementById('single-svg-test');
+            
+            // 清除舊的內容
+            container.innerHTML = '<p style="color: #007acc;">創建新的視覺化器...</p>';
+            
+            setTimeout(() => {
+                // 檢查是否有舊的實例
+                if (testVisualizer) {
+                    console.log('清除舊的視覺化器');
+                }
+                
+                // 創建新的視覺化器
+                testVisualizer = new BubbleSortVisualizer('single-svg-test', {
+                    width: 500,
+                    height: 200
+                });
+                
+                const data = [4, 2, 7, 1, 3, 6, 5];
+                testVisualizer.setData(data);
+                
+                // 檢查 SVG 數量
+                const svgCount = container.querySelectorAll('svg').length;
+                console.log(`SVG 數量: ${svgCount}`);
+                
+                if (svgCount === 1) {
+                    container.insertAdjacentHTML('beforeend', '<p style="color: green; font-size: 12px;">✅ 正確：只有一個 SVG</p>');
+                } else {
+                    container.insertAdjacentHTML('beforeend', `<p style="color: red; font-size: 12px;">❌ 錯誤：發現 ${svgCount} 個 SVG</p>`);
+                }
+            }, 100);
+        }
+        
+        function testMultipleReplace() {
+            console.log('測試多次替換...');
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const data = Array.from({ length: 6 }, () => Math.floor(Math.random() * 9) + 1);
+                    testVisualizer.setData(data);
+                    
+                    const svgCount = document.getElementById('single-svg-test').querySelectorAll('svg').length;
+                    console.log(`替換 ${i + 1}: SVG 數量 = ${svgCount}`);
+                }, i * 500);
+            }
+        }
+        
+        function setWidth(width) {
+            const container = document.getElementById('responsive-container');
+            container.style.width = width + 'px';
+            updateLayout();
+        }
+        
+        function updateLayout() {
+            const container = document.getElementById('responsive-container');
+            const grid = document.getElementById('layout-grid');
+            const width = container.offsetWidth;
+            
+            document.getElementById('width-indicator').textContent = `寬度: ${width}px`;
+            
+            if (width <= 1200) {
+                grid.style.gridTemplateColumns = '1fr';
+                grid.style.gap = '15px';
+                
+                // 模擬統計面板移到下方
+                const panels = grid.children;
+                if (panels.length === 2) {
+                    grid.appendChild(panels[1]); // 移動統計面板到最後
+                }
+            } else {
+                grid.style.gridTemplateColumns = '1fr 300px';
+                grid.style.gap = '20px';
+            }
+        }
+        
+        // 監聽容器大小變化
+        const resizeObserver = new ResizeObserver(() => {
+            updateLayout();
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化
+            testSingleSVG();
+            
+            const container = document.getElementById('responsive-container');
+            resizeObserver.observe(container);
+            
+            // 初始布局更新
+            setTimeout(updateLayout, 100);
+        });
+    </script>
+</body>
+</html>

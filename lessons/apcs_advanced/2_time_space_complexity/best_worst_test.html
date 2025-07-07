@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最佳/最差情況測試</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .test-container {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        .direction-test {
+            border: 2px solid;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .ascending { border-color: #4299e1; background: #ebf8ff; }
+        .descending { border-color: #ed8936; background: #fffaf0; }
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 12px;
+        }
+        button:hover { background: #555; }
+        h3 { margin-top: 0; color: #333; }
+        h4 { color: #666; margin-bottom: 10px; }
+        .info-box {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        .data-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-weight: bold;
+        }
+        .result-box {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 最佳/最差情況測試</h1>
+        <p>驗證在不同排序方向下，最佳和最差情況的資料生成是否正確</p>
+        
+        <div class="info-box">
+            <h4>💡 邏輯說明</h4>
+            <ul>
+                <li><strong>最佳情況</strong>：資料已經按照目標方向排序好了</li>
+                <li><strong>最差情況</strong>：資料是按照與目標相反的方向排序的</li>
+            </ul>
+            <p><strong>範例</strong>：如果要「由小到大」排序，最佳是 [1,2,3,4,5]，最差是 [5,4,3,2,1]</p>
+        </div>
+        
+        <div class="test-section">
+            <h3>1. 最佳情況測試</h3>
+            <p>已按目標方向排序的資料 - 應該需要最少的操作</p>
+            
+            <div class="comparison-grid">
+                <div class="direction-test ascending">
+                    <h4>📈 由小到大排序</h4>
+                    <div class="data-display" id="best-asc-data">等待測試...</div>
+                    <div id="best-asc-viz"></div>
+                    <div class="result-box" id="best-asc-result">點擊測試按鈕</div>
+                    <button onclick="testBestCase('ascending')">測試最佳情況</button>
+                </div>
+                
+                <div class="direction-test descending">
+                    <h4>📉 由大到小排序</h4>
+                    <div class="data-display" id="best-desc-data">等待測試...</div>
+                    <div id="best-desc-viz"></div>
+                    <div class="result-box" id="best-desc-result">點擊測試按鈕</div>
+                    <button onclick="testBestCase('descending')">測試最佳情況</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. 最差情況測試</h3>
+            <p>與目標方向相反排序的資料 - 應該需要最多的操作</p>
+            
+            <div class="comparison-grid">
+                <div class="direction-test ascending">
+                    <h4>📈 由小到大排序</h4>
+                    <div class="data-display" id="worst-asc-data">等待測試...</div>
+                    <div id="worst-asc-viz"></div>
+                    <div class="result-box" id="worst-asc-result">點擊測試按鈕</div>
+                    <button onclick="testWorstCase('ascending')">測試最差情況</button>
+                </div>
+                
+                <div class="direction-test descending">
+                    <h4>📉 由大到小排序</h4>
+                    <div class="data-display" id="worst-desc-data">等待測試...</div>
+                    <div id="worst-desc-viz"></div>
+                    <div class="result-box" id="worst-desc-result">點擊測試按鈕</div>
+                    <button onclick="testWorstCase('descending')">測試最差情況</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. 理論值驗證</h3>
+            <div class="info-box">
+                <h4>預期結果 (8個元素)</h4>
+                <ul>
+                    <li><strong>最佳情況</strong>：比較 7 次，交換 0 次，時間複雜度 O(n)</li>
+                    <li><strong>最差情況</strong>：比較 28 次，交換 28 次，時間複雜度 O(n²)</li>
+                </ul>
+            </div>
+            
+            <button onclick="testAllCases()">🚀 測試所有情況</button>
+            <button onclick="clearAll()">🗑️ 清除所有</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. 測試結果總結</h3>
+            <div id="summary-results" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #ddd;">
+                執行測試後這裡會顯示結果總結
+            </div>
+        </div>
+    </div>
+    
+    <script src="scripts/bubble_sort.js"></script>
+    <script>
+        let testResults = {};
+        
+        function testBestCase(direction) {
+            const containerId = `best-${direction === 'ascending' ? 'asc' : 'desc'}-viz`;
+            const dataId = `best-${direction === 'ascending' ? 'asc' : 'desc'}-data`;
+            const resultId = `best-${direction === 'ascending' ? 'asc' : 'desc'}-result`;
+            
+            const visualizer = new BubbleSortVisualizer(containerId, {
+                width: 400,
+                height: 150,
+                onComplete: (stats) => {
+                    const theoretical = visualizer.calculateTheoretical('best', 8);
+                    const result = {
+                        case: 'best',
+                        direction: direction,
+                        comparisons: stats.comparisons,
+                        swaps: stats.swaps,
+                        theoretical: theoretical
+                    };
+                    
+                    testResults[`best-${direction}`] = result;
+                    
+                    document.getElementById(resultId).innerHTML = `
+                        <strong>實際結果：</strong><br>
+                        比較：${stats.comparisons} 次 (理論：${theoretical.comparisons})<br>
+                        交換：${stats.swaps} 次 (理論：${theoretical.swaps})<br>
+                        ${stats.comparisons === theoretical.comparisons && stats.swaps === theoretical.swaps ? 
+                          '<span style="color: green;">✅ 符合理論值</span>' : 
+                          '<span style="color: red;">❌ 與理論值不符</span>'}
+                    `;
+                    
+                    updateSummary();
+                }
+            });
+            
+            visualizer.setDirection(direction);
+            const data = visualizer.generateTestData('best', 8);
+            document.getElementById(dataId).textContent = `最佳情況資料：[${data.join(', ')}]`;
+            
+            visualizer.setData(data);
+            visualizer.autoSort();
+        }
+        
+        function testWorstCase(direction) {
+            const containerId = `worst-${direction === 'ascending' ? 'asc' : 'desc'}-viz`;
+            const dataId = `worst-${direction === 'ascending' ? 'asc' : 'desc'}-data`;
+            const resultId = `worst-${direction === 'ascending' ? 'asc' : 'desc'}-result`;
+            
+            const visualizer = new BubbleSortVisualizer(containerId, {
+                width: 400,
+                height: 150,
+                onComplete: (stats) => {
+                    const theoretical = visualizer.calculateTheoretical('worst', 8);
+                    const result = {
+                        case: 'worst',
+                        direction: direction,
+                        comparisons: stats.comparisons,
+                        swaps: stats.swaps,
+                        theoretical: theoretical
+                    };
+                    
+                    testResults[`worst-${direction}`] = result;
+                    
+                    document.getElementById(resultId).innerHTML = `
+                        <strong>實際結果：</strong><br>
+                        比較：${stats.comparisons} 次 (理論：${theoretical.comparisons})<br>
+                        交換：${stats.swaps} 次 (理論：${theoretical.swaps})<br>
+                        ${stats.comparisons === theoretical.comparisons && stats.swaps === theoretical.swaps ? 
+                          '<span style="color: green;">✅ 符合理論值</span>' : 
+                          '<span style="color: red;">❌ 與理論值不符</span>'}
+                    `;
+                    
+                    updateSummary();
+                }
+            });
+            
+            visualizer.setDirection(direction);
+            const data = visualizer.generateTestData('worst', 8);
+            document.getElementById(dataId).textContent = `最差情況資料：[${data.join(', ')}]`;
+            
+            visualizer.setData(data);
+            visualizer.autoSort();
+        }
+        
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary-results');
+            let html = '<h4>測試結果總結</h4>';
+            
+            Object.keys(testResults).forEach(key => {
+                const result = testResults[key];
+                const directionText = result.direction === 'ascending' ? '由小到大' : '由大到小';
+                const caseText = result.case === 'best' ? '最佳' : '最差';
+                
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        <strong>${caseText}情況 - ${directionText}</strong><br>
+                        比較次數：${result.comparisons} / ${result.theoretical.comparisons}<br>
+                        交換次數：${result.swaps} / ${result.theoretical.swaps}<br>
+                        時間複雜度：${result.theoretical.timeComplexity}
+                    </div>
+                `;
+            });
+            
+            summaryDiv.innerHTML = html;
+        }
+        
+        function testAllCases() {
+            testBestCase('ascending');
+            setTimeout(() => testBestCase('descending'), 1000);
+            setTimeout(() => testWorstCase('ascending'), 2000);
+            setTimeout(() => testWorstCase('descending'), 3000);
+        }
+        
+        function clearAll() {
+            ['best-asc-viz', 'best-desc-viz', 'worst-asc-viz', 'worst-desc-viz'].forEach(id => {
+                document.getElementById(id).innerHTML = '';
+            });
+            
+            ['best-asc-data', 'best-desc-data', 'worst-asc-data', 'worst-desc-data'].forEach(id => {
+                document.getElementById(id).textContent = '等待測試...';
+            });
+            
+            ['best-asc-result', 'best-desc-result', 'worst-asc-result', 'worst-desc-result'].forEach(id => {
+                document.getElementById(id).textContent = '點擊測試按鈕';
+            });
+            
+            testResults = {};
+            document.getElementById('summary-results').innerHTML = '執行測試後這裡會顯示結果總結';
+        }
+        
+        // 頁面載入時顯示示例
+        document.addEventListener('DOMContentLoaded', function() {
+            // 顯示資料範例但不執行排序
+            const ascVisualizer = new BubbleSortVisualizer('best-asc-viz', { width: 400, height: 150 });
+            ascVisualizer.setDirection('ascending');
+            const bestAscData = ascVisualizer.generateTestData('best', 8);
+            document.getElementById('best-asc-data').textContent = `最佳情況資料：[${bestAscData.join(', ')}]`;
+            ascVisualizer.setData(bestAscData);
+            
+            const descVisualizer = new BubbleSortVisualizer('best-desc-viz', { width: 400, height: 150 });
+            descVisualizer.setDirection('descending');
+            const bestDescData = descVisualizer.generateTestData('best', 8);
+            document.getElementById('best-desc-data').textContent = `最佳情況資料：[${bestDescData.join(', ')}]`;
+            descVisualizer.setData(bestDescData);
+        });
+    </script>
+</body>
+</html>

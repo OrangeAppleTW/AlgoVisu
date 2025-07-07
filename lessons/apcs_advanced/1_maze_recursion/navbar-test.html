@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>導覽列測試 - AlgoVisu</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        
+        .test-results {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .test-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .test-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .test-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+    
+    <div class="container">
+        <h1>🧪 導覽列載入測試</h1>
+        
+        <div class="test-results">
+            <h3>測試結果</h3>
+            <div id="test-output">
+                <div class="test-item test-info">正在執行測試...</div>
+            </div>
+        </div>
+        
+        <div class="test-results">
+            <h3>當前頁面資訊</h3>
+            <div class="test-item test-info">
+                <strong>當前路徑：</strong><span id="current-path"></span>
+            </div>
+            <div class="test-item test-info">
+                <strong>計算的 AlgoVisu 路徑：</strong><span id="algov-path"></span>
+            </div>
+            <div class="test-item test-info">
+                <strong>預期導覽列路徑：</strong><span id="navbar-path"></span>
+            </div>
+        </div>
+        
+        <div class="test-results">
+            <h3>導覽列連結測試</h3>
+            <div id="link-tests">
+                <!-- 測試結果將在這裡顯示 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 等待導覽列載入完成後執行測試
+        document.addEventListener('DOMContentLoaded', function() {
+            // 設置當前頁面資訊
+            document.getElementById('current-path').textContent = window.location.pathname;
+            
+            // 等待導覽列載入器執行
+            setTimeout(function() {
+                runNavbarTests();
+            }, 1000);
+        });
+        
+        function runNavbarTests() {
+            const testOutput = document.getElementById('test-output');
+            const linkTests = document.getElementById('link-tests');
+            const results = [];
+            
+            // 測試1: 檢查導覽列是否存在
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                results.push({type: 'success', message: '✅ 導覽列成功載入'});
+            } else {
+                results.push({type: 'error', message: '❌ 導覽列載入失敗'});
+            }
+            
+            // 測試2: 檢查 Logo 是否載入
+            const logo = document.querySelector('.navbar-logo img');
+            if (logo) {
+                results.push({type: 'success', message: '✅ Logo 成功載入'});
+                results.push({type: 'info', message: `Logo 路徑: ${logo.src}`});
+            } else {
+                results.push({type: 'error', message: '❌ Logo 載入失敗'});
+            }
+            
+            // 測試3: 檢查主要導覽連結
+            const navLinks = document.querySelectorAll('.nav-link');
+            if (navLinks.length > 0) {
+                results.push({type: 'success', message: `✅ 找到 ${navLinks.length} 個主導覽連結`});
+                navLinks.forEach((link, index) => {
+                    results.push({type: 'info', message: `導覽連結 ${index + 1}: ${link.textContent} → ${link.href}`});
+                });
+            } else {
+                results.push({type: 'error', message: '❌ 未找到主導覽連結'});
+            }
+            
+            // 測試4: 檢查下拉選單連結
+            const dropdownLinks = document.querySelectorAll('.dropdown-link');
+            if (dropdownLinks.length > 0) {
+                results.push({type: 'success', message: `✅ 找到 ${dropdownLinks.length} 個下拉選單連結`});
+                dropdownLinks.forEach((link, index) => {
+                    const testItem = document.createElement('div');
+                    testItem.className = 'test-item test-info';
+                    testItem.innerHTML = `<strong>下拉連結 ${index + 1}:</strong> ${link.textContent} → <a href="${link.href}" target="_blank">${link.href}</a>`;
+                    linkTests.appendChild(testItem);
+                });
+            } else {
+                results.push({type: 'error', message: '❌ 未找到下拉選單連結'});
+            }
+            
+            // 測試5: 檢查路徑計算
+            if (window.NavbarLoader) {
+                try {
+                    const testLoader = {
+                        findAlgoVisuPath: function() {
+                            const pathname = window.location.pathname;
+                            const segments = pathname.split('/').filter(segment => segment.length > 0);
+                            
+                            const algoVisuIndex = segments.findIndex(segment => segment === 'AlgoVisu');
+                            
+                            if (algoVisuIndex !== -1) {
+                                const depth = segments.length - algoVisuIndex - 1;
+                                if (depth === 0) {
+                                    return './';
+                                }
+                                return '../'.repeat(depth);
+                            }
+                            
+                            return './';
+                        }
+                    };
+                    
+                    const algoPath = testLoader.findAlgoVisuPath();
+                    document.getElementById('algov-path').textContent = algoPath;
+                    document.getElementById('navbar-path').textContent = algoPath + 'components/navbar.html';
+                    results.push({type: 'success', message: '✅ 路徑計算功能正常'});
+                } catch (error) {
+                    results.push({type: 'error', message: `❌ 路徑計算錯誤: ${error.message}`});
+                }
+            } else {
+                results.push({type: 'error', message: '❌ NavbarLoader 類別未找到'});
+            }
+            
+            // 顯示所有測試結果
+            testOutput.innerHTML = '';
+            results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-item test-${result.type}`;
+                div.textContent = result.message;
+                testOutput.appendChild(div);
+            });
+        }
+    </script>
+    
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

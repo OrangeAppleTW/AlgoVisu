@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>泡泡排序測試</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #test-container { margin: 20px 0; }
+        .test-info { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>泡泡排序測試</h1>
+    <div class="test-info">
+        <p><strong>測試目的：</strong>驗證泡泡排序是否按照正確的順序執行：0~9, 0~8, ..., 0~1</p>
+        <p><strong>測試陣列：</strong>[4, 2, 7, 1, 3]</p>
+    </div>
+    
+    <button onclick="runTest()">開始測試</button>
+    <button onclick="resetTest()">重置</button>
+    
+    <div id="test-container"></div>
+    <div id="log"></div>
+    
+    <script src="scripts/bubble_sort.js"></script>
+    <script>
+        let visualizer;
+        let stepCount = 0;
+        
+        function initTest() {
+            visualizer = new BubbleSortVisualizer('test-container', {
+                width: 600,
+                height: 200,
+                onUpdate: (stats) => {
+                    document.getElementById('log').innerHTML += 
+                        `<div>統計：比較${stats.comparisons}次，交換${stats.swaps}次，輪次${stats.passes}</div>`;
+                },
+                onStep: (result) => {
+                    stepCount++;
+                    const logDiv = document.getElementById('log');
+                    
+                    if (result.action === 'compare') {
+                        logDiv.innerHTML += 
+                            `<div style="color: red;">步驟${stepCount}：比較位置${result.indices[0]}和${result.indices[1]} (${result.values[0]} vs ${result.values[1]})</div>`;
+                    } else if (result.action === 'swap') {
+                        logDiv.innerHTML += 
+                            `<div style="color: blue;">步驟${stepCount}：交換位置${result.indices[0]}和${result.indices[1]} (${result.values[1]} ↔ ${result.values[0]})</div>`;
+                    } else if (result.action === 'pass_completed') {
+                        logDiv.innerHTML += 
+                            `<div style="color: green; font-weight: bold;">--- 第${result.pass}輪完成 ---</div>`;
+                    } else if (result.action === 'completed') {
+                        logDiv.innerHTML += 
+                            `<div style="color: green; font-weight: bold;">🎉 排序完成！</div>`;
+                    }
+                    
+                    // 自動滾動到底部
+                    logDiv.scrollTop = logDiv.scrollHeight;
+                },
+                onComplete: (stats) => {
+                    console.log('排序完成！', stats);
+                }
+            });
+            
+            // 設置測試資料
+            const testData = [4, 2, 7, 1, 3];
+            visualizer.setData(testData);
+        }
+        
+        async function runTest() {
+            document.getElementById('log').innerHTML = '<h3>執行日誌：</h3>';
+            stepCount = 0;
+            
+            if (!visualizer) {
+                initTest();
+            }
+            
+            visualizer.setSpeed(1000); // 慢速執行以便觀察
+            await visualizer.autoSort();
+        }
+        
+        function resetTest() {
+            document.getElementById('log').innerHTML = '';
+            stepCount = 0;
+            if (visualizer) {
+                visualizer.reset();
+            }
+        }
+        
+        // 頁面載入時初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initTest();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>長方形寬度測試</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+        .test-container {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 12px;
+        }
+        button:hover { background: #555; }
+        h3 { margin-top: 0; color: #333; }
+        h4 { color: #666; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📏 長方形寬度測試</h1>
+        <p>測試不同數量的元素在視覺化中的顯示效果，確保長方形不會超出格子範圍。</p>
+        
+        <div class="test-section">
+            <h3>不同元素數量測試</h3>
+            
+            <div class="test-container">
+                <h4>5 個元素 (較少元素)</h4>
+                <div id="test-5"></div>
+                <button onclick="testWithSize(5)">測試 5 個元素</button>
+            </div>
+            
+            <div class="test-container">
+                <h4>8 個元素 (標準數量)</h4>
+                <div id="test-8"></div>
+                <button onclick="testWithSize(8)">測試 8 個元素</button>
+            </div>
+            
+            <div class="test-container">
+                <h4>10 個元素 (較多元素)</h4>
+                <div id="test-10"></div>
+                <button onclick="testWithSize(10)">測試 10 個元素</button>
+            </div>
+            
+            <div class="test-container">
+                <h4>12 個元素 (很多元素)</h4>
+                <div id="test-12"></div>
+                <button onclick="testWithSize(12)">測試 12 個元素</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>寬度比例說明</h3>
+            <ul>
+                <li><strong>5-7 個元素</strong>：寬度比例 60%，間距 40%</li>
+                <li><strong>8-9 個元素</strong>：寬度比例 55%，間距 45%</li>
+                <li><strong>10+ 個元素</strong>：寬度比例 50%，間距 50%</li>
+            </ul>
+            <p>字體大小會根據長方形寬度自動調整，確保文字不會超出範圍。</p>
+        </div>
+        
+        <div class="test-section">
+            <h3>快速測試所有大小</h3>
+            <button onclick="testAll()">🚀 測試所有大小</button>
+            <button onclick="clearAll()">🗑️ 清除所有</button>
+        </div>
+    </div>
+    
+    <script src="scripts/bubble_sort.js"></script>
+    <script>
+        let visualizers = {};
+        
+        function testWithSize(size) {
+            const containerId = `test-${size}`;
+            
+            // 清除舊的視覺化器
+            if (visualizers[containerId]) {
+                document.getElementById(containerId).innerHTML = '';
+            }
+            
+            // 創建新的視覺化器
+            visualizers[containerId] = new BubbleSortVisualizer(containerId, {
+                width: 700,
+                height: 200
+            });
+            
+            // 生成測試資料
+            const data = Array.from({ length: size }, (_, i) => Math.floor(Math.random() * 9) + 1);
+            visualizers[containerId].setData(data);
+            
+            console.log(`測試 ${size} 個元素:`, data);
+        }
+        
+        function testAll() {
+            [5, 8, 10, 12].forEach(size => {
+                testWithSize(size);
+            });
+        }
+        
+        function clearAll() {
+            [5, 8, 10, 12].forEach(size => {
+                const containerId = `test-${size}`;
+                document.getElementById(containerId).innerHTML = '';
+                delete visualizers[containerId];
+            });
+        }
+        
+        // 頁面載入時自動測試 8 個元素
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                testWithSize(8);
+            }, 500);
+        });
+    </script>
+</body>
+</html>
