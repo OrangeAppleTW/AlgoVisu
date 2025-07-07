@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演算法視覺化模板</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* 頁面特定樣式 - 黑白簡約風格模板 */
+        .algorithm-container {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 6px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .visualization-area {
+            background-color: #ffffff;
+            border: 2px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .svg-container {
+            width: 100%;
+            height: 300px;
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+
+        .controls-section {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            background-color: #555555;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background-color: #666666;
+        }
+
+        .btn-secondary:hover {
+            background-color: #777777;
+        }
+
+        .status-display {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            background-color: #f8f8f8;
+            border-left: 4px solid #333333;
+            color: #333333;
+            font-weight: 500;
+        }
+
+        .legend-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #333333;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .speed-slider {
+            width: 200px;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .speed-slider:hover {
+            opacity: 1;
+        }
+
+        .speed-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #333333;
+            cursor: pointer;
+        }
+
+        .speed-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #333333;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* D3.js 視覺化元素樣式 */
+        .bar-element {
+            transition: all 0.3s ease;
+        }
+
+        .bar-unsorted {
+            fill: #A0AEC0;  /* 未排序 - 冷調灰藍色 */
+        }
+
+        .bar-comparing {
+            fill: #4A5568;  /* 正在比較 - 深藍灰色 */
+        }
+
+        .bar-swapping {
+            fill: #2B6CB0;  /* 正在交換 - 深藍色 */
+        }
+
+        .bar-sorted {
+            fill: #1A365D;  /* 已排序 - 深藏青色 */
+        }
+
+        .bar-text {
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            fill: #000000;
+            text-anchor: middle;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .controls-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .legend-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .speed-control {
+                flex-direction: column;
+            }
+
+            .speed-slider {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+
+    <div class="container">
+        <h1>演算法視覺化模板</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            這是 AlgoVisu 專案的頁面模板，展示了標準的黑白簡約風格設計
+        </p>
+
+        <!-- 分頁導航 (如果需要) -->
+        <div class="tabs">
+            <div class="tab active" data-tab="demo">演示頁面</div>
+            <div class="tab" data-tab="style-guide">樣式指南</div>
+        </div>
+
+        <!-- 演示頁面 -->
+        <div id="demo" class="tab-content active">
+            <div class="algorithm-container">
+                <h2>演算法視覺化區域</h2>
+                
+                <!-- 輸入區域 -->
+                <div class="input-section">
+                    <h3 style="margin-top: 0; color: #333;">參數設定</h3>
+                    <label for="input-field">輸入數據：</label>
+                    <input type="text" id="input-field" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;" placeholder="請輸入數據...">
+                </div>
+
+                <!-- 視覺化區域 -->
+                <div class="visualization-area">
+                    <svg id="main-svg" class="svg-container">
+                        <!-- D3.js 或其他視覺化內容將在這裡生成 -->
+                        <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="#999" font-size="16">
+                            視覺化內容將顯示在這裡
+                        </text>
+                    </svg>
+                </div>
+
+                <!-- 控制按鈕 -->
+                <div class="controls-section">
+                    <button class="btn" id="generate-btn">生成數據</button>
+                    <button class="btn" id="start-btn" disabled>開始演算法</button>
+                    <button class="btn btn-secondary" id="pause-btn" disabled>暫停</button>
+                    <button class="btn btn-secondary" id="reset-btn" disabled>重置</button>
+                </div>
+
+                <!-- 速度控制 -->
+                <div class="speed-control">
+                    <label for="speed-slider">演算法速度：</label>
+                    <input type="range" id="speed-slider" class="speed-slider" min="1" max="100" value="50">
+                    <span>快</span>
+                </div>
+
+                <!-- 狀態顯示 -->
+                <div class="status-display" id="status-display">
+                    請點擊「生成數據」按鈕開始
+                </div>
+
+                <!-- 圖例 -->
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #A0AEC0;"></div>
+                        <span>未處理</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4A5568;"></div>
+                        <span>比較中</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #2B6CB0;"></div>
+                        <span>處理中</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #1A365D;"></div>
+                        <span>已完成</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 樣式指南 -->
+        <div id="style-guide" class="tab-content">
+            <div class="algorithm-container">
+                <h2>AlgoVisu 設計風格指南</h2>
+                
+                <h3>顏色配置</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0;">
+                    <div style="padding: 15px; background-color: #333333; color: white; border-radius: 6px;">
+                        <strong>#333333</strong><br>主要按鈕色彩
+                    </div>
+                    <div style="padding: 15px; background-color: #666666; color: white; border-radius: 6px;">
+                        <strong>#666666</strong><br>次要按鈕色彩
+                    </div>
+                    <div style="padding: 15px; background-color: #A0AEC0; color: black; border-radius: 6px;">
+                        <strong>#A0AEC0</strong><br>未處理狀態
+                    </div>
+                    <div style="padding: 15px; background-color: #1A365D; color: white; border-radius: 6px;">
+                        <strong>#1A365D</strong><br>完成狀態
+                    </div>
+                </div>
+
+                <h3>設計原則</h3>
+                <ul style="line-height: 1.8; color: #555;">
+                    <li><strong>黑白簡約：</strong>主要使用黑、白、灰色調，避免過於鮮豔的顏色</li>
+                    <li><strong>清晰易讀：</strong>使用足夠的對比度和適當的字體大小</li>
+                    <li><strong>一致性：</strong>所有頁面使用相同的設計模式和元件</li>
+                    <li><strong>響應式：</strong>適應不同螢幕尺寸，確保在手機和桌面都能正常顯示</li>
+                    <li><strong>教育導向：</strong>重點突出演算法邏輯，減少視覺干擾</li>
+                </ul>
+
+                <h3>標準元件</h3>
+                <div style="margin: 20px 0;">
+                    <h4>按鈕樣式</h4>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0;">
+                        <button class="btn">主要按鈕</button>
+                        <button class="btn btn-secondary">次要按鈕</button>
+                        <button class="btn" disabled>禁用按鈕</button>
+                    </div>
+
+                    <h4>狀態區域</h4>
+                    <div class="status-display">
+                        這是標準的狀態顯示區域樣式
+                    </div>
+
+                    <h4>輸入區域</h4>
+                    <div class="input-section">
+                        <label>標準輸入區域</label>
+                        <input type="text" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px;" placeholder="輸入範例">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 導航區域 -->
+        <div class="navigation">
+            <a href="index.html" class="nav-button">回到首頁</a>
+            <a href="#" class="nav-button">下一個演算法 →</a>
+        </div>
+    </div>
+
+    <!-- 標準 JavaScript 結構 -->
+    <script>
+        // 分頁功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 分頁切換
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    
+                    // 移除所有活動狀態
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    
+                    // 添加活動狀態
+                    this.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+
+            // 按鈕事件範例
+            document.getElementById('generate-btn').addEventListener('click', function() {
+                document.getElementById('status-display').textContent = '數據已生成';
+                document.getElementById('start-btn').disabled = false;
+                document.getElementById('reset-btn').disabled = false;
+            });
+
+            document.getElementById('start-btn').addEventListener('click', function() {
+                document.getElementById('status-display').textContent = '演算法執行中...';
+                this.disabled = true;
+                document.getElementById('pause-btn').disabled = false;
+            });
+
+            document.getElementById('pause-btn').addEventListener('click', function() {
+                document.getElementById('status-display').textContent = '演算法已暫停';
+                this.disabled = true;
+                document.getElementById('start-btn').disabled = false;
+            });
+
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                document.getElementById('status-display').textContent = '請點擊「生成數據」按鈕開始';
+                document.getElementById('start-btn').disabled = true;
+                document.getElementById('pause-btn').disabled = true;
+                this.disabled = true;
+            });
+        });
+    </script>
+    <script src="./components/navbar-loader.js"></script>
+    <script src="navbar.js"></script>
+</body>
+</html>

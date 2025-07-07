@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速排序 - 排序演算法視覺化</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="../module-styles.css">
+    <!-- 引入D3.js庫 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* 黑白簡約風格 */
+        h2 {
+            color: #222;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .visualization-container {
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin: 30px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        
+        button {
+            background-color: #222;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        
+        button:hover {
+            background-color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .slider-container {
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+            justify-content: center;
+        }
+        
+        .slider {
+            flex-grow: 1;
+            max-width: 250px;
+            -webkit-appearance: none;
+            height: 5px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        /* 添加進度條效果 */
+        .slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #222 0%, #222 var(--progress-percent, 50%), #ddd var(--progress-percent, 50%), #ddd 100%);
+            border-radius: 5px;
+            cursor: pointer;
+            /* 調整軌道位置 */
+            position: relative;
+            top: 0px;
+        }
+        
+        .slider::-moz-range-track {
+            width: 100%;
+            height: 5px;
+            background: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-progress {
+            height: 5px;
+            background-color: #222;
+            border-radius: 5px;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #222;
+            cursor: pointer;
+            margin-top: -5px; /* 讓滑動點垂直置中 */
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #222;
+            cursor: pointer;
+            border: none;
+            margin-top: -5px; /* 讓滑動點垂直置中 */
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: transparent;
+            border-radius: 3px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 代碼展示區域 */
+        .code-container {
+            margin: 30px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .code-tabs {
+            display: flex;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .code-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-right: 1px solid #e0e0e0;
+            transition: background-color 0.2s;
+        }
+        
+        .code-tab:hover {
+            background-color: #eaeaea;
+        }
+        
+        .code-tab.active {
+            background-color: #222;
+            color: white;
+        }
+        
+        .code-view {
+            display: none;
+            padding: 15px;
+            background-color: #f8f8f8;
+            white-space: pre-wrap;
+            font-family: monospace;
+            line-height: 1.5;
+            font-size: 0.95em;
+            color: #333;
+        }
+        
+        .code-view.active {
+            display: block;
+        }
+        
+        /* 複雜度區域的樣式 */
+        h3 {
+            font-size: 1.1em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        /* SVG區域樣式 */
+        svg {
+            background-color: #f8f8f8;
+            border: 1px solid #eee;
+            border-radius: 3px;
+        }
+        
+        /* Tab樣式 */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .tab:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid #222;
+            color: #222;
+        }
+        
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #f8f8f8;
+            border-radius: 3px;
+            color: #555;
+        }
+
+        /* 快速排序說明面板的簡約風格 */
+        .info-panel {
+            background-color: #f8f8f8;
+            border-left: 3px solid #222;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .info-panel h4 {
+            margin-top: 0;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+        
+        .info-panel p {
+            margin: 6px 0;
+            font-size: 0.9em;
+            line-height: 1.4;
+            color: #555;
+        }
+
+        /* 強調標記的顏色變更為黑白風格 */
+        .info-panel span.i-pointer {
+            color: #222;
+            font-weight: bold;
+        }
+        
+        .info-panel span.j-pointer {
+            color: #444;
+            font-weight: bold;
+        }
+        
+        .info-panel span.pivot {
+            color: #e74c3c;
+            font-weight: bold;
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="../../index.html" class="navbar-logo">
+                <img src="../../picture/OA_logo2.png" alt="OA Logo" class="logo-img">
+            </a>
+            <div class="navbar-links">
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">APCS進階班</a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-section">
+                            <h4>APCS教學資源</h4>
+                            <a href="../../3_maze_recursion/index.html" class="dropdown-link">老鼠走迷宮</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">學習資源</a>
+                    <div class="dropdown-menu">
+                        <a href="../../1_sorting/index.html" class="dropdown-link">排序演算法</a>
+                        <a href="../../2_2d_linked_list/index.html" class="dropdown-link">二維鏈表</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab" data-tab="bubble">氣泡排序</div>
+            <div class="tab" data-tab="selection">選擇排序</div>
+            <div class="tab" data-tab="insertion">插入排序</div>
+            <div class="tab active" data-tab="quick">快速排序</div>
+            <div class="tab" data-tab="merge">合併排序</div>
+        </div>
+        
+        <div id="quick" class="tab-content active">
+            <h2>快速排序 (Quick Sort)</h2>
+            <p>快速排序是一種分治法的排序演算法，它選擇一個元素作為基準，然後將數組分為兩部分，一部分小於基準，另一部分大於基準。</p>
+            
+            <div class="visualization-container">
+                <!-- D3.js 視覺化區域 -->
+                <svg id="quick-svg" width="100%" height="400"></svg>
+                <div class="status" id="quick-status">請點擊「生成數組」按鈕開始</div>
+                <div class="info-panel">
+                    <h4>快速排序分區過程說明</h4>
+                    <p><span class="i-pointer">i</span>: 小於等於基準的元素區域的邊界指針 (初始為 low-1)</p>
+                    <p><span class="j-pointer">j</span>: 遍歷數組的指針 (從 low 到 high-1)</p>
+                    <p><span style="color: #e74c3c; font-weight: bold; background-color: transparent;">基準元素</span>: 選擇最右側元素作為基準，排序後會放在 i+1 位置</p>
+                    <p>算法核心: 每當找到小於等於基準的元素，就增加 i 並交換元素，確保 i 左側的元素都小於等於基準</p>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button id="quick-generate">生成數組</button>
+                <button id="quick-start" disabled>開始排序</button>
+                <button id="quick-pause" disabled>暫停</button>
+                <button id="quick-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="quick-speed">速度:</label>
+                <input type="range" id="quick-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #A0AEC0;"></div>
+                    <span>未排序</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #4A5568;"></div>
+                    <span>基準元素</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2B6CB0;"></div>
+                    <span>正在比較</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #805AD5;"></div>
+                    <span>正在交換</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #1A365D;"></div>
+                    <span>已排序</span>
+                </div>
+            </div>
+            
+            <h3>演算法說明</h3>
+            <p>快速排序是一種效率較高的排序演算法，它使用分治法策略，選擇一個基準元素，將數組分為兩部分，然後遞迴地對這兩部分進行排序。</p>
+            
+            <h3>時間複雜度</h3>
+            <ul>
+                <li>最壞情況: O(n²) - 當數組已經排序或逆序時</li>
+                <li>平均情況: O(n log n)</li>
+                <li>最好情況: O(n log n)</li>
+            </ul>
+            
+            <h3>空間複雜度</h3>
+            <p>O(log n) - 因為遞迴調用棧的深度</p>
+            
+            <div class="code-container">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-code="pseudo-quick">演算法</div>
+                    <div class="code-tab" data-code="python-quick">Python</div>
+                    <div class="code-tab" data-code="cpp-quick">C++</div>
+                    <div class="code-tab" data-code="c-quick">C</div>
+                    <div class="code-tab" data-code="js-quick">JavaScript</div>
+                </div>
+                
+                <div class="code-view" id="js-quick">
+function quickSort(arr, low = 0, high = arr.length - 1) {
+    if (low < high) {
+        // 找到基準元素的位置
+        const pivotIndex = partition(arr, low, high);
+        
+        // 遞迴排序基準元素的左右兩部分
+        quickSort(arr, low, pivotIndex - 1);
+        quickSort(arr, pivotIndex + 1, high);
+    }
+    
+    return arr;
+}
+
+function partition(arr, low, high) {
+    // 選擇最右邊的元素作為基準
+    const pivot = arr[high];
+    let i = low - 1;
+    
+    for (let j = low; j < high; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+    
+    // 將基準元素放到正確的位置
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    
+    return i + 1;
+}
+                </div>
+                
+                <div class="code-view" id="python-quick">
+def quick_sort(arr, low=0, high=None):
+    if high is None:
+        high = len(arr) - 1
+        
+    if low < high:
+        # 找到基準元素的位置
+        pivot_index = partition(arr, low, high)
+        
+        # 遞迴排序基準元素的左右兩部分
+        quick_sort(arr, low, pivot_index - 1)
+        quick_sort(arr, pivot_index + 1, high)
+    
+    return arr
+
+def partition(arr, low, high):
+    # 選擇最右邊的元素作為基準
+    pivot = arr[high]
+    i = low - 1
+    
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    
+    # 將基準元素放到正確的位置
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    
+    return i + 1
+                </div>
+                
+                <div class="code-view" id="cpp-quick">
+#include <vector>
+
+int partition(std::vector<int>& arr, int low, int high) {
+    // 選擇最右邊的元素作為基準
+    int pivot = arr[high];
+    int i = low - 1;
+    
+    for (int j = low; j < high; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            std::swap(arr[i], arr[j]);
+        }
+    }
+    
+    // 將基準元素放到正確的位置
+    std::swap(arr[i + 1], arr[high]);
+    
+    return i + 1;
+}
+
+void quickSortHelper(std::vector<int>& arr, int low, int high) {
+    if (low < high) {
+        // 找到基準元素的位置
+        int pivotIndex = partition(arr, low, high);
+        
+        // 遞迴排序基準元素的左右兩部分
+        quickSortHelper(arr, low, pivotIndex - 1);
+        quickSortHelper(arr, pivotIndex + 1, high);
+    }
+}
+
+std::vector<int> quickSort(std::vector<int> arr) {
+    quickSortHelper(arr, 0, arr.size() - 1);
+    return arr;
+}
+                </div>
+                
+                <div class="code-view" id="c-quick">
+#include <stdbool.h>
+
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(int arr[], int low, int high) {
+    // 選擇最右邊的元素作為基準
+    int pivot = arr[high];
+    int i = low - 1;
+    
+    for (int j = low; j < high; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    
+    // 將基準元素放到正確的位置
+    swap(&arr[i + 1], &arr[high]);
+    
+    return i + 1;
+}
+
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        // 找到基準元素的位置
+        int pivotIndex = partition(arr, low, high);
+        
+        // 遞迴排序基準元素的左右兩部分
+        quickSort(arr, low, pivotIndex - 1);
+        quickSort(arr, pivotIndex + 1, high);
+    }
+}
+                </div>
+                
+                <div class="code-view active" id="pseudo-quick">
+## 快速排序算法
+
+輸入: 一個數組 array 及起始索引 low 和結束索引 high
+輸出: 排序後的數組
+
+### 主要函數 quickSort(array, low, high):
+1. 如果 low < high:
+   a. 找到基準元素的位置 pivotIndex = partition(array, low, high)
+   b. 過算基準元素左週的部分: quickSort(array, low, pivotIndex - 1)
+   c. 過算基準元素右週的部分: quickSort(array, pivotIndex + 1, high)
+2. 返回排序後的數組
+
+### 分割函數 partition(array, low, high):
+1. 選擇最後一個元素作為基準元素: pivot = array[high]
+2. 初始化分割索引: i = low - 1
+3. 從 low 到 high-1 遍歷數組:
+   a. 如果當前元素 array[j] 小於等於 pivot:
+      i. i 增加 1
+      ii. 交換 array[i] 和 array[j]
+4. 將基準元素放到正確位置: 交換 array[i+1] 和 array[high]
+5. 返回基準元素的索引: i + 1
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 載入所需的腳本檔案 -->
+    <script src="quick-sort-d3.js"></script>
+    <script src="../../navbar.js"></script>
+    <script>
+        // 頁簽切換功能（簡化版，僅用於直接導航）
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化程式碼選項卡功能
+            initCodeTabs();
+            
+            // 頁簽點擊事件 - 導航到對應頁面
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const algorithmName = this.getAttribute('data-tab');
+                    if (algorithmName !== 'quick') {
+                        window.location.href = `../${algorithmName}-sort/${algorithmName}.html`;
+                    }
+                });
+            });
+            
+            // 為進度條添加滑塊拖曳效果
+            const speedSlider = document.getElementById('quick-speed');
+            
+            function updateSliderProgress(slider) {
+                const percent = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+                slider.style.setProperty('--progress-percent', `${percent}%`);
+            }
+            
+            // 初始更新進度
+            updateSliderProgress(speedSlider);
+            
+            // 監聽值變化
+            speedSlider.addEventListener('input', function() {
+                updateSliderProgress(this);
+            });
+        });
+        
+        // 程式碼選項卡切換功能
+        function initCodeTabs() {
+            const codeTabs = document.querySelectorAll('.code-tab');
+            
+            codeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const codeId = tab.getAttribute('data-code');
+                    const parentContainer = tab.closest('.code-container');
+                    
+                    // 移除該容器內所有活動狀態
+                    parentContainer.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+                    parentContainer.querySelectorAll('.code-view').forEach(view => view.classList.remove('active'));
+                    
+                    // 設置活動狀態
+                    tab.classList.add('active');
+                    document.getElementById(codeId).classList.add('active');
+                });
+            });
+        }
+    </script>
+</body>
+</html>

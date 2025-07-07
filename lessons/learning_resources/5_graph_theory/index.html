@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圖論基礎視覺化</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+    <div class="container">
+        <h1>圖論基礎視覺化</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="graph-types">圖的類型</div>
+            <div class="tab" data-tab="path-cycle">路徑與環路</div>
+            <div class="tab" data-tab="connected-tree">連通與樹</div>
+        </div>
+        
+        <!-- 圖的類型 -->
+        <div id="graph-types" class="tab-content active">
+            <h2>圖的類型</h2>
+            <p>圖是由節點（頂點）和連接節點的邊組成的數據結構。圖可以分為有向圖與無向圖，以及加權圖與非加權圖。</p>
+            
+            <div class="visualization-container">
+                <div id="graph-type-container" class="graph-container"></div>
+                <div class="status" id="graph-type-status">選擇圖的類型查看視覺化</div>
+            </div>
+            
+            <div class="structure-view" id="graph-type-structure">
+                <!-- 顯示圖的表示方法 -->
+            </div>
+            
+            <div class="controls">
+                <button id="graph-type-generate">生成圖</button>
+                <select id="graph-type-select">
+                    <option value="undirected">無向圖</option>
+                    <option value="directed">有向圖</option>
+                    <option value="weighted-undirected">無向加權圖</option>
+                    <option value="weighted-directed">有向加權圖</option>
+                </select>
+                <select id="graph-type-representation">
+                    <option value="adjacency-matrix">鄰接矩陣</option>
+                    <option value="adjacency-list">鄰接列表</option>
+                </select>
+                <select id="graph-type-size">
+                    <option value="5">5個節點</option>
+                    <option value="7" selected>7個節點</option>
+                    <option value="10">10個節點</option>
+                </select>
+            </div>
+            
+            <h3>圖的基本概念</h3>
+            <ul>
+                <li><strong>無向圖：</strong>邊沒有方向，節點A到B的連接與B到A的連接相同</li>
+                <li><strong>有向圖：</strong>邊有方向，節點A到B的連接不一定意味著B到A也有連接</li>
+                <li><strong>無向加權圖：</strong>無向圖的邊帶有權重（或成本）</li>
+                <li><strong>有向加權圖：</strong>有向圖的邊帶有權重（或成本）</li>
+            </ul>
+            
+            <h3>圖的表示方法</h3>
+            <ul>
+                <li><strong>鄰接矩陣：</strong>使用二維矩陣表示，若節點i和j有連接，則矩陣中對應位置的值為1（或權重值）</li>
+                <li><strong>鄰接列表：</strong>對每個節點維護一個列表，列表中包含與該節點相鄰的所有節點</li>
+            </ul>
+        </div>
+        
+        <!-- 路徑與環路 -->
+        <div id="path-cycle" class="tab-content">
+            <h2>路徑與環路</h2>
+            <p>路徑是圖中連接兩個節點的一系列邊，而環路是起點和終點相同的路徑。</p>
+            
+            <div class="visualization-container">
+                <div id="path-cycle-container" class="graph-container"></div>
+                <div class="status" id="path-cycle-status">選擇操作查看路徑或環路</div>
+            </div>
+            
+            <div class="structure-view" id="path-cycle-structure">
+                <!-- 顯示路徑或環路信息 -->
+            </div>
+            
+            <div class="controls">
+                <button id="path-cycle-generate">生成圖</button>
+                <select id="path-cycle-operation">
+                    <option value="find-path">查找路徑</option>
+                    <option value="find-cycle">查找環路</option>
+                </select>
+                <button id="path-cycle-start" disabled>開始查找</button>
+                <button id="path-cycle-pause" disabled>暫停</button>
+                <button id="path-cycle-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="path-cycle-speed">速度:</label>
+                <input type="range" id="path-cycle-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <h3>路徑和環路的概念</h3>
+            <ul>
+                <li><strong>路徑：</strong>從一個節點到另一個節點的邊序列，其中每條邊都與前一條邊的終點相連</li>
+                <li><strong>簡單路徑：</strong>不包含重複節點的路徑</li>
+                <li><strong>環路：</strong>起點和終點相同的路徑</li>
+                <li><strong>簡單環路：</strong>除起點和終點外，不包含重複節點的環路</li>
+            </ul>
+            
+            <h3>查找路徑與環路的算法</h3>
+            <ul>
+                <li><strong>深度優先搜索 (DFS)：</strong>用於查找兩點之間的路徑或檢測環路</li>
+                <li><strong>廣度優先搜索 (BFS)：</strong>用於查找兩點之間的最短路徑（邊數最少）</li>
+            </ul>
+        </div>
+        
+        <!-- 連通與樹 -->
+        <div id="connected-tree" class="tab-content">
+            <h2>連通與樹</h2>
+            <p>無向連通圖是任意兩點之間都存在路徑的無向圖，而樹是無環路的連通圖。</p>
+            
+            <div class="visualization-container">
+                <div id="connected-tree-container" class="graph-container"></div>
+                <div class="status" id="connected-tree-status">選擇操作查看連通組件或生成樹</div>
+            </div>
+            
+            <div class="structure-view" id="connected-tree-structure">
+                <!-- 顯示連通組件或樹的信息 -->
+            </div>
+            
+            <div class="controls">
+                <button id="connected-tree-generate">生成圖</button>
+                <select id="connected-tree-operation">
+                    <option value="connected-components">查找連通組件</option>
+                    <option value="spanning-tree">生成最小生成樹</option>
+                </select>
+                <button id="connected-tree-start" disabled>開始操作</button>
+                <button id="connected-tree-pause" disabled>暫停</button>
+                <button id="connected-tree-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="connected-tree-speed">速度:</label>
+                <input type="range" id="connected-tree-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <h3>連通與樹的概念</h3>
+            <ul>
+                <li><strong>連通圖：</strong>任意兩個節點之間都存在路徑的圖</li>
+                <li><strong>連通組件：</strong>圖中的極大連通子圖</li>
+                <li><strong>樹：</strong>無環路的連通圖</li>
+                <li><strong>生成樹：</strong>包含圖中所有節點的樹</li>
+                <li><strong>最小生成樹：</strong>在加權圖中，邊權重之和最小的生成樹</li>
+            </ul>
+            
+            <h3>連通組件與最小生成樹算法</h3>
+            <ul>
+                <li><strong>深度優先搜索 (DFS)：</strong>用於查找連通組件</li>
+                <li><strong>Kruskal 算法：</strong>基於邊的權重貪心選擇構建最小生成樹</li>
+                <li><strong>Prim 算法：</strong>基於節點的貪心策略構建最小生成樹</li>
+            </ul>
+        </div>
+        
+
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.7.0/d3.min.js"></script>
+    <script src="graph_types.js"></script>
+    <script src="path_cycle.js"></script>
+    <script src="connected_tree.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="../../../components/navbar.js"></script>
+</body>
+</html>

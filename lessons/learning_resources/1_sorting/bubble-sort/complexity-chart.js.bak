@@ -1,0 +1,117 @@
+            const margin = { top: 20, right: 80, bottom: 50, left: 60 };
+            const width = parseInt(svg.style('width')) - margin.left - margin.right;
+            const height = parseInt(svg.style('height')) - margin.top - margin.bottom;
+            
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`);
+            
+            // 數據：不同數組大小的理論複雜度
+            const data = [];
+            for (let n = 5; n <= 50; n += 5) {
+                data.push({
+                    n: n,
+                    worstCase: n * (n - 1) / 2,  // O(n²)
+                    averageCase: n * (n - 1) / 4, // O(n²/2)
+                    bestCase: n - 1             // O(n)
+                });
+            }
+            
+            // 比例尺
+            const xScale = d3.scaleLinear()
+                .domain(d3.extent(data, d => d.n))
+                .range([0, width]);
+            
+            const yScale = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.worstCase)])
+                .range([height, 0]);
+            
+            // 線條生成器
+            const line = d3.line()
+                .x(d => xScale(d.n))
+                .y(d => yScale(d.worstCase))
+                .curve(d3.curveMonotoneX);
+            
+            const avgLine = d3.line()
+                .x(d => xScale(d.n))
+                .y(d => yScale(d.averageCase))
+                .curve(d3.curveMonotoneX);
+            
+            const bestLine = d3.line()
+                .x(d => xScale(d.n))
+                .y(d => yScale(d.bestCase))
+                .curve(d3.curveMonotoneX);
+            
+            // 繪製座標軸
+            g.append('g')
+                .attr('transform', `translate(0, ${height})`)
+                .call(d3.axisBottom(xScale))
+                .append('text')
+                .attr('x', width / 2)
+                .attr('y', 35)
+                .attr('fill', 'black')
+                .style('text-anchor', 'middle')
+                .text('數組大小 (n)');
+            
+            g.append('g')
+                .call(d3.axisLeft(yScale))
+                .append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('y', -40)
+                .attr('x', -height / 2)
+                .attr('fill', 'black')
+                .style('text-anchor', 'middle')
+                .text('操作次數');
+            
+            // 繪製線條
+            g.append('path')
+                .datum(data)
+                .attr('fill', 'none')
+                .attr('stroke', '#ff6b6b')
+                .attr('stroke-width', 2)
+                .attr('d', line);
+            
+            g.append('path')
+                .datum(data)
+                .attr('fill', 'none')
+                .attr('stroke', '#4ecdc4')
+                .attr('stroke-width', 2)
+                .attr('d', avgLine);
+            
+            g.append('path')
+                .datum(data)
+                .attr('fill', 'none')
+                .attr('stroke', '#45b7d1')
+                .attr('stroke-width', 2)
+                .attr('d', bestLine);
+            
+            // 添加圖例
+            const legend = g.append('g')
+                .attr('transform', `translate(${width - 120}, 20)`);
+            
+            const legendData = [
+                { color: '#ff6b6b', label: '最壞情況 O(n²)' },
+                { color: '#4ecdc4', label: '平均情況 O(n²/2)' },
+                { color: '#45b7d1', label: '最好情況 O(n)' }
+            ];
+            
+            legendData.forEach((d, i) => {
+                const legendItem = legend.append('g')
+                    .attr('transform', `translate(0, ${i * 20})`);
+                
+                legendItem.append('line')
+                    .attr('x1', 0)
+                    .attr('x2', 15)
+                    .attr('stroke', d.color)
+                    .attr('stroke-width', 2);
+                
+                legendItem.append('text')
+                    .attr('x', 20)
+                    .attr('y', 4)
+                    .attr('fill', 'black')
+                    .style('font-size', '12px')
+                    .text(d.label);
+            });
+        }
+    </script>
+</body>
+</html>

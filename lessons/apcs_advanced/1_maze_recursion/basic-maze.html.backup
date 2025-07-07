@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>基礎迷宮探索 - 老鼠走迷宮</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* 黑白簡約風格 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #222;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .maze-section {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .maze-container {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .maze-grid {
+            display: inline-block;
+            border: 2px solid #333;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .maze-cell {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            position: relative;
+            vertical-align: top;
+            transition: all 0.3s ease;
+        }
+
+        .cell-wall {
+            background-color: #333;
+        }
+
+        .cell-path {
+            background-color: white;
+        }
+
+        .cell-mouse {
+            background-color: #e3f2fd;
+            position: relative;
+        }
+
+        .cell-mouse::after {
+            content: "🐭";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+        }
+
+        .cell-visited {
+            background-color: #f3e5f5;
+        }
+
+        .cell-current {
+            background-color: #fff3e0;
+            animation: pulse 1s infinite;
+        }
+
+        .cell-goal {
+            background-color: #e8f5e8;
+            position: relative;
+        }
+
+        .cell-goal::after {
+            content: "🧀";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25px;
+        }
+
+        .cell-backtrack {
+            background-color: #ffebee;
+            position: relative;
+        }
+        
+        .cell-backtrack::after {
+            content: "❌";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            opacity: 0.7;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .control-panel {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #222;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #000;
+        }
+
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .speed-control {
+            margin: 15px 0;
+        }
+
+        .speed-control input {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .info-panel {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info-panel h4 {
+            margin: 0 0 10px 0;
+            color: #222;
+        }
+
+        .info-panel p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .recursion-stack {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .stack-item {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 3px;
+            padding: 8px;
+            margin: 5px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .stack-item.current {
+            background-color: #fff3e0;
+            border-color: #ff9800;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+
+        .explanation {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .explanation h3 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .maze-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .maze-cell {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .cell-mouse::after, .cell-goal::after {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="../index.html" class="navbar-logo">
+                <img src="../picture/OA_logo2.png" alt="OA Logo" class="logo-img">
+            </a>
+            <div class="navbar-links">
+                <a href="../1_sorting/index.html" class="nav-link">排序演算法</a>
+                <a href="../2_2d_linked_list/index.html" class="nav-link">二維鏈表</a>
+                <a href="../3_maze_recursion/index.html" class="nav-link">老鼠走迷宮</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>🐭 基礎迷宮探索</h1>
+        
+        <div class="explanation">
+            <h3>🎯 遞迴探索的概念</h3>
+            <p>
+                老鼠在每個位置都會問自己同樣的問題：「從這裡開始，我能找到奶酪嗎？」
+                這就是遞迴的本質 - <strong>用相同的方法處理相似的子問題</strong>。
+            </p>
+            <p>
+                觀察老鼠如何：<strong>①</strong> 探索可能的方向 
+                <strong>②</strong> 遞迴地從新位置繼續搜尋 
+                <strong>③</strong> 如果找不到路就回溯到原點
+            </p>
+        </div>
+        
+        <div class="maze-section">
+            <div class="maze-container">
+                <div id="maze-grid" class="maze-grid"></div>
+                
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #333;"></div>
+                        <span>牆壁</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: white; border: 1px solid #ddd;"></div>
+                        <span>通道</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #e3f2fd;"></div>
+                        <span>🐭 老鼠</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #e8f5e8;"></div>
+                        <span>🧀 目標</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f3e5f5;"></div>
+                        <span>已探索</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #fff3e0;"></div>
+                        <span>當前位置</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ffebee;"></div>
+                        <span>❌ 死路（已回溯）</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-panel">
+                <div class="controls">
+                    <button id="start-btn">開始探索</button>
+                    <button id="step-btn" disabled>單步執行</button>
+                    <button id="pause-btn" disabled>暫停</button>
+                    <button id="reset-btn">重置迷宮</button>
+                </div>
+                
+                <div class="speed-control">
+                    <label for="speed-slider">動畫速度：</label>
+                    <input type="range" id="speed-slider" min="1" max="10" value="5">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666;">
+                        <span>慢</span>
+                        <span>快</span>
+                    </div>
+                </div>
+                
+                <div class="info-panel">
+                    <h4>📊 探索統計</h4>
+                    <p>總步數：<span id="step-count">0</span></p>
+                    <p>遞迴層次：<span id="recursion-depth">0</span></p>
+                    <p>回溯次數：<span id="backtrack-count">0</span></p>
+                    <p>當前狀態：<span id="current-status">準備開始</span></p>
+                </div>
+                
+                <div class="recursion-stack">
+                    <h4>🔄 遞迴呼叫堆疊</h4>
+                    <div id="call-stack"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+            <h3 style="color: #222; margin-bottom: 15px;">💡 觀察重點</h3>
+            <ul style="color: #666; line-height: 1.6;">
+                <li><strong>遞迴呼叫：</strong>每次移動到新位置時，都會呼叫相同的「尋找路徑」函數</li>
+                <li><strong>基礎情況：</strong>找到奶酪（成功）或無路可走（失敗）時停止遞迴</li>
+                <li><strong>回溯機制：</strong>當遇到死路時，會返回上一個位置嘗試其他方向</li>
+                <li><strong>狀態記錄：</strong>記住已經走過的路，避免無限循環</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="maze-logic.js"></script>
+    <script src="maze-render.js"></script>
+    <script src="../navbar.js"></script>
+</body>
+</html>

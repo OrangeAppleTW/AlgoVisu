@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>導覽列組件測試頁面</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .test-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .info-item {
+            margin: 8px 0;
+            padding: 8px;
+            background-color: white;
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+
+        .debug-log {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+
+    <div class="test-container">
+        <h1>🧪 導覽列組件測試頁面</h1>
+        
+        <div class="test-section">
+            <h2>📋 自動檢測結果</h2>
+            <div id="auto-tests">
+                <div class="test-info">正在執行自動檢測...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 系統資訊</h2>
+            <div id="system-info">
+                <div class="info-item">正在收集系統資訊...</div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 手動測試</h2>
+            <p>請手動測試以下功能：</p>
+            <ul>
+                <li>✓ 導覽列是否正確顯示</li>
+                <li>✓ Logo圖片是否載入</li>
+                <li>✓ 下拉選單是否能正常展開（滑鼠懸停）</li>
+                <li>✓ 連結是否可以點擊並跳轉</li>
+                <li>✓ 當前頁面是否有高亮顯示</li>
+            </ul>
+
+            <div style="margin-top: 20px;">
+                <button onclick="testNavbarFunctionality()">測試導覽列功能</button>
+                <button onclick="testPathResolution()">測試路徑解析</button>
+                <button onclick="clearDebugLog()">清除日誌</button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🐛 除錯日誌</h2>
+            <div id="debug-log" class="debug-log">等待測試執行...</div>
+        </div>
+    </div>
+
+    <script src="../components/navbar-loader.js"></script>
+    <script>
+        let debugLog = '';
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog += `[${timestamp}] ${type.toUpperCase()}: ${message}\n`;
+            updateDebugLog();
+        }
+
+        function updateDebugLog() {
+            document.getElementById('debug-log').textContent = debugLog;
+        }
+
+        function clearDebugLog() {
+            debugLog = '';
+            updateDebugLog();
+        }
+
+        // 頁面載入完成後執行自動測試
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(runAutomaticTests, 2000); // 等待導覽列載入
+            displaySystemInfo();
+        });
+
+        function runAutomaticTests() {
+            const results = [];
+            
+            // 測試1：導覽列是否存在
+            const navbar = document.querySelector('.navbar');
+            if (navbar) {
+                results.push({ test: '導覽列DOM元素', status: 'pass', message: '導覽列已成功載入' });
+                log('導覽列DOM元素檢測通過');
+            } else {
+                results.push({ test: '導覽列DOM元素', status: 'fail', message: '找不到導覽列元素' });
+                log('導覽列DOM元素檢測失敗', 'error');
+            }
+
+            // 測試2：Logo圖片是否存在
+            const logo = document.querySelector('.logo-img');
+            if (logo) {
+                results.push({ test: 'Logo圖片', status: 'pass', message: 'Logo圖片元素存在' });
+                log('Logo圖片檢測通過');
+                
+                // 檢查圖片是否載入成功
+                if (logo.complete && logo.naturalHeight > 0) {
+                    results.push({ test: 'Logo圖片載入', status: 'pass', message: 'Logo圖片載入成功' });
+                    log('Logo圖片載入成功');
+                } else {
+                    results.push({ test: 'Logo圖片載入', status: 'fail', message: 'Logo圖片載入失敗' });
+                    log('Logo圖片載入失敗', 'error');
+                }
+            } else {
+                results.push({ test: 'Logo圖片', status: 'fail', message: '找不到Logo圖片元素' });
+                log('Logo圖片檢測失敗', 'error');
+            }
+
+            // 測試3：下拉選單是否存在
+            const dropdowns = document.querySelectorAll('.nav-dropdown');
+            if (dropdowns.length > 0) {
+                results.push({ test: '下拉選單', status: 'pass', message: `發現 ${dropdowns.length} 個下拉選單` });
+                log(`下拉選單檢測通過，共 ${dropdowns.length} 個`);
+            } else {
+                results.push({ test: '下拉選單', status: 'fail', message: '找不到下拉選單元素' });
+                log('下拉選單檢測失敗', 'error');
+            }
+
+            // 測試4：連結是否存在
+            const links = document.querySelectorAll('.dropdown-link');
+            if (links.length > 0) {
+                results.push({ test: '導覽連結', status: 'pass', message: `發現 ${links.length} 個導覽連結` });
+                log(`導覽連結檢測通過，共 ${links.length} 個`);
+            } else {
+                results.push({ test: '導覽連結', status: 'fail', message: '找不到導覽連結' });
+                log('導覽連結檢測失敗', 'error');
+            }
+
+            // 測試5：CSS樣式是否載入
+            const navbarStyles = window.getComputedStyle(navbar);
+            if (navbarStyles.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                results.push({ test: 'CSS樣式', status: 'pass', message: '導覽列樣式已正確載入' });
+                log('CSS樣式檢測通過');
+            } else {
+                results.push({ test: 'CSS樣式', status: 'fail', message: '導覽列樣式可能未正確載入' });
+                log('CSS樣式檢測失敗', 'error');
+            }
+
+            displayTestResults(results);
+        }
+
+        function displayTestResults(results) {
+            const container = document.getElementById('auto-tests');
+            container.innerHTML = '';
+
+            results.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result test-${result.status}`;
+                div.innerHTML = `
+                    <strong>${result.status === 'pass' ? '✅' : '❌'} ${result.test}:</strong> 
+                    ${result.message}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function displaySystemInfo() {
+            const info = [
+                `當前URL: ${window.location.href}`,
+                `頁面路徑: ${window.location.pathname}`,
+                `用戶代理: ${navigator.userAgent}`,
+                `螢幕解析度: ${screen.width}x${screen.height}`,
+                `視窗大小: ${window.innerWidth}x${window.innerHeight}`,
+                `文件準備狀態: ${document.readyState}`
+            ];
+
+            const container = document.getElementById('system-info');
+            container.innerHTML = '';
+
+            info.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'info-item';
+                div.textContent = item;
+                container.appendChild(div);
+            });
+        }
+
+        function testNavbarFunctionality() {
+            log('開始測試導覽列功能');
+            
+            // 測試下拉選單hover效果
+            const dropdowns = document.querySelectorAll('.nav-dropdown');
+            dropdowns.forEach((dropdown, index) => {
+                const menu = dropdown.querySelector('.dropdown-menu');
+                if (menu) {
+                    const isVisible = window.getComputedStyle(menu).display !== 'none';
+                    log(`下拉選單 ${index + 1} 初始狀態: ${isVisible ? '顯示' : '隱藏'}`);
+                }
+            });
+
+            log('導覽列功能測試完成');
+        }
+
+        function testPathResolution() {
+            log('開始測試路徑解析');
+            
+            const links = document.querySelectorAll('.dropdown-link, .navbar-logo');
+            links.forEach((link, index) => {
+                const href = link.getAttribute('href');
+                log(`連結 ${index + 1}: ${href}`);
+            });
+
+            const images = document.querySelectorAll('.logo-img');
+            images.forEach((img, index) => {
+                const src = img.getAttribute('src');
+                log(`圖片 ${index + 1}: ${src}`);
+            });
+
+            log('路徑解析測試完成');
+        }
+
+        // 監聽導覽列載入事件
+        window.addEventListener('load', function() {
+            log('頁面完全載入');
+        });
+    </script>
+</body>
+</html>

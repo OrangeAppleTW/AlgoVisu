@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>最短路徑算法視覺化</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+    <div class="container">
+        <h1>最短路徑算法視覺化</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="bfs">廣度優先搜索</div>
+            <div class="tab" data-tab="dfs">深度優先搜索</div>
+        </div>
+        
+        <!-- 廣度優先搜索 -->
+        <div id="bfs" class="tab-content active">
+            <h2>廣度優先搜索 (BFS)</h2>
+            <p>廣度優先搜索是一種按層次遍歷圖的算法，它從起點開始，逐層擴展，直到找到目標或遍歷完整個圖。</p>
+            
+            <div class="visualization-container">
+                <div id="bfs-container" class="graph-container"></div>
+                <div class="status" id="bfs-status">請點擊「生成圖」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="bfs-structure">
+                <!-- 顯示BFS過程 -->
+            </div>
+            
+            <div class="controls">
+                <button id="bfs-generate">生成圖</button>
+                <select id="bfs-size">
+                    <option value="6">6個節點</option>
+                    <option value="9" selected>9個節點</option>
+                    <option value="12">12個節點</option>
+                </select>
+                <button id="bfs-start" disabled>開始搜索</button>
+                <button id="bfs-pause" disabled>暫停</button>
+                <button id="bfs-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="bfs-speed">速度:</label>
+                <input type="range" id="bfs-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <h3>BFS的特點</h3>
+            <ul>
+                <li>按照節點與起點的距離逐層訪問</li>
+                <li>使用隊列來管理訪問順序</li>
+                <li>總是能找到最短路徑（以邊數計算）</li>
+                <li>適用於無權圖或所有邊權重相同的圖</li>
+            </ul>
+            
+            <h3>BFS的應用</h3>
+            <ul>
+                <li>無權圖中的最短路徑問題</li>
+                <li>網絡爬蟲的URL抓取策略</li>
+                <li>社交網絡中的「度」關係</li>
+                <li>迷宮求解、拼圖問題</li>
+            </ul>
+            
+            <div class="code-view">
+// 使用BFS查找最短路徑
+function findShortestPathBFS(graph, start, end) {
+    // 創建一個隊列，起點入隊
+    const queue = [start];
+    // 訪問標記
+    const visited = new Set([start]);
+    // 記錄路徑
+    const parent = {};
+    
+    // BFS主循環
+    while (queue.length > 0) {
+        const node = queue.shift();
+        
+        // 找到終點
+        if (node === end) {
+            break;
+        }
+        
+        // 訪問所有相鄰節點
+        for (const neighbor of graph.getNeighbors(node)) {
+            if (!visited.has(neighbor)) {
+                visited.add(neighbor);
+                queue.push(neighbor);
+                parent[neighbor] = node;
+            }
+        }
+    }
+    
+    // 構建路徑
+    if (!(end in parent) && start !== end) {
+        return null; // 沒有路徑
+    }
+    
+    const path = [];
+    let current = end;
+    
+    while (current !== start) {
+        path.unshift(current);
+        current = parent[current];
+    }
+    
+    path.unshift(start);
+    return path;
+}
+            </div>
+        </div>
+        
+        <!-- 深度優先搜索 -->
+        <div id="dfs" class="tab-content">
+            <h2>深度優先搜索 (DFS)</h2>
+            <p>深度優先搜索是一種優先往深處探索的算法，通常使用遞迴或棧實現，它沿著一條路徑一直探索直到無法繼續，然後回溯。</p>
+            
+            <div class="visualization-container">
+                <div id="dfs-container" class="graph-container"></div>
+                <div class="status" id="dfs-status">請點擊「生成圖」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="dfs-structure">
+                <!-- 顯示DFS過程 -->
+            </div>
+            
+            <div class="controls">
+                <button id="dfs-generate">生成圖</button>
+                <select id="dfs-size">
+                    <option value="6">6個節點</option>
+                    <option value="9" selected>9個節點</option>
+                    <option value="12">12個節點</option>
+                </select>
+                <button id="dfs-start" disabled>開始搜索</button>
+                <button id="dfs-pause" disabled>暫停</button>
+                <button id="dfs-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="dfs-speed">速度:</label>
+                <input type="range" id="dfs-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <h3>DFS的特點</h3>
+            <ul>
+                <li>優先探索深度而非廣度</li>
+                <li>使用遞迴或棧來管理訪問順序</li>
+                <li>不一定能找到最短路徑，但可以找到一條路徑</li>
+                <li>空間複雜度通常比BFS小（在某些情況下）</li>
+            </ul>
+            
+            <h3>DFS的應用</h3>
+            <ul>
+                <li>拓撲排序</li>
+                <li>檢測環路</li>
+                <li>尋找連通組件</li>
+                <li>解決迷宮和遊戲問題</li>
+                <li>查找所有可能的路徑</li>
+            </ul>
+            
+            <div class="code-view">
+// 使用DFS查找路徑（遞迴實現）
+function findPathDFS(graph, start, end, visited = new Set(), path = []) {
+    // 將當前節點添加到路徑和訪問集合
+    path.push(start);
+    visited.add(start);
+    
+    // 找到終點
+    if (start === end) {
+        return path;
+    }
+    
+    // 遍歷所有相鄰節點
+    for (const neighbor of graph.getNeighbors(start)) {
+        if (!visited.has(neighbor)) {
+            const result = findPathDFS(graph, neighbor, end, visited, path);
+            if (result) {
+                return result;
+            }
+        }
+    }
+    
+    // 回溯
+    path.pop();
+    return null;
+}
+
+// 使用DFS查找路徑（迭代實現）
+function findPathDFSIterative(graph, start, end) {
+    const stack = [{ node: start, path: [start] }];
+    const visited = new Set([start]);
+    
+    while (stack.length > 0) {
+        const { node, path } = stack.pop();
+        
+        if (node === end) {
+            return path;
+        }
+        
+        // 將相鄰節點逆序添加到棧中
+        const neighbors = [...graph.getNeighbors(node)].reverse();
+        for (const neighbor of neighbors) {
+            if (!visited.has(neighbor)) {
+                visited.add(neighbor);
+                stack.push({
+                    node: neighbor,
+                    path: [...path, neighbor]
+                });
+            }
+        }
+    }
+    
+    return null; // 沒有找到路徑
+}
+            </div>
+        </div>
+        
+
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.7.0/d3.min.js"></script>
+    <script src="bfs.js"></script>
+    <script src="dfs.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="../../../components/navbar.js"></script>
+</body>
+</html>

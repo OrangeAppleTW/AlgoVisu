@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合併排序 - 排序演算法視覺化</title>
+    <link rel="stylesheet" href="../../styles.css">
+    <link rel="stylesheet" href="../module-styles.css">
+    <!-- 引入D3.js函式庫 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* 黑白簡約風格 */
+        h2 {
+            color: #222;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .visualization-container {
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin: 30px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+            justify-content: center;
+        }
+        
+        button {
+            background-color: #222;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        
+        button:hover {
+            background-color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .slider-container {
+            margin: 15px auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+            justify-content: center;
+        }
+        
+        .slider {
+            flex-grow: 1;
+            max-width: 250px;
+            -webkit-appearance: none;
+            height: 5px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        /* 添加進度條效果 */
+        .slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #222 0%, #222 var(--progress-percent, 50%), #ddd var(--progress-percent, 50%), #ddd 100%);
+            border-radius: 5px;
+            cursor: pointer;
+            /* 調整軌道位置 */
+            position: relative;
+            top: 0px;
+        }
+        
+        .slider::-moz-range-track {
+            width: 100%;
+            height: 5px;
+            background: #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-progress {
+            height: 5px;
+            background-color: #222;
+            border-radius: 5px;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #222;
+            cursor: pointer;
+            margin-top: -5px; /* 讓滑動點垂直置中 */
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #222;
+            cursor: pointer;
+            border: none;
+            margin-top: -5px; /* 讓滑動點垂直置中 */
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: transparent;
+            border-radius: 3px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 代碼展示區域 */
+        .code-container {
+            margin: 30px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .code-tabs {
+            display: flex;
+            background-color: #f5f5f5;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .code-tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-right: 1px solid #e0e0e0;
+            transition: background-color 0.2s;
+        }
+        
+        .code-tab:hover {
+            background-color: #eaeaea;
+        }
+        
+        .code-tab.active {
+            background-color: #222;
+            color: white;
+        }
+        
+        .code-view {
+            display: none;
+            padding: 15px;
+            background-color: #f8f8f8;
+            white-space: pre-wrap;
+            font-family: monospace;
+            line-height: 1.5;
+            font-size: 0.95em;
+            color: #333;
+        }
+        
+        .code-view.active {
+            display: block;
+        }
+        
+        /* 複雜度區域的樣式 */
+        h3 {
+            font-size: 1.1em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        /* SVG區域樣式 */
+        svg {
+            background-color: #f8f8f8;
+            border: 1px solid #eee;
+            border-radius: 3px;
+        }
+        
+        /* Tab樣式 */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .tab:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid #222;
+            color: #222;
+        }
+        
+        .status {
+            text-align: center;
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #f8f8f8;
+            border-radius: 3px;
+            color: #555;
+        }
+
+        /* 合併排序過程視覺化樣式 */
+        .recursion-visual-container {
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .recursion-description h4,
+        .recursion-flow-description h4 {
+            font-size: 1.1em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .recursion-flow-description {
+            margin-top: 20px;
+        }
+        
+        .recursion-flow-description ol {
+            padding-left: 20px;
+        }
+        
+        .recursion-flow-description li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="../../index.html" class="navbar-logo">
+                <img src="../../picture/OA_logo2.png" alt="OA Logo" class="logo-img">
+            </a>
+            <div class="navbar-links">
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">APCS進階班</a>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-section">
+                            <h4>APCS教學資源</h4>
+                            <a href="../../3_maze_recursion/index.html" class="dropdown-link">老鼠走迷宮</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-dropdown">
+                    <a href="#" class="nav-link dropdown-toggle">學習資源</a>
+                    <div class="dropdown-menu">
+                        <a href="../../1_sorting/index.html" class="dropdown-link">排序演算法</a>
+                        <a href="../../2_2d_linked_list/index.html" class="dropdown-link">二維鏈表</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab" data-tab="bubble">氣泡排序</div>
+            <div class="tab" data-tab="selection">選擇排序</div>
+            <div class="tab" data-tab="insertion">插入排序</div>
+            <div class="tab" data-tab="quick">快速排序</div>
+            <div class="tab active" data-tab="merge">合併排序</div>
+        </div>
+        
+        <div id="merge" class="tab-content active">
+            <h2>合併排序 (Merge Sort)</h2>
+            <p>合併排序是一種分治法的排序演算法，它將數組分成兩半，遞迴地對它們進行排序，然後將排序後的子數組合併。</p>
+            <div class="visualization-container">
+                <!-- D3.js 視覺化區域 -->
+                <svg id="merge-svg" width="100%" height="240"></svg>
+            </div>
+            <div class="status" id="merge-status">請點擊「生成數組」按鈕開始</div>
+            
+            <div class="controls">
+                <button id="merge-generate">生成數組</button>
+                <button id="merge-start" disabled>開始排序</button>
+                <button id="merge-reset" disabled>重置</button>
+            </div>
+            
+            <div class="slider-container">
+                <label for="merge-speed">速度:</label>
+                <input type="range" id="merge-speed" class="slider" min="1" max="100" value="50">
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #A0AEC0;"></div>
+                    <span>未排序</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #4A5568;"></div>
+                    <span>比較中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2B6CB0;"></div>
+                    <span>正在比較元素</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #805AD5;"></div>
+                    <span>分割中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #1A365D;"></div>
+                    <span>合併中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2C5282;"></div>
+                    <span>已排序</span>
+                </div>
+            </div>
+            
+            <div class="recursion-visual-container" id="merge-recursion-visual">
+                <!-- 合併排序的遞迴分治過程 -->
+                <div class="recursion-description">
+                    <h4>合併排序的遞迴分治過程</h4>
+                    <p>合併排序是一種分治法的排序演算法，它將數組分成兩半遞迴排序，然後合併已排序的子數組。</p>
+                </div>
+                
+                <div class="recursion-flow-description">
+                    <h4>遞迴分治流程說明</h4>
+                    <ol>
+                        <li><strong>分割階段（Divide）</strong>: 將數組不斷分成更小的子數組，直到每個子數組只有一個元素或為空。</li>
+                        <li><strong>解決階段（Conquer）</strong>: 從最小的子數組開始，將已排序的子數組合併成更大的已排序數組。</li>
+                        <li><strong>合併階段（Merge）</strong>: 比較兩個相鄰子數組的元素，按順序合併到新的數組中。</li>
+                    </ol>
+                    
+                    <p>當我們將一個數組 [7, 3, 2, 16, 24, 4, 11, 9] 進行合併排序時，它會經歷以下步驟：</p>
+                    <ol>
+                        <li>首先將數組分成兩半：[7, 3, 2, 16] 和 [24, 4, 11, 9]</li>
+                        <li>繼續將左半部分再分割：[7, 3] 和 [2, 16]</li>
+                        <li>將 [7, 3] 分割為 [7] 和 [3]，這些是單個元素，已經是已排序狀態</li>
+                        <li>合併 [7] 和 [3] 產生 [3, 7]</li>
+                        <li>同樣將 [2, 16] 分割為 [2] 和 [16] 並合併為 [2, 16]</li>
+                        <li>合併 [3, 7] 和 [2, 16] 產生 [2, 3, 7, 16]</li>
+                        <li>對右半部分重複同樣的過程，最終得到 [4, 9, 11, 24]</li>
+                        <li>最後合併 [2, 3, 7, 16] 和 [4, 9, 11, 24] 產生最終結果 [2, 3, 4, 7, 9, 11, 16, 24]</li>
+                    </ol>
+                </div>
+            </div>
+            
+
+            
+            <h3>演算法說明</h3>
+            <p>合併排序是一種穩定的排序算法，基於分治法的思想。它的基本步驟是：</p>
+            <ol>
+                <li>將數組分成兩半</li>
+                <li>遞迴排序左半部分和右半部分</li>
+                <li>合併兩個已排序的部分</li>
+            </ol>
+            
+            <h3>時間複雜度</h3>
+            <ul>
+                <li>最壞情況: O(n log n)</li>
+                <li>平均情況: O(n log n)</li>
+                <li>最好情況: O(n log n)</li>
+            </ul>
+            
+            <h3>空間複雜度</h3>
+            <p>O(n) - 需要額外的空間來存儲合併時的臨時數組</p>
+            
+            <div class="code-container">
+                <div class="code-tabs">
+                    <div class="code-tab active" data-code="pseudo-merge">演算法</div>
+                    <div class="code-tab" data-code="python-merge">Python</div>
+                    <div class="code-tab" data-code="cpp-merge">C++</div>
+                    <div class="code-tab" data-code="c-merge">C</div>
+                    <div class="code-tab" data-code="js-merge">JavaScript</div>
+                </div>
+                
+                <div class="code-view" id="js-merge">
+function mergeSort(arr) {
+    if (arr.length <= 1) {
+        return arr;
+    }
+    
+    // 將數組分成兩半
+    const mid = Math.floor(arr.length / 2);
+    const left = arr.slice(0, mid);
+    const right = arr.slice(mid);
+    
+    // 遞迴排序左右兩部分
+    return merge(mergeSort(left), mergeSort(right));
+}
+
+function merge(left, right) {
+    let result = [];
+    let leftIndex = 0;
+    let rightIndex = 0;
+    
+    // 比較左右兩部分的元素，將較小的放入結果數組
+    while (leftIndex < left.length && rightIndex < right.length) {
+        if (left[leftIndex] < right[rightIndex]) {
+            result.push(left[leftIndex]);
+            leftIndex++;
+        } else {
+            result.push(right[rightIndex]);
+            rightIndex++;
+        }
+    }
+    
+    // 將剩餘元素加入結果數組
+    return result.concat(left.slice(leftIndex)).concat(right.slice(rightIndex));
+}
+                </div>
+                
+                <div class="code-view" id="python-merge">
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+        
+    # 將數組分成兩半
+    mid = len(arr) // 2
+    left = arr[:mid]
+    right = arr[mid:]
+    
+    # 遞迴排序左右兩部分
+    left = merge_sort(left)
+    right = merge_sort(right)
+    
+    # 合併已排序的兩部分
+    return merge(left, right)
+
+def merge(left, right):
+    result = []
+    left_index = right_index = 0
+    
+    # 比較左右兩部分的元素，將較小的放入結果數組
+    while left_index < len(left) and right_index < len(right):
+        if left[left_index] < right[right_index]:
+            result.append(left[left_index])
+            left_index += 1
+        else:
+            result.append(right[right_index])
+            right_index += 1
+    
+    # 將剩餘元素加入結果數組
+    result.extend(left[left_index:])
+    result.extend(right[right_index:])
+    
+    return result
+                </div>
+                
+                <div class="code-view" id="cpp-merge">
+#include <vector>
+
+std::vector<int> merge(const std::vector<int>& left, const std::vector<int>& right) {
+    std::vector<int> result;
+    size_t leftIndex = 0, rightIndex = 0;
+    
+    // 比較左右兩部分的元素，將較小的放入結果數組
+    while (leftIndex < left.size() && rightIndex < right.size()) {
+        if (left[leftIndex] < right[rightIndex]) {
+            result.push_back(left[leftIndex]);
+            leftIndex++;
+        } else {
+            result.push_back(right[rightIndex]);
+            rightIndex++;
+        }
+    }
+    
+    // 將剩餘元素加入結果數組
+    while (leftIndex < left.size()) {
+        result.push_back(left[leftIndex]);
+        leftIndex++;
+    }
+    
+    while (rightIndex < right.size()) {
+        result.push_back(right[rightIndex]);
+        rightIndex++;
+    }
+    
+    return result;
+}
+
+std::vector<int> mergeSort(std::vector<int> arr) {
+    if (arr.size() <= 1) {
+        return arr;
+    }
+    
+    // 將數組分成兩半
+    size_t mid = arr.size() / 2;
+    std::vector<int> left(arr.begin(), arr.begin() + mid);
+    std::vector<int> right(arr.begin() + mid, arr.end());
+    
+    // 遞迴排序左右兩部分
+    left = mergeSort(left);
+    right = mergeSort(right);
+    
+    // 合併已排序的兩部分
+    return merge(left, right);
+}
+                </div>
+                
+                <div class="code-view" id="c-merge">
+#include <stdlib.h>
+
+// 合併兩個已排序的子數組
+ void merge(int arr[], int left, int mid, int right) {
+    int i, j, k;
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+    
+    // 創建臨時數組
+    int* L = (int*)malloc(n1 * sizeof(int));
+    int* R = (int*)malloc(n2 * sizeof(int));
+    
+    // 複製數據到臨時數組
+    for (i = 0; i < n1; i++)
+        L[i] = arr[left + i];
+    for (j = 0; j < n2; j++)
+        R[j] = arr[mid + 1 + j];
+    
+    // 合併臨時數組回到arr[left..right]
+    i = 0;
+    j = 0;
+    k = left;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            arr[k] = L[i];
+            i++;
+        } else {
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+    
+    // 複製剩餘元素
+    while (i < n1) {
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+    
+    while (j < n2) {
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+    
+    // 釋放臨時數組
+    free(L);
+    free(R);
+}
+
+void mergeSortHelper(int arr[], int left, int right) {
+    if (left < right) {
+        // 找到中間點
+        int mid = left + (right - left) / 2;
+        
+        // 遞迴排序兩半
+        mergeSortHelper(arr, left, mid);
+        mergeSortHelper(arr, mid + 1, right);
+        
+        // 合併兩半
+        merge(arr, left, mid, right);
+    }
+}
+
+void mergeSort(int arr[], int n) {
+    mergeSortHelper(arr, 0, n - 1);
+}
+                </div>
+                
+                <div class="code-view active" id="pseudo-merge">
+## 合併排序算法
+
+輸入: 一個數組 array
+輸出: 排序後的數組
+
+### 主要函數 mergeSort(array):
+1. 如果數組長度小於等於 1，直接返回數組
+2. 找到中間點: mid = 數組長度 / 2 (取整)
+3. 將數組分割為兩個子數組:
+   - 左子數組 = array[0...mid-1]
+   - 右子數組 = array[mid...n-1]
+4. 遞迴對左右子數組進行排序:
+   - 左子數組 = mergeSort(左子數組)
+   - 右子數組 = mergeSort(右子數組)
+5. 合併兩個已排序的子數組: 返回 merge(左子數組, 右子數組)
+
+### 合併函數 merge(left, right):
+1. 創建空的結果數組 result
+2. 初始化左右子數組的索引: leftIndex = 0, rightIndex = 0
+3. 比較兩個子數組的元素，將較小的放入結果數組:
+   - 當 leftIndex < 左子數組長度 且 rightIndex < 右子數組長度 時:
+     a. 如果 left[leftIndex] < right[rightIndex]:
+        - 將 left[leftIndex] 加入 result
+        - leftIndex 增加 1
+     b. 否則:
+        - 將 right[rightIndex] 加入 result
+        - rightIndex 增加 1
+4. 將剩餘元素加入結果數組:
+   - 將 left 中剩餘元素加入 result
+   - 將 right 中剩餘元素加入 result
+5. 返回結果數組 result
+                </div>
+            </div>
+        </div>
+        
+
+    </div>
+    
+    <!-- 載入基本程式碼功能 -->
+    <script src="../sorting.js"></script>
+    <!-- 載入D3.js合併排序視覺化 (使用ES模塊) -->
+    <script type="module" src="merge-sort-d3.js"></script>
+    <script src="../../navbar.js"></script>
+    <script>
+        // 頁簽切換功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化代碼選項卡
+            const codeTabs = document.querySelectorAll('.code-tab');
+            const codeViews = document.querySelectorAll('.code-view');
+            
+            codeTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const codeId = this.getAttribute('data-code');
+                    
+                    // 移除所有活動狀態
+                    codeTabs.forEach(t => t.classList.remove('active'));
+                    codeViews.forEach(v => v.classList.remove('active'));
+                    
+                    // 設置活動狀態
+                    this.classList.add('active');
+                    document.getElementById(codeId).classList.add('active');
+                });
+            });
+            
+            // 頁簽點擊事件 - 導航到對應頁面
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const algorithmName = this.getAttribute('data-tab');
+                    if (algorithmName !== 'merge') {
+                        window.location.href = `../${algorithmName}-sort/${algorithmName}.html`;
+                    }
+                });
+            });
+            
+            // 為進度條添加滑塊拖曳效果
+            const speedSlider = document.getElementById('merge-speed');
+            
+            function updateSliderProgress(slider) {
+                const percent = ((slider.value - slider.min) / (slider.max - slider.min)) * 100;
+                slider.style.setProperty('--progress-percent', `${percent}%`);
+            }
+            
+            // 初始更新進度
+            updateSliderProgress(speedSlider);
+            
+            // 監聽值變化
+            speedSlider.addEventListener('input', function() {
+                updateSliderProgress(this);
+            });
+        });
+    </script>
+</body>
+</html>

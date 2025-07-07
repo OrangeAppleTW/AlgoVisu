@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>二維鏈表處理視覺化</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="matrix-visualizer/matrix-styles.css">
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+    
+    <div class="container">
+        <h1>二維鏈表處理視覺化</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="representation">座標表示</div>
+            <div class="tab" data-tab="search">搜尋操作</div>
+            <div class="tab" data-tab="recursive">遞迴搜尋</div>
+            <div class="tab" data-tab="matrix-visualizer">矩陣視覺化</div>
+        </div>
+        
+        <!-- 座標表示 -->
+        <div id="representation" class="tab-content active">
+            <h2>二維鏈表座標表示</h2>
+            <p>二維鏈表是一種特殊的資料結構，每個節點可以有四個方向（上、下、左、右）的連接。這種結構可以表示二維網格或矩陣。</p>
+            
+            <div class="visualization-container">
+                <div id="grid-representation" class="matrix-container"></div>
+                <div class="status" id="representation-status">點擊「生成網格」按鈕開始</div>
+            </div>
+            
+            <div class="structure-view" id="node-structure">
+                <!-- 顯示節點結構 -->
+            </div>
+            
+            <div class="controls">
+                <button id="representation-generate">生成網格</button>
+                <select id="representation-size">
+                    <option value="3">3x3</option>
+                    <option value="4">4x4</option>
+                    <option value="5" selected>5x5</option>
+                    <option value="6">6x6</option>
+                </select>
+            </div>
+            
+            <h3>二維鏈表節點結構</h3>
+            <div class="code-view">
+class Node {
+    constructor(value, row, col) {
+        this.value = value;    // 節點值
+        this.row = row;        // 行座標
+        this.col = col;        // 列座標
+        this.up = null;        // 上方節點連接
+        this.down = null;      // 下方節點連接
+        this.left = null;      // 左方節點連接
+        this.right = null;     // 右方節點連接
+    }
+}
+            </div>
+        </div>
+        
+        <!-- 搜尋操作 -->
+        <div id="search" class="tab-content">
+            <h2>二維鏈表搜尋操作</h2>
+            <p>在二維鏈表中，我們可以通過節點之間的連接進行搜尋，例如找到特定值的節點，或從某個起點到達目標位置。</p>
+            
+            <div class="visualization-container">
+                <div id="grid-search" class="matrix-container"></div>
+                <div class="status" id="search-status">點擊「生成網格」按鈕開始</div>
+            </div>
+            
+            <div class="controls">
+                <button id="search-generate">生成網格</button>
+                <button id="search-start" disabled>開始搜尋</button>
+                <button id="search-pause" disabled>暫停</button>
+                <button id="search-reset" disabled>重置</button>
+            </div>
+        </div>
+        
+        <!-- 遞迴搜尋 -->
+        <div id="recursive" class="tab-content">
+            <h2>二維鏈表遞迴搜尋</h2>
+            <p>遞迴搜尋是一種利用遞迴函數訪問二維鏈表的方法，特別適合深度優先搜尋（DFS）的應用。</p>
+            
+            <div class="visualization-container">
+                <div id="grid-recursive" class="matrix-container"></div>
+                <div class="status" id="recursive-status">點擊「生成網格」按鈕開始</div>
+            </div>
+            
+            <div class="controls">
+                <button id="recursive-generate">生成網格</button>
+                <button id="recursive-start" disabled>開始搜尋</button>
+                <button id="recursive-pause" disabled>暫停</button>
+                <button id="recursive-reset" disabled>重置</button>
+            </div>
+        </div>
+        
+        <!-- 矩陣視覺化工具 -->
+        <div id="matrix-visualizer" class="tab-content">
+            <h2 style="color: #333333;">矩陣視覺化工具</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">
+                專為教學設計的矩陣視覺化工具，支援同時顯示最多四個矩陣，幫助老師快速展示矩陣相關概念
+            </p>
+
+            <div class="matrix-visualizer-container" style="background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <!-- 輸入區域 -->
+                <div class="input-section" style="margin-bottom: 30px; padding: 20px; background-color: #fafafa; border-radius: 6px; border: 1px solid #e8e8e8;">
+                    <h3 style="margin-top: 0; color: #333;">矩陣輸入</h3>
+                    <textarea 
+                        id="matrix-input" 
+                        style="
+                            width: 100%;
+                            min-height: 120px;
+                            padding: 15px;
+                            border: 2px solid #d0d0d0;
+                            border-radius: 6px;
+                            font-family: 'Courier New', monospace;
+                            font-size: 14px;
+                            line-height: 1.4;
+                            background-color: #ffffff;
+                            color: #333333;
+                            resize: vertical;
+                            transition: border-color 0.3s ease;
+                            box-sizing: border-box;
+                        "
+                        placeholder="請輸入矩陣，每行一列，元素之間用空格分隔，用空行分隔不同矩陣
+
+範例：
+1 2 3
+4 5 6
+
+7 8
+9 10"></textarea>
+                    
+                    <div style="background-color: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin-top: 15px; color: #555555; font-size: 13px; line-height: 1.5;">
+                        <h4 style="margin: 0 0 10px 0; color: #333333; font-size: 14px;">使用說明：</h4>
+                        <ul style="margin: 5px 0; padding-left: 20px;">
+                            <li>每一行代表矩陣的一列，元素之間用空格分隔</li>
+                            <li>用空行分隔不同的矩陣（最多支捣4個矩陣）</li>
+                            <li>支援整數、小數和負數</li>
+                            <li>每個矩陣的所有行必須有相同的元素個數</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 控制按鈕 -->
+                <div style="display: flex; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap;">
+                    <button id="visualize-btn" style="background-color: #333333; color: #ffffff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; min-width: 120px;">視覺化矩陣</button>
+                    <button id="clear-btn" style="background-color: #666666; color: #ffffff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; min-width: 120px;">清除全部</button>
+                    <button id="example-btn" style="background-color: #666666; color: #ffffff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; min-width: 120px;">載入範例</button>
+                    <button id="export-btn" style="background-color: #666666; color: #ffffff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; min-width: 120px;">匯出矩陣</button>
+                </div>
+
+                <!-- 狀態訊息 -->
+                <div id="status-message" style="display: none; text-align: center; padding: 15px; margin: 20px 0; background-color: #f8f8f8; border-left: 4px solid #333333; color: #333333; font-weight: 500; border-radius: 0 4px 4px 0;"></div>
+
+                <!-- 矩陣顯示區域 -->
+                <div id="matrix-display-area" style="display: grid; gap: 15px; margin: 20px 0; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+                    <div style="text-align: center; padding: 40px 20px; color: #999999; font-style: italic;">
+                        <p>請在上方輸入矩陣數據，然後點擊「視覺化矩陣」按鈕開始</p>
+                    </div>
+                </div>
+
+                <!-- D3.js 互動式視覺化區域 -->
+                <div id="d3-visualization-section" style="display: none;">
+                    <h3 style="color: #333; margin-top: 30px;">互動式矩陣視覺化</h3>
+                    <div style="display: flex; justify-content: center; gap: 15px; margin: 15px 0; flex-wrap: wrap; align-items: center;">
+                        <button id="animate-btn" style="background-color: #666666; color: #ffffff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; min-width: 120px;">播放動畫</button>
+                        <button id="highlight-btn" style="background-color: #666666; color: #ffffff; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; min-width: 120px;">高亮顯示</button>
+                        <select id="animation-type" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; background-color: #ffffff; color: #333333; min-width: 150px;">
+                            <option value="traverse">遍歷動畫</option>
+                            <option value="multiply">矩陣乘法</option>
+                            <option value="transpose">轉置動畫</option>
+                        </select>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-left: 20px;">
+                            <button id="zoom-out-btn" style="background-color: #888888; color: #ffffff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">−</button>
+                            <span style="font-size: 14px; color: #333; min-width: 60px; text-align: center;" id="zoom-level">100%</span>
+                            <button id="zoom-in-btn" style="background-color: #888888; color: #ffffff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">+</button>
+                            <button id="zoom-reset-btn" style="background-color: #888888; color: #ffffff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">重置</button>
+                        </div>
+                    </div>
+                    <div id="d3-container" style="background-color: #ffffff; border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; margin: 20px 0; min-height: 400px; overflow: auto; cursor: grab; user-select: none;"></div>
+                </div>
+            </div>
+
+            <!-- 矩陣操作說明 -->
+            <div style="margin-top: 40px; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+                <h3 style="color: #333; margin-top: 0;">矩陣相關教學應用</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 15px;">
+                    <div>
+                        <h4 style="color: #555; margin-bottom: 8px;">基礎概念</h4>
+                        <ul style="color: #666; line-height: 1.6;">
+                            <li>矩陣的維度與結構</li>
+                            <li>行與列的概念</li>
+                            <li>方陣與非方陣</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #555; margin-bottom: 8px;">矩陣運算</h4>
+                        <ul style="color: #666; line-height: 1.6;">
+                            <li>矩陣加法與減法</li>
+                            <li>矩陣乘法規則</li>
+                            <li>轉置矩陣</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #555; margin-bottom: 8px;">程式應用</h4>
+                        <ul style="color: #666; line-height: 1.6;">
+                            <li>二維陣列的表示</li>
+                            <li>巢狀迴圈遍歷</li>
+                            <li>圖像處理基礎</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color: #555; margin-bottom: 8px;">演算法概念</h4>
+                        <ul style="color: #666; line-height: 1.6;">
+                            <li>搜尋與排序</li>
+                            <li>動態規劃表格</li>
+                            <li>圖論鄰接矩陣</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="matrix-visualizer/matrix-core.js"></script>
+    <script src="matrix-visualizer/matrix-d3.js"></script>
+    <script src="matrix-visualizer/matrix-ui.js"></script>
+    <script src="matrix-visualizer/matrix-main.js"></script>
+    <script src="2d_linked_list.js"></script>
+    <script src="representation.js"></script>
+    <script src="search.js"></script>
+    <script src="recursive_search.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="../../../components/navbar.js"></script>
+</body>
+</html>

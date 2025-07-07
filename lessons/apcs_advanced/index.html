@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APCS進階班 - 演算法與資料結構視覺化</title>
+    <link rel="stylesheet" href="../../styles/styles.css">
+    <style>
+        /* 黑白簡約風格 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #222;
+            font-weight: 300;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin: 40px 0 30px 0;
+            color: #222;
+            font-weight: 400;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* 課程卡片網格 */
+        .course-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .lesson-card {
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            cursor: pointer;
+            min-height: 200px;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            border-color: #222;
+        }
+
+        .lesson-card.available {
+            cursor: pointer;
+        }
+
+        .lesson-card.unavailable {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .lesson-card.unavailable:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #e0e0e0;
+        }
+
+        .card-header {
+            padding: 20px 20px 10px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .lesson-number {
+            font-size: 0.9em;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .card-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #222;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 15px 20px 20px 20px;
+        }
+
+        /* 課程狀態標籤 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-top: 10px;
+        }
+
+        .status-available {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+
+        .status-coming-soon {
+            background-color: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffcc02;
+        }
+
+        /* 課程類別區塊 */
+        .course-section {
+            margin: 50px 0;
+        }
+
+        .section-intro {
+            background-color: white;
+            border-radius: 8px;
+            border-left: 4px solid #222;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-intro h3 {
+            margin-top: 0;
+            color: #222;
+            font-size: 1.3em;
+        }
+
+        .section-intro p {
+            margin-bottom: 0;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .course-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .lesson-card {
+                min-height: auto;
+            }
+
+            .card-header {
+                padding: 15px 15px 8px 15px;
+            }
+
+            .card-body {
+                padding: 10px 15px 15px 15px;
+            }
+        }
+
+        .progress-note {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .progress-note h3 {
+            color: #222;
+            margin-bottom: 15px;
+        }
+
+        .progress-note p {
+            color: #666;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+    
+    <div class="container">
+        <h1>🎓 APCS進階班</h1>
+        
+        <p class="subtitle">
+            專為準備APCS檢定的同學設計的進階演算法課程，
+            透過視覺化學習和互動實作，深入掌握程式設計核心概念。
+        </p>
+        
+        <div class="course-section">
+            <div class="section-intro">
+                <h3>📚 課程大綱</h3>
+                <p>
+                    依照APCS檢定重點設計的系統性課程，從基礎遞迴到進階動態規劃，
+                    每堂課都包含理論講解和實際操作練習。
+                </p>
+            </div>
+            
+            <div class="course-cards">
+                <a href="1_maze_recursion/index.html" class="lesson-card available">
+                    <div class="card-header">
+                        <div class="lesson-number">L1</div>
+                        <h3 class="card-title">遞迴函式</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-available">✅ 已上線</span>
+                    </div>
+                </a>
+
+                <div class="lesson-card unavailable">
+                    <div class="card-header">
+                        <div class="lesson-number">L2</div>
+                        <h3 class="card-title">時間與空間複雜度</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-coming-soon">🚧 即將推出</span>
+                    </div>
+                </div>
+
+                <div class="lesson-card unavailable">
+                    <div class="card-header">
+                        <div class="lesson-number">L3</div>
+                        <h3 class="card-title">枚舉與遍歷</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-coming-soon">🚧 即將推出</span>
+                    </div>
+                </div>
+
+                <div class="lesson-card unavailable">
+                    <div class="card-header">
+                        <div class="lesson-number">L4</div>
+                        <h3 class="card-title">二維串列應用</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-coming-soon">🚧 即將推出</span>
+                    </div>
+                </div>
+
+                <div class="lesson-card unavailable">
+                    <div class="card-header">
+                        <div class="lesson-number">L5</div>
+                        <h3 class="card-title">樹狀圖、二元樹</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-coming-soon">🚧 即將推出</span>
+                    </div>
+                </div>
+
+                <div class="lesson-card unavailable">
+                    <div class="card-header">
+                        <div class="lesson-number">L6</div>
+                        <h3 class="card-title">圖形搜尋方法</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-coming-soon">🚧 即將推出</span>
+                    </div>
+                </div>
+
+                <div class="lesson-card unavailable">
+                    <div class="card-header">
+                        <div class="lesson-number">L7</div>
+                        <h3 class="card-title">貪心演算法</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-coming-soon">🚧 即將推出</span>
+                    </div>
+                </div>
+
+                <div class="lesson-card unavailable">
+                    <div class="card-header">
+                        <div class="lesson-number">L8</div>
+                        <h3 class="card-title">動態規劃 (1)</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-coming-soon">🚧 即將推出</span>
+                    </div>
+                </div>
+
+                <div class="lesson-card unavailable">
+                    <div class="card-header">
+                        <div class="lesson-number">L9</div>
+                        <h3 class="card-title">動態規劃 (2)</h3>
+                    </div>
+                    <div class="card-body">
+                        <span class="status-badge status-coming-soon">🚧 即將推出</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress-note">
+            <h3>📈 持續更新中</h3>
+            <p>
+                課程內容將陸續開發完成，每個單元都將包含完整的視覺化演示和互動練習，
+                幫助同學更好地理解演算法概念並在APCS檢定中取得理想成績。
+            </p>
+        </div>
+    </div>
+    
+    <script src="../../components/navbar-loader.js"></script>
+    <script src="../../components/navbar.js"></script>
+</body>
+</html>

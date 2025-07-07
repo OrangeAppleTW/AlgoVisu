@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式練習 - 老鼠走迷宮</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #222;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .practice-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .maze-container {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .interactive-panel {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .maze-grid {
+            display: inline-block;
+            border: 2px solid #333;
+            border-radius: 4px;
+            background-color: white;
+            user-select: none;
+        }
+
+        .maze-cell {
+            width: 60px;
+            height: 60px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            position: relative;
+            vertical-align: top;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .maze-cell:hover {
+            transform: scale(1.05);
+        }
+
+        .cell-wall { 
+            background-color: #333; 
+            cursor: not-allowed;
+        }
+        .cell-wall:hover { 
+            transform: none; 
+        }
+
+        .cell-path { 
+            background-color: white; 
+        }
+
+        .cell-mouse { 
+            background-color: #e3f2fd;
+            position: relative;
+        }
+        .cell-mouse::after {
+            content: "🐭";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+        }
+
+        .cell-goal { 
+            background-color: #e8f5e8;
+            position: relative;
+        }
+        .cell-goal::after {
+            content: "🧀";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25px;
+        }
+
+        .cell-visited { 
+            background-color: #f3e5f5; 
+        }
+
+        .cell-obstacle {
+            background-color: #ffebee;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .cell-obstacle::after {
+            content: "❌";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25px;
+            opacity: 0.8;
+        }
+
+        .cell-highlight {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #222;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #000;
+        }
+
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .difficulty-selector {
+            margin: 15px 0;
+        }
+
+        .difficulty-selector select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .score-board {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .score-board h4 {
+            margin: 0 0 10px 0;
+            color: #222;
+        }
+
+        .thinking-tips {
+            background-color: #e3f2fd;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .thinking-tips h4 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+
+        .thinking-tips ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .explanation-box {
+            background-color: #e8f5e8;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .explanation-box h3 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+
+        /* Hover 提示框樣式 */
+        .direction-tooltip {
+            position: absolute;
+            background-color: white;
+            border: 2px solid #4169e1;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            min-width: 200px;
+            font-size: 14px;
+            display: none;
+            pointer-events: auto; /* 允許點擊 */
+        }
+
+        .direction-tooltip h4 {
+            margin: 0 0 10px 0;
+            color: #4169e1;
+            font-size: 16px;
+        }
+
+        .direction-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            padding: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .direction-item:hover {
+            background-color: #f0f8ff;
+        }
+
+        .direction-item.completed {
+            text-decoration: line-through;
+            opacity: 0.7;
+            background-color: #f5f5f5;
+        }
+
+        .direction-item .direction-number {
+            font-weight: bold;
+            color: #4169e1;
+            margin-right: 8px;
+            min-width: 20px;
+        }
+
+        .direction-item.completed .direction-number {
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .practice-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .maze-cell {
+                width: 45px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+    
+    <div class="container">
+        <h1>📚 教學工具 - 遞迴探索示範</h1>
+        
+        <div class="explanation-box">
+            <h3>🧠 遞迴思維解析</h3>
+            <p>
+                <strong>递歸的本質：將大問題分解成小問題</strong><br>
+                老鼠在每一格都會問自己同樣的問題：「從這裡開始，我能找到起司嗎？」
+            </p>
+            <p>
+                <strong>每一步的方法：</strong><br>
+                ① <strong>先判斷是否找到起司</strong> → 如果找到就勝利！<br>
+                ② <strong>嘗試向上移動</strong> → 若可行，遞迴呼叫 findPath(新位置)<br>
+                ③ <strong>嘗試向右移動</strong> → 若可行，遞迴呼叫 findPath(新位置)<br>
+                ④ <strong>嘗試向下移動</strong> → 若可行，遞迴呼叫 findPath(新位置)<br>
+                ⑤ <strong>嘗試向左移動</strong> → 若可行，遞迴呼叫 findPath(新位置)<br>
+                ⑥ <strong>所有方向都沒路</strong> → 回溯到上一格再試其他方向
+            </p>
+        </div>
+        
+        <div class="practice-section">
+            <div class="maze-container">
+                <div id="interactive-maze" class="maze-grid"></div>
+                
+                <!-- 方向提示框 -->
+                <div id="direction-tooltip" class="direction-tooltip">
+                    <h4>🧠 在這一格的思考步驟</h4>
+                    <div class="direction-item" data-direction="check">
+                        <span class="direction-number">①</span>
+                        <span>先判斷是否找到起司</span>
+                    </div>
+                    <div class="direction-item" data-direction="up">
+                        <span class="direction-number">②</span>
+                        <span>嘗試向上移動</span>
+                    </div>
+                    <div class="direction-item" data-direction="right">
+                        <span class="direction-number">③</span>
+                        <span>嘗試向右移動</span>
+                    </div>
+                    <div class="direction-item" data-direction="down">
+                        <span class="direction-number">④</span>
+                        <span>嘗試向下移動</span>
+                    </div>
+                    <div class="direction-item" data-direction="left">
+                        <span class="direction-number">⑤</span>
+                        <span>嘗試向左移動</span>
+                    </div>
+                    <div class="direction-item" data-direction="backtrack">
+                        <span class="direction-number">⑥</span>
+                        <span>所有方向都沒路 - 回溯</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div style="font-size: 18px; font-weight: bold; color: #222;">
+                        狀態：<span id="game-status">點擊開始示範</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="interactive-panel">
+                <div class="controls">
+                    <button id="new-game">開始新示範</button>
+                    <button id="mode-switch" disabled>🔄 切換模式：移動老鼠</button>
+                    <button id="solve-btn" disabled>🤖 自動求解</button>
+                    <button id="reset-position" disabled>↶ 重置位置</button>
+                </div>
+                
+                <div class="thinking-tips">
+                    <h4>🎯 教學操作說明</h4>
+                    <ul>
+                        <li><strong>移動模式：</strong>點擊相鄰格子移動老鼠</li>
+                        <li><strong>標記模式：</strong>點擊可移動格子標記死路</li>
+                        <li>示範遞迴探索過程中的每一步思考</li>
+                        <li>解釋回溯機制：無路可走時返回上一步</li>
+                        <li>使用標記死路功能讓學生理解回溯概念</li>
+                    </ul>
+                </div>
+                
+                <div class="score-board">
+                    <h4>📝 遞迴狀態追蹤</h4>
+                    <p>當前送迴層次：<span id="recursion-depth">0</span></p>
+                    <p>探索步數：<span id="move-count">0</span></p>
+                    <p>回溯次數：<span id="backtrack-moves">0</span></p>
+                    <p>標記死路：<span id="obstacles-placed">0</span></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 程式碼對照區塊放在最下方 -->
+        <div style="background-color: #f0f8ff; border: 2px solid #4169e1; border-radius: 8px; padding: 20px; margin: 30px 0;">
+            <h3 style="color: #4169e1; margin-top: 0;">📝 程式碼思維對照 (進階參考)</h3>
+            <p style="color: #666; margin-bottom: 15px; font-size: 14px;">
+                以下是對應的程式碼結構，可供進階學習時參考：
+            </p>
+            <div style="background-color: #f8f8f8; border-left: 4px solid #4169e1; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 13px;">
+                <strong>function findPath(x, y) {</strong><br>
+                &nbsp;&nbsp;// ① 先判斷是否找到起司<br>
+                &nbsp;&nbsp;<strong style="color: #228b22;">if (x == 起司位置) return true;</strong><br><br>
+                &nbsp;&nbsp;// 檢查位置是否有效<br>
+                &nbsp;&nbsp;<strong style="color: #dc143c;">if (無效位置 || 已訪問) return false;</strong><br>
+                &nbsp;&nbsp;visited[x][y] = true; // 標記已訪問<br><br>
+                &nbsp;&nbsp;// ② 嘗試向上移動，如果找到路就回傳 true<br>
+                &nbsp;&nbsp;<strong style="color: #4169e1;">if (findPath(x, y-1)) return true;</strong><br>
+                &nbsp;&nbsp;// ③ 嘗試向右移動，如果找到路就回傳 true<br>
+                &nbsp;&nbsp;<strong style="color: #4169e1;">if (findPath(x+1, y)) return true;</strong><br>
+                &nbsp;&nbsp;// ④ 嘗試向下移動，如果找到路就回傳 true<br>
+                &nbsp;&nbsp;<strong style="color: #4169e1;">if (findPath(x, y+1)) return true;</strong><br>
+                &nbsp;&nbsp;// ⑤ 嘗試向左移動，如果找到路就回傳 true<br>
+                &nbsp;&nbsp;<strong style="color: #4169e1;">if (findPath(x-1, y)) return true;</strong><br><br>
+                &nbsp;&nbsp;// ⑥ 所有方向都沒路 - 回溯<br>
+                &nbsp;&nbsp;<strong style="color: #dc143c;">return false;</strong><br>
+                <strong>}</strong>
+            </div>
+        </div>
+    </div>
+    
+    <script src="interactive-logic.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="../../../components/navbar.js"></script>
+</body>
+</html>

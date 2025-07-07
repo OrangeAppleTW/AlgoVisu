@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>回溯機制演示 - 老鼠走迷宮</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* 繼承基礎樣式 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: #222;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .demo-section {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .maze-container {
+            background-color: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .backtrack-visualization {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .maze-grid {
+            display: inline-block;
+            border: 2px solid #333;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .maze-cell {
+            width: 50px;
+            height: 50px;
+            border: 1px solid #ddd;
+            display: inline-block;
+            position: relative;
+            vertical-align: top;
+            transition: all 0.3s ease;
+        }
+
+        /* 迷宮單元格樣式 */
+        .cell-wall { background-color: #333; }
+        .cell-path { background-color: white; }
+        .cell-mouse { 
+            background-color: #e3f2fd;
+            position: relative;
+        }
+        .cell-mouse::after {
+            content: "🐭";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 25px;
+        }
+        .cell-goal { 
+            background-color: #e8f5e8;
+            position: relative;
+        }
+        .cell-goal::after {
+            content: "🧀";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+        }
+        .cell-visited { background-color: #f3e5f5; }
+        .cell-deadend { background-color: #ffebee; }
+        .cell-backtrack { 
+            background-color: #fff3e0;
+            animation: backtrack-highlight 1s ease-in-out;
+        }
+
+        @keyframes backtrack-highlight {
+            0%, 100% { background-color: #fff3e0; }
+            50% { background-color: #ff9800; transform: scale(1.1); }
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #222;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #000;
+        }
+
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+        .backtrack-info {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .backtrack-info h4 {
+            margin: 0 0 10px 0;
+            color: #222;
+        }
+
+        .step-counter {
+            font-family: monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        .decision-tree {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .tree-node {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 12px;
+            border-left: 3px solid #ddd;
+        }
+
+        .tree-node.current {
+            background-color: #fff3e0;
+            border-left-color: #ff9800;
+        }
+
+        .tree-node.success {
+            background-color: #e8f5e8;
+            border-left-color: #4caf50;
+        }
+
+        .tree-node.deadend {
+            background-color: #ffebee;
+            border-left-color: #f44336;
+        }
+
+        .explanation-box {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .explanation-box h3 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .demo-section {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .maze-cell {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="../index.html" class="navbar-logo">
+                <img src="../picture/OA_logo2.png" alt="OA Logo" class="logo-img">
+            </a>
+            <div class="navbar-links">
+                <a href="../1_sorting/index.html" class="nav-link">排序演算法</a>
+                <a href="../2_2d_linked_list/index.html" class="nav-link">二維鏈表</a>
+                <a href="../3_maze_recursion/index.html" class="nav-link">老鼠走迷宮</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <h1>🔄 回溯機制演示</h1>
+        
+        <div class="explanation-box">
+            <h3>🎯 什麼是回溯？</h3>
+            <p>
+                <strong>回溯（Backtracking）</strong>是遞迴中的重要概念。當老鼠走到死路時，
+                它不會放棄，而是<strong>「返回上一個決策點」</strong>，嘗試其他可能的路線。
+            </p>
+            <p>
+                這就像你在做選擇題時，如果發現某個答案不對，你會回到原題重新思考其他選項。
+                在程式設計中，這種「試錯並回退」的策略非常實用！
+            </p>
+        </div>
+        
+        <div class="demo-section">
+            <div class="maze-container">
+                <div id="backtrack-maze" class="maze-grid"></div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <div class="step-counter">
+                        回溯次數：<span id="backtrack-counter">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="backtrack-visualization">
+                <div class="controls">
+                    <button id="start-demo">開始演示</button>
+                    <button id="step-demo" disabled>單步回溯</button>
+                    <button id="reset-demo">重置演示</button>
+                </div>
+                
+                <div class="backtrack-info">
+                    <h4>📍 當前狀態</h4>
+                    <p>位置：<span id="current-position">(1, 1)</span></p>
+                    <p>動作：<span id="current-action">準備開始</span></p>
+                    <p>深度：<span id="current-depth">0</span></p>
+                </div>
+                
+                <div class="decision-tree">
+                    <h4>🌳 決策樹</h4>
+                    <div id="decision-nodes"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+            <h3 style="color: #222; margin-bottom: 15px;">🔍 觀察要點</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div>
+                    <h4 style="color: #e74c3c;">❌ 遇到死路時</h4>
+                    <ul style="color: #666; line-height: 1.6;">
+                        <li>老鼠會標記當前位置為「死路」</li>
+                        <li>返回到上一個有其他選擇的位置</li>
+                        <li>嘗試其他尚未探索的方向</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #4caf50;">✅ 成功策略</h4>
+                    <ul style="color: #666; line-height: 1.6;">
+                        <li>系統性地探索所有可能路徑</li>
+                        <li>記住已經嘗試過的失敗路線</li>
+                        <li>利用遞迴的「記憶」特性避免重複</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px; padding: 20px; background-color: #fff3e0; border-radius: 8px; border-left: 4px solid #ff9800;">
+            <h3 style="color: #f57c00; margin-top: 0;">💡 程式設計中的回溯應用</h3>
+            <p style="color: #555; line-height: 1.6;">回溯法廣泛應用於許多問題：</p>
+            <ul style="color: #666; line-height: 1.6;">
+                <li><strong>數獨求解：</strong>嘗試數字，遇到衝突就回退重新選擇</li>
+                <li><strong>八皇后問題：</strong>放置棋子，衝突時回溯到前一步</li>
+                <li><strong>路徑規劃：</strong>在地圖中尋找最佳路線</li>
+                <li><strong>組合優化：</strong>在大量選擇中找到最優解</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script src="backtrack-logic.js"></script>
+    <script src="backtrack-render.js"></script>
+    <script src="../navbar.js"></script>
+</body>
+</html>

@@ -4,61 +4,399 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>演算法與資料結構視覺化</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
+    <style>
+        /* 黑白簡約風格 */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #222;
+            font-weight: 300;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            margin: 40px 0 30px 0;
+            color: #222;
+            font-weight: 400;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        /* 演算法卡片網格 */
+        .algorithm-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .algorithm-card {
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            cursor: pointer;
+            min-height: 280px;
+        }
+
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-color: #222;
+        }
+
+        .card-header {
+            padding: 25px 25px 15px 25px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #222;
+            margin: 0 0 10px 0;
+        }
+
+        .card-subtitle {
+            font-size: 0.9em;
+            color: #666;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 20px 25px 25px 25px;
+        }
+
+        .card-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .card-features li {
+            position: relative;
+            padding: 5px 0 5px 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .card-features li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #222;
+            font-weight: bold;
+        }
+
+        /* 開發中提示區塊 */
+        .development-notice {
+            margin-top: 60px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            border-left: 4px solid #222;
+            text-align: center;
+        }
+
+        .development-notice h3 {
+            margin-top: 0;
+            color: #222;
+            font-size: 1.3em;
+            font-weight: 500;
+        }
+
+        .development-notice p {
+            margin-bottom: 0;
+            color: #666;
+            font-size: 1em;
+        }
+
+        .development-notice .emoji {
+            font-size: 1.5em;
+            margin-right: 8px;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .algorithm-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .algorithm-card {
+                min-height: auto;
+            }
+
+            .card-header {
+                padding: 20px 20px 10px 20px;
+            }
+
+            .card-body {
+                padding: 15px 20px 20px 20px;
+            }
+
+            .development-notice {
+                padding: 20px;
+                margin-top: 40px;
+            }
+        }
+
+        /* 確保導航列樣式一致 */
+        .navbar {
+            background-color: #222;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            width: 100%;
+            padding: 0;
+            height: 60px;
+        }
+
+        .navbar-container {
+            width: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: flex-start;
+            align-items: stretch;
+            height: 100%;
+            padding: 0 20px;
+            gap: 0;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            margin-right: 20px;
+            padding: 0 10px;
+            height: 100%;
+        }
+
+        .logo-img {
+            height: 45px;
+            width: auto;
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: stretch;
+            height: 100%;
+            margin-left: 0;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 0 15px;
+            background-color: transparent;
+            display: flex;
+            align-items: flex-end;
+            padding-bottom: 12px;
+            transition: color 0.3s, border-color 0.3s;
+            height: 100%;
+            font-size: 18px;
+        }
+
+        .nav-link:hover {
+            background-color: transparent;
+            color: #f8f8f8;
+        }
+
+        .nav-link.active {
+            background-color: transparent;
+            color: #ffffff;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: none;
+        }
+
+        /* 下拉選單樣式 */
+        .nav-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle::after {
+            content: ' ▼';
+            font-size: 0.7em;
+            margin-left: 5px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #333;
+            min-width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .nav-dropdown:hover .dropdown-menu {
+            display: block;
+        }
+
+        .dropdown-section {
+            padding: 10px 0;
+        }
+
+        .dropdown-section h4 {
+            color: #ccc;
+            padding: 8px 15px;
+            margin: 0;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #555;
+            font-weight: 600;
+        }
+
+        .dropdown-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 12px 15px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-link:hover {
+            background-color: #555;
+            color: #f8f8f8;
+        }
+
+        /* 調整主內容區域，避免被固定導覽列覆蓋 */
+        body {
+            margin: 0;
+            padding: 0;
+            padding-top: 60px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="index.html" class="navbar-logo">
-                <img src="picture/OA_logo2.png" alt="OA Logo" class="logo-img">
-            </a>
-            <div class="navbar-links">
-                <a href="1_sorting/index.html" class="nav-link">排序演算法</a>
-                <a href="2_2d_linked_list/index.html" class="nav-link">二維鏈表</a>
-                <a href="3_divide_and_conquer/index.html" class="nav-link">分治法</a>
-                <a href="4_coin_change/index.html" class="nav-link">找零錢問題</a>
-                <a href="5_graph_theory/index.html" class="nav-link">圖論基礎</a>
-                <a href="6_shortest_path/index.html" class="nav-link">最短路徑</a>
-            </div>
-        </div>
-    </nav>
-    <div class="container index-container">
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+    
+    <div class="container">
         <h1>演算法與資料結構視覺化</h1>
         
-        <p>這個網站提供了各種常見演算法和資料結構的互動式視覺化展示。通過這些視覺化工具，您可以更加直觀地理解這些演算法的工作原理和資料結構的特性。</p>
+        <p class="subtitle">
+            透過互動式視覺化展示，深入理解各種演算法的工作原理和資料結構的特性。
+            讓抽象的概念變得直觀易懂。
+        </p>
         
-        <h2>目錄</h2>
-        <ul class="index-list">
-            <li class="index-item">
-                <a href="1_sorting/index.html" class="index-link">排序演算法</a>
-                <p class="index-description">包括氣泡排序、插入排序、快速排序和合併排序等常見排序演算法的可視化。</p>
-            </li>
-            <li class="index-item">
-                <a href="2_2d_linked_list/index.html" class="index-link">二維鏈表處理</a>
-                <p class="index-description">展示二維鏈表的座標表示、搜尋和遞迴搜尋等操作。</p>
-            </li>
-            <li class="index-item">
-                <a href="3_divide_and_conquer/index.html" class="index-link">分治法</a>
-                <p class="index-description">包含矩陣乘法和樹的走訪方法（前序、中序、後序）等分治策略的展示。</p>
-            </li>
-            <li class="index-item">
-                <a href="4_coin_change/index.html" class="index-link">找零錢問題</a>
-                <p class="index-description">展示解決找零錢的貪婪演算法和動態規劃方法。</p>
-            </li>
-            <li class="index-item">
-                <a href="5_graph_theory/index.html" class="index-link">圖論基礎</a>
-                <p class="index-description">介紹有向圖與無向圖、加權圖、路徑與環路、無向連通圖和樹狀圖等概念。</p>
-            </li>
-            <li class="index-item">
-                <a href="6_shortest_path/index.html" class="index-link">最短路徑算法</a>
-                <p class="index-description">展示廣度優先搜尋和深度優先搜尋在找尋最短路徑中的應用。</p>
-            </li>
-        </ul>
+        <h2>主要入口</h2>
+        
+        <div class="algorithm-cards">
+            <a href="lessons/apcs_advanced/index.html" class="algorithm-card">
+                <div class="card-header">
+                    <h3 class="card-title">🎓 APCS進階班</h3>
+                    <p class="card-subtitle">Advanced Programming Course</p>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">
+                        專為APCS檢定設計的進階課程，透過視覺化學習和互動實作，深入掌握程式設計核心概念。
+                    </p>
+                    <ul class="card-features">
+                        <li>🐭 老鼠走迷宮 - 遞迴與回溯入門</li>
+                        <li>🌳 樹狀結構進階 - 即將推出</li>
+                        <li>🔄 動態規劃專題 - 開發中</li>
+                        <li>📊 圖論演算法 - 開發中</li>
+                        <li>🎯 APCS考試重點解析</li>
+                    </ul>
+                </div>
+            </a>
+
+            <a href="lessons/learning_resources/index.html" class="algorithm-card">
+                <div class="card-header">
+                    <h3 class="card-title">📚 學習資源</h3>
+                    <p class="card-subtitle">Learning Resources</p>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">
+                        從基礎到進階的完整學習路徑，透過互動式視覺化和實作練習，循序漸進地掌握演算法與資料結構的核心概念。
+                    </p>
+                    <ul class="card-features">
+                        <li>🔄 排序演算法 - 5個經典演算法</li>
+                        <li>🔗 二維鏈表處理 - 資料結構基礎</li>
+                        <li>🌲 樹狀結構基礎 - 即將推出</li>
+                        <li>📊 圖論基礎 - 開發中</li>
+                        <li>🧮 數學演算法 - 開發中</li>
+                    </ul>
+                </div>
+            </a>
+        </div>
+        
+        <div class="development-notice">
+            <h3>
+                <span class="emoji">🚧</span>
+                持續開發中
+            </h3>
+            <p>
+                更多演算法與資料結構單元正在開發中，包括圖論、動態規劃、樹狀結構等進階主題。
+                <br>
+                敬請期待更豐富的學習內容！
+            </p>
+        </div>
     </div>
     
-    <script>
-        // No JavaScript needed for the index page123123123
-    </script>
-    <script src="navbar.js"></script>
+    <script src="components/navbar-loader.js"></script>
+    <script src="components/navbar.js"></script>
 </body>
 </html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>矩陣視覺化工具</title>
+    <link rel="stylesheet" href="../../../../styles/styles.css">
+    <link rel="stylesheet" href="matrix-styles.css">
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+
+    <div class="container">
+        <h1>矩陣視覺化工具</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            專為教學設計的矩陣視覺化工具，支援同時顯示最多四個矩陣，幫助老師快速展示矩陣相關概念
+        </p>
+
+        <div class="matrix-visualizer-container">
+            <!-- 輸入區域 -->
+            <div class="input-section">
+                <h3 style="margin-top: 0; color: #333;">矩陣輸入</h3>
+                <textarea 
+                    id="matrix-input" 
+                    class="matrix-input-area" 
+                    placeholder="請輸入矩陣，每行一列，元素之間用空格分隔，用空行分隔不同矩陣&#10;&#10;範例：&#10;1 2 3&#10;4 5 6&#10;&#10;7 8&#10;9 10">1 2 3
+4 5 6
+7 8 9
+
+10 11
+12 13</textarea>
+                
+                <div class="help-text">
+                    <h4>使用說明：</h4>
+                    <ul>
+                        <li>每一行代表矩陣的一列，元素之間用空格分隔</li>
+                        <li>用空行分隔不同的矩陣（最多支援4個矩陣）</li>
+                        <li>支援整數、小數和負數</li>
+                        <li>每個矩陣的所有行必須有相同的元素個數</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 控制按鈕 -->
+            <div class="controls-section">
+                <button id="visualize-btn" class="btn">視覺化矩陣</button>
+                <button id="clear-btn" class="btn btn-secondary">清除全部</button>
+                <button id="example-btn" class="btn btn-secondary">載入範例</button>
+                <button id="export-btn" class="btn btn-secondary">匯出矩陣</button>
+            </div>
+
+            <!-- 狀態訊息 -->
+            <div id="status-message" class="status-message" style="display: none;"></div>
+
+            <!-- 編輯功能說明 -->
+            <div class="edit-info" style="background-color: #e8f5e8; border-left: 4px solid #4caf50; padding: 15px; margin: 15px 0; border-radius: 0 4px 4px 0;">
+                <h4 style="margin: 0 0 10px 0; color: #2e7d32; font-size: 16px;">🚀 直接編輯矩陣</h4>
+                <p style="margin: 0; color: #388e3c; font-size: 14px; line-height: 1.5;">
+                    <strong>單擊</strong>矩陣儲存格選擇，<strong>雙擊</strong>直接編輯數值！編輯後會自動更新矩陣資訊和D3視覺化。
+                    按 <kbd>Enter</kbd> 確認，<kbd>Esc</kbd> 取消。
+                </p>
+            </div>
+
+            <!-- 矩陣顯示區域 -->
+            <div id="matrix-display-area" class="matrix-grid">
+                <div class="empty-state">
+                    <p>請在上方輸入矩陣數據，然後點擊「視覺化矩陣」按鈕開始</p>
+                </div>
+            </div>
+
+            <!-- D3.js 互動式視覺化區域 -->
+            <div id="d3-visualization-section" style="display: none;">
+                <h3 style="color: #333; margin-top: 30px;">互動式矩陣視覺化</h3>
+                <div class="d3-controls">
+                    <button id="animate-btn" class="btn btn-secondary">播放動畫</button>
+                    <button id="highlight-btn" class="btn btn-secondary">高亮顯示</button>
+                    <select id="animation-type" class="animation-select">
+                        <option value="traverse">遍歷動畫</option>
+                        <option value="multiply">矩陣乘法</option>
+                        <option value="transpose">轉置動畫</option>
+                    </select>
+                    <div class="zoom-controls">
+                        <button id="zoom-in-btn" class="btn btn-secondary btn-small">放大</button>
+                        <button id="zoom-out-btn" class="btn btn-secondary btn-small">縮小</button>
+                        <button id="zoom-reset-btn" class="btn btn-secondary btn-small">重設</button>
+                    </div>
+                </div>
+                <div id="d3-container" class="d3-visualization-container"></div>
+            </div>
+        </div>
+
+        <!-- 矩陣操作說明 -->
+        <div class="educational-content">
+            <h3 style="color: #333; margin-top: 0;">矩陣相關教學應用</h3>
+            <div class="content-grid">
+                <div class="content-card">
+                    <h4>基礎概念</h4>
+                    <ul>
+                        <li>矩陣的維度與結構</li>
+                        <li>行與列的概念</li>
+                        <li>方陣與非方陣</li>
+                        <li>單位矩陣與零矩陣</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4>矩陣運算</h4>
+                    <ul>
+                        <li>矩陣加法與減法</li>
+                        <li>矩陣乘法規則</li>
+                        <li>轉置矩陣</li>
+                        <li>逆矩陣概念</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4>程式應用</h4>
+                    <ul>
+                        <li>二維陣列的表示</li>
+                        <li>巢狀迴圈遍歷</li>
+                        <li>圖像處理基礎</li>
+                        <li>資料結構應用</li>
+                    </ul>
+                </div>
+                <div class="content-card">
+                    <h4>演算法概念</h4>
+                    <ul>
+                        <li>搜尋與排序</li>
+                        <li>動態規劃表格</li>
+                        <li>圖論鄰接矩陣</li>
+                        <li>最短路徑演算法</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 導航回到主頁面 -->
+        <div class="navigation">
+            <a href="../index.html" class="nav-button">← 回到二維鏈表主頁</a>
+            <a href="../../index.html" class="nav-button">回到首頁</a>
+        </div>
+    </div>
+
+    <!-- JavaScript 檔案 -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="matrix-core.js"></script>
+    <script src="matrix-ui.js"></script>
+    <script src="matrix-d3.js"></script>
+    <script src="matrix-main.js"></script>
+    <script src="../../../../components/navbar-loader.js"></script>
+    <script src="../../../../components/navbar.js"></script>
+    
+    <!-- 開發測試腳本（生產環境請移除） -->
+    <script src="matrix-test.js"></script>
+</body>
+</html>
