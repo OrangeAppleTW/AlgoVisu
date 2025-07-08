@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>路徑測試 - 演算法視覺化</title>
+    <link rel="stylesheet" href="styles/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 80px 20px 20px 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+
+        .test-result {
+            font-family: monospace;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #007bff; }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 GitHub Pages 路徑測試</h1>
+        
+        <div class="test-section">
+            <h3>📍 當前頁面資訊</h3>
+            <div class="test-result" id="page-info"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 導覽列載入狀態</h3>
+            <div class="test-result" id="navbar-status">等待載入...</div>
+            <button onclick="testNavbarLoader()">重新測試導覽列</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🏠 路徑計算測試</h3>
+            <div class="test-result" id="path-calculation"></div>
+            <button onclick="testPathCalculation()">測試路徑計算</button>
+        </div>
+
+        <div class="test-section">
+            <h3>🖼️ 圖片載入測試</h3>
+            <div class="test-result" id="image-test"></div>
+            <button onclick="testImagePaths()">測試圖片路徑</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📄 頁面連結測試</h3>
+            <div class="test-result" id="link-test"></div>
+            <button onclick="testPageLinks()">測試頁面連結</button>
+        </div>
+    </div>
+
+    <script src="components/navbar-loader.js"></script>
+    <script>
+        // 頁面載入時顯示基本資訊
+        document.addEventListener('DOMContentLoaded', function() {
+            displayPageInfo();
+            
+            // 等待導覽列載入完成
+            setTimeout(() => {
+                checkNavbarStatus();
+            }, 1000);
+        });
+
+        function displayPageInfo() {
+            const info = `當前 URL: ${window.location.href}
+當前路徑: ${window.location.pathname}
+當前主機: ${window.location.host}
+是否為 GitHub Pages: ${window.location.host.includes('github.io') ? '是' : '否'}`;
+            
+            document.getElementById('page-info').textContent = info;
+        }
+
+        function checkNavbarStatus() {
+            const navbar = document.querySelector('.navbar');
+            const status = document.getElementById('navbar-status');
+            
+            if (navbar) {
+                const links = navbar.querySelectorAll('a');
+                const logoImg = navbar.querySelector('.logo-img');
+                
+                let result = '✅ 導覽列載入成功\n';
+                result += `包含 ${links.length} 個連結\n`;
+                
+                if (logoImg) {
+                    result += `Logo 圖片: ${logoImg.src}\n`;
+                    result += `Logo 載入狀態: ${logoImg.complete ? '成功' : '失敗'}`;
+                } else {
+                    result += '❌ Logo 圖片未找到';
+                }
+                
+                status.textContent = result;
+                status.className = 'test-result success';
+            } else {
+                status.textContent = '❌ 導覽列載入失敗';
+                status.className = 'test-result error';
+            }
+        }
+
+        function testNavbarLoader() {
+            const status = document.getElementById('navbar-status');
+            status.textContent = '🔄 重新載入導覽列...';
+            status.className = 'test-result info';
+            
+            // 移除現有導覽列
+            const existingNavbar = document.querySelector('.navbar');
+            if (existingNavbar) {
+                existingNavbar.remove();
+            }
+            
+            // 重新載入
+            if (window.NavbarLoader) {
+                new window.NavbarLoader();
+                setTimeout(() => {
+                    checkNavbarStatus();
+                }, 500);
+            } else {
+                status.textContent = '❌ NavbarLoader 未載入';
+                status.className = 'test-result error';
+            }
+        }
+
+        function testPathCalculation() {
+            const result = document.getElementById('path-calculation');
+            
+            if (window.NavbarLoader) {
+                const loader = new window.NavbarLoader();
+                const info = `基礎路徑: ${loader.basePath}
+根目錄路徑: ${loader.rootPath}
+
+路徑計算邏輯:
+1. 檢測是否包含 '/AlgoVisu/'
+2. 計算相對路徑深度
+3. 生成相對路徑字串`;
+                
+                result.textContent = info;
+                result.className = 'test-result success';
+            } else {
+                result.textContent = '❌ NavbarLoader 未載入';
+                result.className = 'test-result error';
+            }
+        }
+
+        function testImagePaths() {
+            const result = document.getElementById('image-test');
+            
+            // 測試 Logo 圖片
+            const logoImg = document.querySelector('.logo-img');
+            if (logoImg) {
+                const testInfo = `Logo 圖片路徑: ${logoImg.src}
+載入狀態: ${logoImg.complete ? '✅ 成功' : '❌ 失敗'}
+自然寬度: ${logoImg.naturalWidth}px
+自然高度: ${logoImg.naturalHeight}px`;
+                
+                result.textContent = testInfo;
+                result.className = logoImg.complete ? 'test-result success' : 'test-result error';
+            } else {
+                result.textContent = '❌ 未找到 Logo 圖片元素';
+                result.className = 'test-result error';
+            }
+        }
+
+        function testPageLinks() {
+            const result = document.getElementById('link-test');
+            const links = document.querySelectorAll('.navbar a');
+            
+            if (links.length > 0) {
+                let linkInfo = `找到 ${links.length} 個導覽連結:\n\n`;
+                
+                links.forEach((link, index) => {
+                    const href = link.getAttribute('href');
+                    const text = link.textContent.trim();
+                    linkInfo += `${index + 1}. ${text}: ${href}\n`;
+                });
+                
+                result.textContent = linkInfo;
+                result.className = 'test-result success';
+            } else {
+                result.textContent = '❌ 未找到任何導覽連結';
+                result.className = 'test-result error';
+            }
+        }
+    </script>
+</body>
+</html>

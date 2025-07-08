@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Row 與 Column 概念 - L4 二維串列應用</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/2d_array.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📍 第一部分：Row 與 Column 概念</h1>
+        <div class="lesson-info">
+            理解二維陣列中 row（列）和 column（行）的基本概念
+        </div>
+
+        <div class="section">
+            <h2>🎯 學習重點</h2>
+            <div class="section-description">
+                許多學生在學習二維陣列時容易混淆 row（列）和 column（行）的概念。
+                這個互動演示會幫助你清楚理解 (i, j) 座標系統中 i 和 j 分別代表什麼。
+            </div>
+
+            <div class="coordinate-container">
+                <!-- 左側控制面板 -->
+                <div class="controls-panel">
+                    <div class="controls">
+                        <div class="control-group">
+                            <h4>🎯 互動式座標系統</h4>
+                            <div class="input-controls">
+                                <div class="matrix-size-control">
+                                    <label>矩陣大小：</label>
+                                    <select id="matrixRows">
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5" selected>5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                    <span> × </span>
+                                    <select id="matrixCols">
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5" selected>5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                    </select>
+                                    <button class="btn" onclick="updateMatrixSize()">更新矩陣</button>
+                                </div>
+                                
+                                <div class="matrix-input-control">
+                                    <label>自定義矩陣：</label>
+                                    <textarea id="matrixInput" placeholder="輸入矩陣數值，每行用換行分隔：&#10;1 3 4 5&#10;2 1 4 6&#10;7 8 9 0" rows="4" cols="25"></textarea>
+                                    <button class="btn" onclick="loadCustomMatrix()">載入矩陣</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 中間矩陣區域 -->
+                <div class="matrix-section">
+                    <div class="grid-container">
+                        <div class="col-labels" id="colLabels"></div>
+                        <div style="display: flex; align-items: center;">
+                            <div class="row-labels" id="rowLabels"></div>
+                            <div class="grid-2d" id="coordinateGrid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右側資訊面板 -->
+                <div class="info-panel">
+                    <div class="info-header">
+                        <h3>座標資訊</h3>
+                    </div>
+                    <div class="info-content" id="coordinateInfo">
+                        <div class="placeholder">
+                            點擊任意格子查看詳細資訊
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-explanation">
+                <h4>💡 重要概念</h4>
+                <p><strong>Row（列）</strong>：水平方向，通常用 i 表示</p>
+                <p><strong>Column（行）</strong>：垂直方向，通常用 j 表示</p>
+                <p><strong>arr[i][j]</strong>：表示第 i 列、第 j 行的元素</p>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="nav-button prev">← 回到課程概覽</a>
+            <a href="grid_traversal.html" class="nav-button next">下一部分：網格搜尋 →</a>
+        </div>
+    </div>
+
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="scripts/row_column_concept.js"></script>
+</body>
+</html>

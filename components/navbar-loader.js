@@ -1,57 +1,58 @@
 /**
  * 動態載入導覽列組件
- * 確保所有連結都從 AlgoVisu 根目錄開始
+ * 專為 GitHub Pages 部署優化，自動處理路徑問題
  */
 
 class NavbarLoader {
     constructor() {
-        this.algoVisuPath = this.findAlgoVisuPath();
+        this.basePath = this.getBasePath();
+        this.rootPath = this.getRootPath();
+        console.log(`🔧 基礎路徑: ${this.basePath}`);
+        console.log(`🏠 根目錄路徑: ${this.rootPath}`);
         this.loadNavbar();
     }
 
     /**
-     * 尋找 AlgoVisu 根目錄的相對路徑
+     * 獲取基礎路徑（相對於 GitHub Pages 的路徑）
      */
-    findAlgoVisuPath() {
+    getBasePath() {
         const pathname = window.location.pathname;
-        const segments = pathname.split('/').filter(segment => segment.length > 0);
         
-        // 找到 AlgoVisu 目錄的位置
-        const algoVisuIndex = segments.findIndex(segment => segment === 'AlgoVisu');
-        
-        if (algoVisuIndex !== -1) {
-            // 計算從當前位置到 AlgoVisu 根目錄的相對路徑
-            const depth = segments.length - algoVisuIndex - 1;
-            if (depth === 0) {
-                return './'; // 已經在 AlgoVisu 根目錄
-            }
-            return '../'.repeat(depth);
+        // GitHub Pages 環境檢測
+        if (pathname.includes('/AlgoVisu/')) {
+            return '/AlgoVisu/';
         }
         
-        // 備用方案：根據檔案路徑結構估算
-        const htmlFile = pathname.split('/').pop();
-        if (htmlFile && htmlFile.endsWith('.html')) {
-            // 計算目錄層級
-            const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-            let depth = 0;
-            
-            // 檢查是否在 lessons 子目錄中
-            if (pathname.includes('/lessons/')) {
-                const lessonsIndex = pathSegments.findIndex(segment => segment === 'lessons');
-                if (lessonsIndex !== -1) {
-                    depth = pathSegments.length - lessonsIndex - 1;
-                    if (htmlFile !== 'index.html') {
-                        depth++; // 如果不是 index.html，再加一層
-                    }
-                }
-            } else if (pathname.includes('/components/')) {
-                depth = 1;
-            }
-            
-            return depth > 0 ? '../'.repeat(depth) : './';
+        // 本地開發環境或其他環境
+        return '/';
+    }
+
+    /**
+     * 獲取從當前頁面到 AlgoVisu 根目錄的相對路徑
+     */
+    getRootPath() {
+        const pathname = window.location.pathname;
+        const basePath = this.basePath;
+        
+        // 移除基礎路徑，獲取相對路徑
+        const relativePath = pathname.replace(basePath, '');
+        
+        // 計算目錄深度
+        const segments = relativePath.split('/').filter(segment => segment.length > 0);
+        
+        // 移除檔案名稱（如果存在）
+        if (segments.length > 0 && segments[segments.length - 1].includes('.')) {
+            segments.pop();
         }
         
-        return './'; // 預設為當前目錄
+        // 計算需要返回的層級數
+        const depth = segments.length;
+        
+        if (depth === 0) {
+            return './'; // 已在根目錄
+        }
+        
+        return '../'.repeat(depth);
     }
 
     /**
@@ -59,7 +60,7 @@ class NavbarLoader {
      */
     async loadNavbar() {
         try {
-            const navbarPath = `${this.algoVisuPath}components/navbar.html`;
+            const navbarPath = `${this.rootPath}components/navbar.html`;
             
             console.log(`🔄 正在載入導覽列: ${navbarPath}`);
             
@@ -70,8 +71,8 @@ class NavbarLoader {
             
             let navbarHTML = await response.text();
             
-            // 調整導覽列中的絕對路徑為相對路徑
-            navbarHTML = this.adjustAbsolutePaths(navbarHTML);
+            // 替換模板中的 {{ROOT}} 為實際的根路徑
+            navbarHTML = navbarHTML.replace(/\{\{ROOT\}\}/g, this.rootPath);
             
             // 插入導覽列到頁面
             this.insertNavbar(navbarHTML);
@@ -87,15 +88,6 @@ class NavbarLoader {
             console.error('❌ 導覽列載入失敗:', error);
             this.showFallbackNavbar();
         }
-    }
-
-    /**
-     * 將導覽列中的絕對路徑調整為當前頁面的相對路徑
-     */
-    adjustAbsolutePaths(html) {
-        // 將 /AlgoVisu/ 開頭的路徑替換為相對路徑
-        const regex = /\/AlgoVisu\//g;
-        return html.replace(regex, this.algoVisuPath);
     }
 
     /**
@@ -118,18 +110,21 @@ class NavbarLoader {
     setActiveLinks() {
         const currentPath = window.location.pathname;
         const dropdownLinks = document.querySelectorAll('.dropdown-link');
-        const navLinks = document.querySelectorAll('.nav-link');
+        const navLinks = document.querySelectorAll('.nav-link:not(.dropdown-toggle)');
+        
+        // 正規化當前路徑
+        const normalizedCurrentPath = this.normalizePath(currentPath);
         
         // 為下拉選單連結設置活動狀態
         dropdownLinks.forEach(link => {
             const linkPath = link.getAttribute('href');
-            if (linkPath && this.isCurrentPage(linkPath, currentPath)) {
+            if (linkPath && this.isCurrentPage(linkPath, normalizedCurrentPath)) {
                 link.classList.add('active');
                 
                 // 為父級下拉選單加上活動狀態
                 const parentDropdown = link.closest('.nav-dropdown');
                 if (parentDropdown) {
-                    const parentToggle = parentDropdown.querySelector('.nav-link');
+                    const parentToggle = parentDropdown.querySelector('.dropdown-toggle');
                     if (parentToggle) {
                         parentToggle.classList.add('active');
                     }
@@ -140,40 +135,80 @@ class NavbarLoader {
         // 為主導覽連結設置活動狀態
         navLinks.forEach(link => {
             const linkPath = link.getAttribute('href');
-            if (linkPath && this.isCurrentPage(linkPath, currentPath)) {
+            if (linkPath && this.isCurrentPage(linkPath, normalizedCurrentPath)) {
                 link.classList.add('active');
             }
         });
     }
 
     /**
+     * 正規化路徑，移除基礎路徑部分
+     */
+    normalizePath(path) {
+        return path.replace(this.basePath, '/').replace(/\/+/g, '/');
+    }
+
+    /**
      * 判斷連結是否指向當前頁面
      */
     isCurrentPage(linkPath, currentPath) {
-        // 移除可能的 AlgoVisu 前綴進行比較
-        const normalizedLinkPath = linkPath.replace(/^.*\/AlgoVisu/, '');
-        const normalizedCurrentPath = currentPath.replace(/^.*\/AlgoVisu/, '');
+        // 將相對路徑轉換為絕對路徑進行比較
+        let absoluteLinkPath = linkPath;
         
-        return normalizedCurrentPath.includes(normalizedLinkPath.replace('/index.html', '')) ||
-               normalizedCurrentPath === normalizedLinkPath;
+        // 如果是相對路徑，轉換為絕對路徣
+        if (linkPath.startsWith('./') || linkPath.startsWith('../')) {
+            // 這裡簡化處理，在實際場景中可能需要更複雜的路徑解析
+            absoluteLinkPath = this.basePath + linkPath.replace(/^\.\//, '').replace(/\.\.\//g, '');
+        }
+        
+        const normalizedLinkPath = this.normalizePath(absoluteLinkPath);
+        
+        // 檢查是否為當前頁面或所在目錄
+        return currentPath === normalizedLinkPath ||
+               currentPath.includes(normalizedLinkPath.replace('/index.html', '')) ||
+               normalizedLinkPath.includes(currentPath.replace('/index.html', ''));
     }
 
     /**
      * 綁定事件
      */
     bindEvents() {
-        // 為下拉選單加上點擊事件處理
-        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                // 保持hover效果，不需要額外操作
-            });
+        // 為下拉選單加上 hover 和 click 事件處理
+        document.querySelectorAll('.nav-dropdown').forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            if (toggle && menu) {
+                // 防止連結跳轉（僅對下拉選單）
+                toggle.addEventListener('click', function(e) {
+                    if (this.classList.contains('dropdown-toggle')) {
+                        e.preventDefault();
+                    }
+                });
+
+                // 觸控設備支援
+                dropdown.addEventListener('touchstart', function() {
+                    this.classList.add('touched');
+                });
+
+                document.addEventListener('touchstart', function(e) {
+                    if (!dropdown.contains(e.target)) {
+                        dropdown.classList.remove('touched');
+                    }
+                });
+            }
         });
 
         // 為所有導覽連結添加點擊事件記錄
         document.querySelectorAll('.navbar a').forEach(link => {
             link.addEventListener('click', function() {
-                console.log(`🔗 導覽至: ${this.getAttribute('href')}`);
+                const href = this.getAttribute('href');
+                console.log(`🔗 導覽至: ${href}`);
+                
+                // 檢查連結是否為相對路徑，如果是，可能需要調整
+                if (href && !href.startsWith('http') && !href.startsWith('#')) {
+                    console.log(`📍 當前頁面: ${window.location.pathname}`);
+                }
             });
         });
     }
@@ -185,23 +220,28 @@ class NavbarLoader {
         const fallbackNavbar = `
             <nav class="navbar">
                 <div class="navbar-container">
-                    <a href="${this.algoVisuPath}index.html" class="navbar-logo">
-                        <img src="${this.algoVisuPath}picture/OA_logo2.png" alt="OA Logo" class="logo-img">
+                    <a href="${this.rootPath}index.html" class="navbar-logo">
+                        <img src="${this.rootPath}picture/OA_logo2.png" alt="OA Logo" class="logo-img">
                     </a>
                     <div class="navbar-links">
                         <div class="nav-dropdown">
-                            <a href="${this.algoVisuPath}lessons/apcs_advanced/index.html" class="nav-link">APCS進階班</a>
+                            <a href="${this.rootPath}lessons/apcs_advanced/index.html" class="nav-link dropdown-toggle">APCS進階班</a>
                             <div class="dropdown-menu">
-                                <a href="${this.algoVisuPath}lessons/apcs_advanced/1_maze_recursion/index.html" class="dropdown-link">遞迴函式</a>
+                                <a href="${this.rootPath}lessons/apcs_advanced/1_maze_recursion/index.html" class="dropdown-link">遞迴函式</a>
+                                <a href="${this.rootPath}lessons/apcs_advanced/2_time_space_complexity/index.html" class="dropdown-link">時間空間複雜度</a>
                             </div>
                         </div>
                         <div class="nav-dropdown">
-                            <a href="${this.algoVisuPath}lessons/learning_resources/index.html" class="nav-link">學習資源</a>
+                            <a href="${this.rootPath}lessons/learning_resources/index.html" class="nav-link dropdown-toggle">學習資源</a>
                             <div class="dropdown-menu">
                                 <div class="dropdown-section">
                                     <h4>基礎演算法</h4>
-                                    <a href="${this.algoVisuPath}lessons/learning_resources/1_sorting/index.html" class="dropdown-link">排序演算法</a>
-                                    <a href="${this.algoVisuPath}lessons/learning_resources/2_2d_linked_list/index.html" class="dropdown-link">二維鏈表</a>
+                                    <a href="${this.rootPath}lessons/learning_resources/1_sorting/index.html" class="dropdown-link">排序演算法</a>
+                                    <a href="${this.rootPath}lessons/learning_resources/2_2d_linked_list/index.html" class="dropdown-link">二維鏈表</a>
+                                    <a href="${this.rootPath}lessons/learning_resources/3_divide_and_conquer/index.html" class="dropdown-link">分治演算法</a>
+                                    <a href="${this.rootPath}lessons/learning_resources/4_coin_change/index.html" class="dropdown-link">動態規劃</a>
+                                    <a href="${this.rootPath}lessons/learning_resources/5_graph_theory/index.html" class="dropdown-link">圖論基礎</a>
+                                    <a href="${this.rootPath}lessons/learning_resources/6_shortest_path/index.html" class="dropdown-link">最短路徑</a>
                                 </div>
                             </div>
                         </div>
@@ -220,6 +260,7 @@ class NavbarLoader {
 
 // 當 DOM 載入完成後自動載入導覽列
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 開始載入導覽列...');
     new NavbarLoader();
 });
 

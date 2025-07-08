@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網格搜尋演算法 - L4 二維串列應用</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/2d_array.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 第二部分：網格搜尋演算法</h1>
+        <div class="lesson-info">
+            學習 4-neighbors 和 8-neighbors 搜尋方式，實作 Flood Fill 演算法
+        </div>
+
+        <div class="section">
+            <h2>🎯 學習重點</h2>
+            <div class="section-description">
+                在二維陣列中進行搜尋時，我們經常需要檢查相鄰的格子。
+                這裡演示兩種常見的相鄰格搜尋方式：4-neighbors 和 8-neighbors。
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <h4>🎮 選擇演示模式</h4>
+                    <button class="btn" onclick="showNeighbors(4)">4-Neighbors 搜尋</button>
+                    <button class="btn" onclick="showNeighbors(8)">8-Neighbors 搜尋</button>
+                    <button class="btn demo" onclick="startFloodFillDemo()">連通區域搜尋演示</button>
+                    <button class="btn reset" onclick="resetGrid()">重置網格</button>
+                </div>
+                
+                <div class="control-group">
+                    <h4>🖱️ 互動操作</h4>
+                    <p>點擊格子選擇中心點，或切換格子為障礙物</p>
+                    <button class="btn" onclick="toggleEditMode()">
+                        <span id="editModeText">切換為編輯模式</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid-container">
+                <div class="grid-2d" id="searchGrid"></div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e74c3c;"></div>
+                    <span>當前位置</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f39c12;"></div>
+                    <span>4-Neighbors</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #9b59b6;"></div>
+                    <span>8-Neighbors</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #2ecc71;"></div>
+                    <span>已搜尋</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #34495e;"></div>
+                    <span>障礙物</span>
+                </div>
+            </div>
+
+            <div class="step-explanation" id="algorithmExplanation">
+                <h4>🤔 演算法說明</h4>
+                <p>點擊上方按鈕開始演示不同的搜尋方式</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📚 演算法概念</h2>
+            
+            <div class="step-explanation">
+                <h4>🔢 4-Neighbors 搜尋</h4>
+                <p><strong>定義</strong>：檢查上、下、左、右四個方向的相鄰格子</p>
+                <p><strong>方向向量</strong>：(-1,0), (1,0), (0,-1), (0,1)</p>
+                <p><strong>應用</strong>：迷宮尋路、連通性檢查、島嶼計數等</p>
+            </div>
+
+            <div class="step-explanation" style="background-color: #f3e5f5; border-left-color: #9b59b6;">
+                <h4>🔢 8-Neighbors 搜尋</h4>
+                <p><strong>定義</strong>：檢查周圍八個方向的相鄰格子（包含對角線）</p>
+                <p><strong>方向向量</strong>：(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)</p>
+                <p><strong>應用</strong>：圖像處理、遊戲AI、模式識別等</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🌊 Flood Fill 演算法</h2>
+            <div class="section-description">
+                Flood Fill 是一種用來確定連通區域的演算法，類似於繪圖軟體中的「油漆桶」工具。
+                它會從一個起始點開始，遞迴地搜尋所有相連的同色區域。
+            </div>
+
+            <div class="step-explanation">
+                <h4>⚙️ 演算法步驟</h4>
+                <ol>
+                    <li>檢查當前位置是否超出邊界</li>
+                    <li>檢查當前位置是否符合搜尋條件</li>
+                    <li>標記當前位置為已訪問</li>
+                    <li>遞迴搜尋四個相鄰方向</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="row_column_concept.html" class="nav-button prev">← 上一部分：Row & Column</a>
+            <a href="code_examples.html" class="nav-button next">下一部分：程式碼範例 →</a>
+        </div>
+    </div>
+
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="scripts/grid_traversal.js"></script>
+</body>
+</html>

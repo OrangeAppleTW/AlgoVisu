@@ -218,7 +218,8 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.2s ease;
-            min-width: 140px;
+            min-width: 160px;
+            flex: 1;
         }
         
         .btn:first-child {
@@ -312,7 +313,7 @@
         }
         
         .nav-text {
-            font-size: 17px;
+            font-size: 24px;
         }
 
         .control-group {
@@ -511,7 +512,7 @@
                 border-right: 2px solid #000;
                 border-bottom: none;
                 border-top: 2px solid #000;
-                min-width: 220px;
+                min-width: 240px;
                 font-size: 18px;
                 padding: 18px 25px;
             }
@@ -547,6 +548,10 @@
                 font-size: 20px;
                 padding: 25px 35px;
             }
+            
+            .nav-text {
+                font-size: 22px;
+            }
         }
     </style>
 </head>
@@ -554,9 +559,9 @@
     <!-- 導覽列將由 JavaScript 動態載入 -->
     
     <div class="container">
-        <h1>🚀 自動演示模式</h1>
+        <h1>自動演示模式</h1>
         <p style="text-align: center; color: #666; margin-bottom: 30px;">
-            觀看氣泡排序在不同情況下的完整執行過程，了解時間複雜度的實際表現
+            觀看氣泡排序在不同情況下的完整自動執行過程，了解時間複雜度的實際表現，可調整演示速度
         </p>
 
         <div class="demo-container">
@@ -587,16 +592,18 @@
                     <div id="bubble-sort-container"></div>
                 </div>
 
+                <!-- 演示速度控制 -->
                 <div class="speed-control">
-                    <span>慢</span>
-                    <input type="range" id="speed-slider" class="speed-slider" min="1" max="100" value="50">
-                    <span>快</span>
-                    <span id="speed-display" style="margin-left: 15px; font-weight: bold;">中等速度</span>
+                    <span style="color: #666; font-weight: 500;">演示速度：</span>
+                    <span style="color: #666; font-size: 0.9em;">慢</span>
+                    <input type="range" id="speed-slider" class="speed-slider" min="200" max="2000" value="800" step="100">
+                    <span style="color: #666; font-size: 0.9em;">快</span>
+                    <span id="speed-display" style="color: #333; font-weight: bold; margin-left: 10px;">0.8秒</span>
                 </div>
 
                 <div class="controls-section">
                     <button id="start-btn" class="btn">▶ 開始排序</button>
-                    <button id="pause-btn" class="btn btn-secondary" disabled>⏸ 暫停</button>
+                    <button id="pause-btn" class="btn btn-secondary" style="display: none;">⏸️ 暫停</button>
                     <button id="reset-btn" class="btn btn-secondary">🔄 重置</button>
                     <button id="generate-btn" class="btn btn-secondary">🎲 重新生成</button>
                 </div>

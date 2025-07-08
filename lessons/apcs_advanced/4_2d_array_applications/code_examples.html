@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>程式碼範例 - L4 二維串列應用</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/2d_array.css">
+</head>
+<body>
+    <div class="container">
+        <h1>💻 第三部分：程式碼範例</h1>
+        <div class="lesson-info">
+            完整的程式碼範例和解說，包含 Python 和 C++ 實作
+        </div>
+
+        <div class="section">
+            <h2>🐍 Python 實作</h2>
+            <div class="section-description">
+                這是題目提供的完整 Python 程式碼，我們來逐步解析每個部分：
+            </div>
+
+            <div class="code-demo">
+                <h4>📋 完整程式碼</h4>
+                <pre>arr = [[1, 0, 0, 0, 1],
+       [1, 0, 1, 0, 0],
+       [0, 1, 1, 1, 0],
+       [0, 0, 1, 1, 0],
+       [1, 0, 0, 0, 0]]
+
+marker = [[0, 0, 0, 0, 0] for x in range(5)]
+
+def search_map(arr, marker, x, y):
+    # 邊界檢查
+    if (x < 0 or x >= 5) or (y < 0 or y >= 5):
+        return 0
+    
+    # 檢查是否為目標格子且未訪問過
+    elif arr[x][y] == 1 and marker[x][y] == 0:
+        marker[x][y] = 1  # 標記為已訪問
+        
+        # 遞迴搜尋 4-neighbors
+        search_map(arr, marker, x-1, y)  # 上
+        search_map(arr, marker, x+1, y)  # 下
+        search_map(arr, marker, x, y-1)  # 左
+        search_map(arr, marker, x, y+1)  # 右
+
+# 從 (2, 2) 開始搜尋
+search_map(arr, marker, 2, 2)
+
+# 計算連通區域大小
+c = 0
+for i in range(5):
+    for j in range(5):
+        if marker[i][j] == 1:
+            c += 1
+            
+print(c)
+</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🔍 程式碼解析</h2>
+            
+            <div class="step-explanation">
+                <h4>1️⃣ 資料結構初始化</h4>
+                <div class="code-demo">
+                    <pre>arr = [[1, 0, 0, 0, 1],
+       [1, 0, 1, 0, 0],
+       [0, 1, 1, 1, 0],
+       [0, 0, 1, 1, 0],
+       [1, 0, 0, 0, 0]]
+
+marker = [[0, 0, 0, 0, 0] for x in range(5)]</pre>
+                </div>
+                <p><strong>arr</strong>：原始地圖，1表示可通行，0表示障礙物</p>
+                <p><strong>marker</strong>：標記陣列，記錄哪些位置已經被訪問過</p>
+            </div>
+
+            <div class="step-explanation">
+                <h4>2️⃣ 邊界檢查</h4>
+                <div class="code-demo">
+                    <pre>if (x < 0 or x >= 5) or (y < 0 or y >= 5):
+    return 0</pre>
+                </div>
+                <p>確保座標不會超出陣列範圍，這是遞迴的終止條件之一</p>
+            </div>
+
+            <div class="step-explanation">
+                <h4>3️⃣ 條件檢查與標記</h4>
+                <div class="code-demo">
+                    <pre>elif arr[x][y] == 1 and marker[x][y] == 0:
+    marker[x][y] = 1  # 標記為已訪問</pre>
+                </div>
+                <p>只處理值為1且未訪問過的格子，並立即標記避免重複訪問</p>
+            </div>
+
+            <div class="step-explanation">
+                <h4>4️⃣ 遞迴搜尋</h4>
+                <div class="code-demo">
+                    <pre>search_map(arr, marker, x-1, y)  # 上
+search_map(arr, marker, x+1, y)  # 下
+search_map(arr, marker, x, y-1)  # 左
+search_map(arr, marker, x, y+1)  # 右</pre>
+                </div>
+                <p>向四個方向遞迴搜尋，這是 4-neighbors 的實作</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>⚡ C++ 實作</h2>
+            <div class="section-description">
+                同樣的演算法用 C++ 實作，適合 APCS 檢定：
+            </div>
+
+            <div class="code-demo">
+                <h4>📋 C++ 版本</h4>
+                <pre>#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+int arr[5][5] = {
+    {1, 0, 0, 0, 1},
+    {1, 0, 1, 0, 0},
+    {0, 1, 1, 1, 0},
+    {0, 0, 1, 1, 0},
+    {1, 0, 0, 0, 0}
+};
+
+int marker[5][5] = {0};
+
+void search_map(int x, int y) {
+    // 邊界檢查
+    if (x < 0 || x >= 5 || y < 0 || y >= 5) {
+        return;
+    }
+    
+    // 檢查是否為目標格子且未訪問過
+    if (arr[x][y] == 1 && marker[x][y] == 0) {
+        marker[x][y] = 1;  // 標記為已訪問
+        
+        // 遞迴搜尋 4-neighbors
+        search_map(x-1, y);  // 上
+        search_map(x+1, y);  // 下
+        search_map(x, y-1);  // 左
+        search_map(x, y+1);  // 右
+    }
+}
+
+int main() {
+    // 從 (2, 2) 開始搜尋
+    search_map(2, 2);
+    
+    // 計算連通區域大小
+    int count = 0;
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j < 5; j++) {
+            if (marker[i][j] == 1) {
+                count++;
+            }
+        }
+    }
+    
+    cout << count << endl;
+    return 0;
+}
+</pre>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🎯 演算法變化</h2>
+            
+            <div class="step-explanation">
+                <h4>🔄 8-Neighbors 版本</h4>
+                <div class="code-demo">
+                    <pre>def search_map_8(arr, marker, x, y):
+    if (x < 0 or x >= 5) or (y < 0 or y >= 5):
+        return 0
+    
+    elif arr[x][y] == 1 and marker[x][y] == 0:
+        marker[x][y] = 1
+        
+        # 8個方向的搜尋
+        directions = [(-1,-1), (-1,0), (-1,1),
+                     (0,-1),          (0,1),
+                     (1,-1),  (1,0),  (1,1)]
+        
+        for dx, dy in directions:
+            search_map_8(arr, marker, x+dx, y+dy)
+</pre>
+                </div>
+                <p>包含對角線方向的搜尋，適用於需要更廣搜尋範圍的情況</p>
+            </div>
+
+            <div class="step-explanation">
+                <h4>📊 計數版本</h4>
+                <div class="code-demo">
+                    <pre>def search_map_count(arr, x, y):
+    if (x < 0 or x >= 5) or (y < 0 or y >= 5):
+        return 0
+    
+    if arr[x][y] != 1:
+        return 0
+    
+    arr[x][y] = 0  # 標記為已訪問（修改原陣列）
+    
+    # 返回 1（當前格子）+ 四個方向的遞迴結果
+    return 1 + search_map_count(arr, x-1, y) + \
+               search_map_count(arr, x+1, y) + \
+               search_map_count(arr, x, y-1) + \
+               search_map_count(arr, x, y+1)
+</pre>
+                </div>
+                <p>直接返回連通區域大小，不需要額外的計數迴圈</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>💡 應用實例</h2>
+            
+            <div class="step-explanation">
+                <h4>🏝️ 島嶼計數問題</h4>
+                <p>計算二維陣列中有多少個獨立的島嶼（連通區域）</p>
+                <div class="code-demo">
+                    <pre>def count_islands(grid):
+    count = 0
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            if grid[i][j] == 1:
+                flood_fill(grid, i, j)  # 將整個島嶼標記為已訪問
+                count += 1
+    return count
+</pre>
+                </div>
+            </div>
+
+            <div class="step-explanation">
+                <h4>🎨 圖像填充</h4>
+                <p>類似繪圖軟體的油漆桶功能，填充相同顏色的連通區域</p>
+                <div class="code-demo">
+                    <pre>def flood_fill_color(image, x, y, new_color):
+    original_color = image[x][y]
+    if original_color == new_color:
+        return
+    
+    def fill(x, y):
+        if (x < 0 or x >= len(image) or 
+            y < 0 or y >= len(image[0]) or 
+            image[x][y] != original_color):
+            return
+        
+        image[x][y] = new_color
+        fill(x-1, y); fill(x+1, y)
+        fill(x, y-1); fill(x, y+1)
+    
+    fill(x, y)
+</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>🧠 思考練習</h2>
+            
+            <div class="step-explanation">
+                <h4>❓ 練習題目</h4>
+                <ol>
+                    <li>如果起始點是 (0, 0)，結果會是多少？</li>
+                    <li>如何修改程式碼來找出最大的連通區域？</li>
+                    <li>如何實作一個能找出所有連通區域座標的版本？</li>
+                    <li>8-neighbors 和 4-neighbors 在什麼情況下會產生不同結果？</li>
+                </ol>
+            </div>
+
+            <div class="step-explanation">
+                <h4>💭 延伸思考</h4>
+                <ul>
+                    <li><strong>時間複雜度</strong>：O(mn)，其中 m、n 是陣列的長寬</li>
+                    <li><strong>空間複雜度</strong>：O(mn)，最壞情況下遞迴深度為 m×n</li>
+                    <li><strong>優化方式</strong>：使用 BFS（廣度優先搜尋）避免遞迴深度過深</li>
+                    <li><strong>實際應用</strong>：電腦視覺、遊戲開發、圖像處理等領域</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="grid_traversal.html" class="nav-button prev">← 上一部分：網格搜尋</a>
+            <a href="index.html" class="nav-button next">回到課程概覽 →</a>
+        </div>
+    </div>
+
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

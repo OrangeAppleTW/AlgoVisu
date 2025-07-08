@@ -8,6 +8,7 @@ class AutoDemoController {
         this.currentCase = 'best';
         this.currentDirection = 'ascending';
         this.isRunning = false;
+        this.isPaused = false;  // 添加暫停狀態追蹤
         this.theoreticalData = null;
         
         this.initVisualizer();
@@ -48,12 +49,17 @@ class AutoDemoController {
         
         // 速度控制
         const speedSlider = document.getElementById('speed-slider');
-        speedSlider.addEventListener('input', (e) => {
-            this.updateSpeed(parseInt(e.target.value));
-        });
-        
-        // 初始化速度顯示
-        this.updateSpeed(50);
+        const speedDisplay = document.getElementById('speed-display');
+        if (speedSlider) {
+            speedSlider.addEventListener('input', (e) => {
+                const speed = parseInt(e.target.value);
+                this.visualizer.setSpeed(speed);
+                speedDisplay.textContent = (speed / 1000).toFixed(1) + '秒';
+            });
+            
+            // 初始化速度顯示
+            speedDisplay.textContent = (speedSlider.value / 1000).toFixed(1) + '秒';
+        }
     }
     
     selectCase(caseType) {
@@ -100,10 +106,13 @@ class AutoDemoController {
         this.updateTheoreticalComparison();
         
         // 更新當前操作顯示
-        document.getElementById('current-operation').textContent = `已載入${this.getCaseDisplayName(this.currentCase)}資料`;
+        document.getElementById('current-operation').textContent = `已載入${this.getCaseDisplayName(this.currentCase)}資料，點擊「開始排序」開始`;
         
         // 清除操作記錄
         document.getElementById('operation-log').innerHTML = '<div style="color: #888; font-style: italic;">等待開始...</div>';
+        
+        // 更新按鈕狀態
+        this.updateButtonStates();
     }
     
     generateNewData() {
@@ -111,7 +120,7 @@ class AutoDemoController {
         
         this.loadInitialData();
         // 更新當前操作顯示
-        document.getElementById('current-operation').textContent = '已重新生成資料';
+        document.getElementById('current-operation').textContent = '已重新生成資料，點擊「開始排序」開始';
     }
     
     async startSort() {
@@ -121,61 +130,50 @@ class AutoDemoController {
         this.updateButtonStates();
         
         // 更新當前操作顯示
-        document.getElementById('current-operation').textContent = '排序執行中...';
+        document.getElementById('current-operation').textContent = '正在自動執行泡泡排序...';
         
-        // 清除操作記錄並加入開始記錄
-        const logContainer = document.getElementById('operation-log');
-        logContainer.innerHTML = '<div class="log-entry log-pass">🚀 開始排序...</div>';
+        // 使用用戶設定的速度
+        const speedSlider = document.getElementById('speed-slider');
+        if (speedSlider) {
+            this.visualizer.setSpeed(parseInt(speedSlider.value));
+        }
         
+        // 執行完整的自動排序
         await this.visualizer.autoSort();
         
+        // 排序完成
         this.isRunning = false;
         this.updateButtonStates();
     }
     
     pauseSort() {
-        if (!this.isRunning) return;
-        
-        this.visualizer.pause();
-        this.isRunning = false;
-        this.updateButtonStates();
-        
-        // 更新當前操作顯示
-        document.getElementById('current-operation').textContent = '排序已暫停';
-        
-        // 加入暫停記錄
-        const logContainer = document.getElementById('operation-log');
-        logContainer.innerHTML += '<div class="log-entry log-pass">⏸ 排序已暫停</div>';
-        logContainer.scrollTop = logContainer.scrollHeight;
+        if (this.isRunning) {
+            this.visualizer.pause();
+            this.isRunning = false;
+            this.isPaused = true;  // 設定暫停狀態
+            this.updateButtonStates();
+            
+            // 更新當前操作顯示
+            document.getElementById('current-operation').textContent = '排序已暫停，點擊「繼續排序」繼續';
+        }
     }
+    
+
     
     resetSort() {
         this.visualizer.reset();
         this.isRunning = false;
+        this.isPaused = false;  // 清除暫停狀態
         this.updateButtonStates();
         
         // 更新當前操作顯示
-        document.getElementById('current-operation').textContent = '已重置排序';
+        document.getElementById('current-operation').textContent = '已重置排序，點擊「開始排序」開始';
         
         // 清除操作記錄
         document.getElementById('operation-log').innerHTML = '<div style="color: #888; font-style: italic;">等待開始...</div>';
     }
     
-    updateSpeed(value) {
-        // 將 1-100 的滑桿值轉換為 1000-10 毫秒的延遲
-        const speed = 1010 - (value * 10);
-        this.visualizer.setSpeed(speed);
-        
-        // 更新速度顯示
-        let speedText = '';
-        if (value < 25) speedText = '很慢';
-        else if (value < 50) speedText = '慢';
-        else if (value < 75) speedText = '中等';
-        else if (value < 90) speedText = '快';
-        else speedText = '很快';
-        
-        document.getElementById('speed-display').textContent = speedText;
-    }
+
     
     updateStats(stats) {
         // 原有的統計更新（為了相容性保留）
@@ -256,10 +254,18 @@ class AutoDemoController {
             this.theoreticalData.swaps
         );
         
-        document.getElementById('comparisons-diff').textContent = 
-            stats.isCompleted ? `${comparisonsDiff.toFixed(1)}%` : '-';
-        document.getElementById('swaps-diff').textContent = 
-            stats.isCompleted ? `${swapsDiff.toFixed(1)}%` : '-';
+        // 只更新存在的元素，避免錯誤
+        const comparisonsDiffElement = document.getElementById('comparisons-diff');
+        if (comparisonsDiffElement) {
+            comparisonsDiffElement.textContent = 
+                stats.isCompleted ? `${comparisonsDiff.toFixed(1)}%` : '-';
+        }
+        
+        const swapsDiffElement = document.getElementById('swaps-diff');
+        if (swapsDiffElement) {
+            swapsDiffElement.textContent = 
+                stats.isCompleted ? `${swapsDiff.toFixed(1)}%` : '-';
+        }
     }
     
     onStep(result) {
@@ -361,21 +367,41 @@ class AutoDemoController {
         const resetBtn = document.getElementById('reset-btn');
         const generateBtn = document.getElementById('generate-btn');
         
+        const stats = this.visualizer.getStats();
+        
         if (this.isRunning) {
-            startBtn.disabled = true;
+            // 排序運行時
+            startBtn.style.display = 'none';
+            pauseBtn.style.display = 'block';
             pauseBtn.disabled = false;
             resetBtn.disabled = true;
             generateBtn.disabled = true;
-        } else {
-            startBtn.disabled = false;
-            pauseBtn.disabled = true;
+            startBtn.textContent = '🔄 排序執行中...';
+        } else if (stats.isCompleted) {
+            // 排序完成時
+            startBtn.style.display = 'block';
+            pauseBtn.style.display = 'none';
+            startBtn.disabled = true;
             resetBtn.disabled = false;
             generateBtn.disabled = false;
+            startBtn.textContent = '✓ 排序完成';
+        } else if (this.isPaused) {
+            // 排序暫停時
+            startBtn.style.display = 'block';
+            pauseBtn.style.display = 'none';
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+            generateBtn.disabled = false;
+            startBtn.textContent = '▶ 繼續排序';
+        } else {
+            // 初始狀態或重置後
+            startBtn.style.display = 'block';
+            pauseBtn.style.display = 'none';
+            startBtn.disabled = false;
+            resetBtn.disabled = false;
+            generateBtn.disabled = false;
+            startBtn.textContent = '▶ 開始排序';
         }
-    }
-    
-    updateStatus(message) {
-        document.getElementById('status-display').textContent = message;
     }
     
     getCaseDisplayName(caseType) {

@@ -181,6 +181,36 @@
             color: #222;
         }
 
+        /* 路徑記錄框的子標題樣式 */
+        .score-board h5 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* 路徑顯示區域的捲動條樣式 */
+        .score-board div[style*="overflow-y: auto"] {
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .score-board div[style*="overflow-y: auto"]::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .score-board div[style*="overflow-y: auto"]::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+
+        .score-board div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 2px;
+        }
+
+        .score-board div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
         .thinking-tips {
             background-color: #e3f2fd;
             border-radius: 5px;
@@ -276,6 +306,13 @@
                 height: 45px;
             }
         }
+
+        /* 初始提醒的動畫效果 */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+            50% { transform: scale(1.02); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+            100% { transform: scale(1); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        }
     </style>
 </head>
 <body>
@@ -303,6 +340,12 @@
         
         <div class="practice-section">
             <div class="maze-container">
+                <!-- 初始狀態提醒 -->
+                <div id="initial-reminder" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2); animation: pulse 2s infinite;">
+                    <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">🎓 歡迎使用递迴探索教學工具</div>
+                    <div style="font-size: 16px; opacity: 0.9;">🚀 請點擊右側「開始新示範」按鈕開始使用</div>
+                </div>
+                
                 <div id="interactive-maze" class="maze-grid"></div>
                 
                 <!-- 方向提示框 -->
@@ -336,7 +379,7 @@
                 
                 <div style="margin-top: 20px;">
                     <div style="font-size: 18px; font-weight: bold; color: #222;">
-                        狀態：<span id="game-status">點擊開始示範</span>
+                        狀態：<span id="game-status">🚀 點擊「開始新示範」啟動教學工具</span>
                     </div>
                 </div>
             </div>
@@ -349,23 +392,25 @@
                     <button id="reset-position" disabled>↶ 重置位置</button>
                 </div>
                 
+                <div class="score-board">
+                    <h4>🛤️ 路徑記錄</h4>
+                    <div style="margin-top: 20px;">
+                        <h5 style="margin: 0 0 8px 0; color: #333; font-size: 15px;">📍 當前路徑：</h5>
+                        <div id="current-path" style="font-size: 14px; color: #666; max-height: 140px; overflow-y: auto; background: #f8f9fa; padding: 12px; border-radius: 6px; line-height: 1.5; border: 1px solid #e0e0e0;">起點: (1,1)</div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <h5 style="margin: 0 0 8px 0; color: #333; font-size: 15px;">🏆 最終路徑：</h5>
+                        <div id="final-path" style="font-size: 14px; color: #666; max-height: 120px; overflow-y: auto; background: #e8f5e8; padding: 12px; border-radius: 6px; line-height: 1.5; border: 1px solid #c8e6c9;">尚未完成</div>
+                    </div>
+                </div>
+                
                 <div class="thinking-tips">
                     <h4>🎯 教學操作說明</h4>
                     <ul>
                         <li><strong>移動模式：</strong>點擊相鄰格子移動老鼠</li>
                         <li><strong>標記模式：</strong>點擊可移動格子標記死路</li>
-                        <li>示範遞迴探索過程中的每一步思考</li>
-                        <li>解釋回溯機制：無路可走時返回上一步</li>
-                        <li>使用標記死路功能讓學生理解回溯概念</li>
+                        <li><strong>記錄步驟：</strong>標記每格執行步驟</li>
                     </ul>
-                </div>
-                
-                <div class="score-board">
-                    <h4>📝 遞迴狀態追蹤</h4>
-                    <p>當前送迴層次：<span id="recursion-depth">0</span></p>
-                    <p>探索步數：<span id="move-count">0</span></p>
-                    <p>回溯次數：<span id="backtrack-moves">0</span></p>
-                    <p>標記死路：<span id="obstacles-placed">0</span></p>
                 </div>
             </div>
         </div>

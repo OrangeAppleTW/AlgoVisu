@@ -220,6 +220,55 @@
             line-height: 1.6;
         }
 
+        /* 新增的控制按鈕樣式 */
+        .complexity-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .complexity-status {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        #complexity-visualizer {
+            width: 100%;
+            height: 300px;
+            background-color: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        #current-operation {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        #step-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .test-button:disabled {
+            background-color: #ccc;
+            color: #999;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .test-button:disabled:hover {
+            background-color: #ccc;
+        }
+
         /* 響應式設計 */
         @media (max-width: 768px) {
             .size-controls {
@@ -233,6 +282,11 @@
 
             .complexity-comparison {
                 grid-template-columns: 1fr;
+            }
+            
+            .complexity-controls {
+                flex-direction: column;
+                align-items: center;
             }
         }
     </style>
@@ -248,6 +302,15 @@
 
         <div class="analysis-container">
             <h2>設定分析參數</h2>
+            
+            <div class="big-o-explanation">
+                <div class="explanation-title">🎆 新功能：互動式複雜度分析</div>
+                <div class="explanation-text">
+                    📋 <strong>手動模式</strong>：單步執行氣泡排序，可以逐步觀察每次比較和交換，支持退一步功能。<br>
+                    🚀 <strong>自動模式</strong>：一鍵完整執行排序，快速觀察結果和複雜度表現。<br>
+                    📊 <strong>批量分析</strong>：點擊「執行分析」可進行完整的複雜度測量和圖表分析。
+                </div>
+            </div>
             
             <div class="size-controls">
                 <label for="array-size-slider">陣列大小：</label>

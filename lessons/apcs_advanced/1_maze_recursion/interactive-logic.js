@@ -3,9 +3,9 @@ let interactiveMaze = [];
 let playerPosition = { x: 1, y: 1 };
 let goalPosition = { x: 6, y: 6 };
 let visitedCells = [];
-let moveCount = 0;
-let backtrackMoves = 0;
-let obstaclesPlaced = 0;
+let currentPath = []; // 當前正在探索的路徑
+let finalPath = []; // 最終找到的完整路徑
+let obstaclesPlaced = 0; // 保留標記死路計數用於障礙功能
 let isGameActive = false;
 let mazeSize = 8; // 固定為8x8
 let interactionMode = 'move'; // 'move' 或 'obstacle'
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     bindInteractiveEvents();
     resetGameState();
     renderInteractiveMaze();
-    updateGameDisplay();
+    updatePathDisplay();
     updateModeDisplay();
     setupTooltipEvents();
 });
@@ -114,8 +114,14 @@ function startNewGame() {
     generateInteractiveMaze();
     renderInteractiveMaze();
     isGameActive = true;
-    updateGameDisplay();
+    updatePathDisplay();
     updateButtons();
+    
+    // 隱藏初始提醒
+    const initialReminder = document.getElementById('initial-reminder');
+    if (initialReminder) {
+        initialReminder.style.display = 'none';
+    }
     
     document.getElementById('game-status').textContent = '示範進行中 - 點擊操作老鼠或標記死路';
 }
@@ -126,8 +132,8 @@ function resetGameState() {
     playerPosition = { x: 1, y: 1 };
     goalPosition = { x: 6, y: 6 };
     visitedCells = [];
-    moveCount = 0;
-    backtrackMoves = 0;
+    currentPath = [{ x: 1, y: 1 }]; // 初始化當前路徑為起點
+    finalPath = []; // 清空最終路徑
     obstaclesPlaced = 0;
     isGameActive = false;
     interactionMode = 'move';
@@ -135,6 +141,12 @@ function resetGameState() {
     currentTooltipCell = null;
     hideTooltip();
     updateModeDisplay();
+    
+    // 顯示初始提醒（只在頁面初始化時）
+    const initialReminder = document.getElementById('initial-reminder');
+    if (initialReminder && !isGameActive) {
+        initialReminder.style.display = 'block';
+    }
 }
 
 // 生成互動迷宮
@@ -306,7 +318,6 @@ function handleObstacleClick(x, y) {
     }
     
     renderInteractiveMaze();
-    updateGameDisplay();
 }
 
 // 檢查是否為有效移動
@@ -341,27 +352,37 @@ function movePlayer(newX, newY) {
     const isBacktrack = visitedCells.some(pos => pos.x === newX && pos.y === newY);
     
     if (isBacktrack) {
-        backtrackMoves++;
         const backtrackIndex = visitedCells.findIndex(pos => pos.x === newX && pos.y === newY);
         visitedCells = visitedCells.slice(0, backtrackIndex + 1);
+        
+        // 回溯時更新當前路徑，移除目標位置之後的部分
+        const pathIndex = currentPath.findIndex(pos => pos.x === newX && pos.y === newY);
+        if (pathIndex !== -1) {
+            currentPath = currentPath.slice(0, pathIndex + 1);
+        }
     } else {
         visitedCells.push({ x: playerPosition.x, y: playerPosition.y });
+        // 新位置加入當前路徑
+        currentPath.push({ x: newX, y: newY });
     }
     
     playerPosition.x = newX;
     playerPosition.y = newY;
-    moveCount++;
     
     renderInteractiveMaze();
-    updateGameDisplay();
+    updatePathDisplay();
 }
 
 // 處理獲勝
 function handleGameWin() {
     isGameActive = false;
     
+    // 將當前路徑設為最終路徑
+    finalPath = [...currentPath];
+    
     document.getElementById('game-status').textContent = '🎉 成功找到起司！示範完成';
     
+    updatePathDisplay();
     createVictoryAnimation();
     updateButtons();
 }
@@ -444,19 +465,53 @@ function resetPlayerPosition() {
     
     playerPosition = { x: 1, y: 1 };
     visitedCells = [];
-    moveCount = 0;
-    backtrackMoves = 0;
+    currentPath = [{ x: 1, y: 1 }]; // 重置當前路徑為起點
     
     renderInteractiveMaze();
-    updateGameDisplay();
+    updatePathDisplay();
 }
 
-// 更新顯示
-function updateGameDisplay() {
-    document.getElementById('move-count').textContent = moveCount;
-    document.getElementById('backtrack-moves').textContent = backtrackMoves;
-    document.getElementById('obstacles-placed').textContent = obstaclesPlaced;
-    document.getElementById('recursion-depth').textContent = visitedCells.length;
+// 更新路徑顯示
+function updatePathDisplay() {
+    const currentPathElement = document.getElementById('current-path');
+    const finalPathElement = document.getElementById('final-path');
+    
+    // 更新當前路徑顯示
+    if (currentPath.length > 0) {
+        const pathText = currentPath.map((pos, index) => {
+            if (index === 0) {
+                return `🏁 起點: (${pos.x},${pos.y})`;
+            } else if (index === currentPath.length - 1) {
+                return `📍 目前: (${pos.x},${pos.y})`;
+            } else {
+                return `→ (${pos.x},${pos.y})`;
+            }
+        }).join(' ');
+        
+        // 加上步數統計
+        const stepCount = currentPath.length - 1;
+        currentPathElement.innerHTML = `<div style="margin-bottom: 8px; font-weight: bold; color: #2196f3;">📊 已走 ${stepCount} 步</div>${pathText}`;
+    } else {
+        currentPathElement.innerHTML = '🏁 起點: (1,1)';
+    }
+    
+    // 更新最終路徑顯示
+    if (finalPath.length > 0) {
+        const finalText = finalPath.map((pos, index) => {
+            if (index === 0) {
+                return `🏁 起點: (${pos.x},${pos.y})`;
+            } else if (index === finalPath.length - 1) {
+                return `🧀 終點: (${pos.x},${pos.y})`;
+            } else {
+                return `→ (${pos.x},${pos.y})`;
+            }
+        }).join(' ');
+        
+        const totalSteps = finalPath.length - 1;
+        finalPathElement.innerHTML = `<div style="margin-bottom: 8px; font-weight: bold; color: #4caf50;">🎉 成功！共 ${totalSteps} 步</div>${finalText}`;
+    } else {
+        finalPathElement.innerHTML = '<div style="text-align: center; color: #999; font-style: italic;">等待完成探索...</div>';
+    }
 }
 
 // 更新按鈕狀態

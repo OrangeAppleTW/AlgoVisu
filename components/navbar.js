@@ -1,51 +1,54 @@
 /**
- * 導覽列活動連結自動設置功能
- * 根據當前頁面的URL自動設置對應的導覽連結為活動狀態
+ * 舊版 navbar.js 兼容性檔案
+ * 
+ * 此檔案已被 navbar-loader.js 取代
+ * 保留此檔案僅為向後兼容，避免舊版頁面出現 404 錯誤
+ * 
+ * 新功能已整合到 navbar-loader.js 中，包括：
+ * - 自動路徑計算
+ * - GitHub Pages 支援
+ * - 更精確的活動連結檢測
+ * - 更好的錯誤處理
  */
+
+console.warn('⚠️ navbar.js 已被棄用，請使用 navbar-loader.js');
+console.log('🔄 導覽列功能已由 navbar-loader.js 提供');
+
+// 如果 navbar-loader.js 未載入，提供基本的備用功能
 document.addEventListener('DOMContentLoaded', function() {
-    // 獲取當前頁面的路徑
-    const currentPath = window.location.pathname;
+    // 檢查是否已有 NavbarLoader
+    if (window.NavbarLoader) {
+        console.log('✅ NavbarLoader 已載入，跳過舊版 navbar.js 邏輯');
+        return;
+    }
     
-    // 獲取所有下拉選單連結
-    const dropdownLinks = document.querySelectorAll('.dropdown-link');
-    const navDropdowns = document.querySelectorAll('.nav-dropdown');
+    console.warn('⚠️ NavbarLoader 未找到，使用簡化版導覽列邏輯');
     
-    // 為每個下拉連結檢查是否匹配當前路徑
-    dropdownLinks.forEach(link => {
-        const linkPath = link.getAttribute('href');
+    // 簡化版的活動連結設置
+    setTimeout(() => {
+        const currentPath = window.location.pathname;
+        const dropdownLinks = document.querySelectorAll('.dropdown-link');
         
-        // 獲取主要路徑部分進行匹配
-        if (linkPath) {
-            // 提取關鍵路徑片段進行匹配
-            const linkSegments = linkPath.split('/').filter(seg => seg && seg !== '..' && seg !== 'index.html');
-            const currentSegments = currentPath.split('/').filter(seg => seg && seg !== 'index.html');
-            
-            // 檢查是否有匹配的路徑片段
-            const hasMatch = linkSegments.some(segment => 
-                currentSegments.some(currentSeg => 
-                    currentSeg.includes(segment) || segment.includes(currentSeg)
-                )
-            );
-            
-            if (hasMatch) {
+        dropdownLinks.forEach(link => {
+            const linkPath = link.getAttribute('href');
+            if (linkPath && currentPath.includes(linkPath.split('/').pop().replace('.html', ''))) {
                 link.classList.add('active');
-                // 同時為父級下拉選單加上活動狀態
+                
                 const parentDropdown = link.closest('.nav-dropdown');
                 if (parentDropdown) {
-                    const parentToggle = parentDropdown.querySelector('.dropdown-toggle');
+                    const parentToggle = parentDropdown.querySelector('.dropdown-toggle, .nav-link');
                     if (parentToggle) {
                         parentToggle.classList.add('active');
                     }
                 }
             }
-        }
-    });
-    
-    // 為下拉選單加上點擊事件處理
-    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            // 不做任何操作，保持hover效果
         });
-    });
+        
+        // 為下拉選單加上基本的點擊事件處理
+        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+            });
+        });
+    }, 100);
 });

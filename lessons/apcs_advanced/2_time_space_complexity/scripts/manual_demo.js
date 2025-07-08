@@ -6,10 +6,12 @@ class ManualDemoController {
     constructor() {
         this.visualizer = null;
         this.currentCase = 'best';
+        this.direction = 'ascending';
         this.stepHistory = [];
         this.currentStepIndex = -1;
         this.isAutoCompleting = false;
         this.theoreticalData = null;
+        this.operationLog = [];
         
         this.initVisualizer();
         this.bindEvents();
@@ -34,6 +36,13 @@ class ManualDemoController {
             });
         });
         
+        // 排序方向控制
+        document.querySelectorAll('.direction-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                this.setDirection(e.target.dataset.direction);
+            });
+        });
+        
         // 控制按鈕
         document.getElementById('next-step-btn').addEventListener('click', () => this.nextStep());
         document.getElementById('prev-step-btn').addEventListener('click', () => this.prevStep());
@@ -47,6 +56,24 @@ class ManualDemoController {
                 this.applyCustomData();
             }
         });
+    }
+    
+    setDirection(direction) {
+        if (this.isAutoCompleting) return;
+        
+        this.direction = direction;
+        
+        // 更新方向按鈕狀態
+        document.querySelectorAll('.direction-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-direction="${direction}"]`).classList.add('active');
+        
+        // 更新視覺化器方向
+        this.visualizer.setDirection(direction);
+        
+        // 重新載入當前案例的資料
+        this.loadInitialData();
     }
     
     selectCase(caseType) {
@@ -64,30 +91,33 @@ class ManualDemoController {
         const customInput = document.getElementById('custom-input');
         if (caseType === 'custom') {
             customInput.style.display = 'block';
+            this.updateStepDescription('請輸入自訂數字並點擊「套用」');
         } else {
             customInput.style.display = 'none';
             this.loadInitialData();
         }
-        
-        this.updateStepDescription(`已選擇${this.getCaseDisplayName(caseType)}`);
     }
     
     loadInitialData() {
+        this.visualizer.setDirection(this.direction);
         const data = this.visualizer.generateTestData(this.currentCase, 8);
         this.visualizer.setData(data, this.getCaseDisplayName(this.currentCase));
         
         // 重置步驟歷史
         this.stepHistory = [];
         this.currentStepIndex = -1;
+        this.operationLog = [];
         
         // 儲存初始狀態
         this.saveCurrentState('初始狀態', 'start');
         
         // 計算理論值
         this.theoreticalData = this.visualizer.calculateTheoretical(this.currentCase, data.length);
+        this.updateTheoreticalValues();
         
-        this.updateStepDescription('已載入測試資料，點擊「下一步」開始排序');
+        this.updateStepDescription(`已載入${this.getCaseDisplayName(this.currentCase)}資料，點擊「下一步」開始排序`);
         this.updateCurrentOperation('等待開始...');
+        this.updateOperationLog();
         this.updateButtonStates();
     }
     
@@ -118,20 +148,24 @@ class ManualDemoController {
             }
             
             // 使用自訂資料
+            this.visualizer.setDirection(this.direction);
             this.visualizer.setData(numbers, '自訂資料');
             
             // 重置步驟歷史
             this.stepHistory = [];
             this.currentStepIndex = -1;
+            this.operationLog = [];
             
             // 儲存初始狀態
             this.saveCurrentState('自訂資料初始狀態', 'start');
             
             // 計算理論值（假設為平均情況）
             this.theoreticalData = this.visualizer.calculateTheoretical('average', numbers.length);
+            this.updateTheoreticalValues();
             
             this.updateStepDescription('已載入自訂資料，點擊「下一步」開始排序');
             this.updateCurrentOperation('等待開始...');
+            this.updateOperationLog();
             this.updateButtonStates();
             
         } catch (error) {
@@ -158,6 +192,7 @@ class ManualDemoController {
             this.saveCurrentState('排序完成', 'completed');
             this.updateStepDescription('🎉 排序已完成！所有元素都已正確排序。');
             this.updateCurrentOperation('排序完成');
+            this.addToOperationLog('排序完成', 'log-pass');
         } else {
             const stepDescription = this.generateStepDescription(result);
             const operationText = this.generateOperationText(result);
@@ -165,8 +200,10 @@ class ManualDemoController {
             this.saveCurrentState(stepDescription, result.action, result);
             this.updateStepDescription(stepDescription);
             this.updateCurrentOperation(operationText);
+            this.addToOperationLog(operationText, this.getLogClass(result.action));
         }
         
+        this.updateOperationLog();
         this.updateButtonStates();
     }
     
@@ -187,17 +224,19 @@ class ManualDemoController {
     }
     
     async autoComplete() {
-        if (this.isAutoCompleting) return;
+        if (this.isAutoCompleting) {
+            this.isAutoCompleting = false;
+            this.updateButtonStates();
+            return;
+        }
         
         this.isAutoCompleting = true;
         this.updateButtonStates();
         
         try {
-            while (!this.visualizer.getStats().isCompleted) {
+            while (!this.visualizer.getStats().isCompleted && this.isAutoCompleting) {
                 this.nextStep();
                 await this.sleep(300); // 較快的自動執行速度
-                
-                if (!this.isAutoCompleting) break; // 允許中斷
             }
         } catch (error) {
             console.error('自動完成時發生錯誤:', error);
@@ -221,7 +260,8 @@ class ManualDemoController {
                 passes: this.visualizer.passes,
                 currentI: this.visualizer.currentI,
                 currentJ: this.visualizer.currentJ
-            }
+            },
+            operationLog: [...this.operationLog]
         };
         
         // 如果當前不在歷史記錄的末尾，則刪除後續記錄
@@ -245,6 +285,9 @@ class ManualDemoController {
         this.visualizer.currentI = state.visualizerState.currentI;
         this.visualizer.currentJ = state.visualizerState.currentJ;
         
+        // 恢復操作記錄
+        this.operationLog = [...state.operationLog];
+        
         // 更新視覺化
         this.visualizer.render();
         
@@ -259,13 +302,18 @@ class ManualDemoController {
         
         // 標記已排序區域
         if (state.visualizerState.passes > 0) {
-            this.visualizer.markSorted(this.visualizer.data.length - state.visualizerState.passes);
+            if (this.direction === 'ascending') {
+                this.visualizer.markSorted(this.visualizer.data.length - state.visualizerState.passes);
+            } else {
+                this.visualizer.markSorted(state.visualizerState.passes - 1);
+            }
         }
         
         // 更新界面
         this.updateStepDescription(state.description);
         this.updateCurrentOperation(this.generateOperationText(state.result));
         this.updateStats(state.stats);
+        this.updateOperationLog();
     }
     
     generateStepDescription(result) {
@@ -278,7 +326,7 @@ class ManualDemoController {
                 return `🔄 交換位置 ${result.indices[0]} 和 ${result.indices[1]}: ${result.values[1]} ↔ ${result.values[0]}`;
             
             case 'pass_completed':
-                return `✅ 第 ${result.pass} 輪完成，最大值已移至正確位置`;
+                return `✅ 第 ${result.pass} 輪完成，${this.direction === 'ascending' ? '最大值' : '最小值'}已移至正確位置`;
             
             default:
                 return '執行氣泡排序步驟...';
@@ -306,6 +354,42 @@ class ManualDemoController {
         }
     }
     
+    getLogClass(action) {
+        switch (action) {
+            case 'compare':
+                return 'log-compare';
+            case 'swap':
+                return 'log-swap';
+            case 'pass_completed':
+                return 'log-pass';
+            default:
+                return '';
+        }
+    }
+    
+    addToOperationLog(text, className = '') {
+        this.operationLog.push({ text, className });
+        // 限制記錄數量，避免過多
+        if (this.operationLog.length > 20) {
+            this.operationLog = this.operationLog.slice(-20);
+        }
+    }
+    
+    updateOperationLog() {
+        const logContainer = document.getElementById('operation-log');
+        if (this.operationLog.length === 0) {
+            logContainer.innerHTML = '<div style="color: #888; font-style: italic;">等待開始...</div>';
+            return;
+        }
+        
+        logContainer.innerHTML = this.operationLog
+            .map(entry => `<div class="log-entry ${entry.className}">${entry.text}</div>`)
+            .join('');
+        
+        // 滾動到底部
+        logContainer.scrollTop = logContainer.scrollHeight;
+    }
+    
     updateStats(stats) {
         document.getElementById('comparisons-count').textContent = formatNumber(stats.comparisons);
         document.getElementById('swaps-count').textContent = formatNumber(stats.swaps);
@@ -323,6 +407,17 @@ class ManualDemoController {
         document.getElementById('current-pass-progress').textContent = currentPassProgress + '%';
     }
     
+    updateTheoreticalValues() {
+        if (this.theoreticalData) {
+            document.getElementById('theoretical-comparisons-sidebar').textContent = 
+                formatNumber(this.theoreticalData.comparisons);
+            document.getElementById('theoretical-swaps-sidebar').textContent = 
+                formatNumber(this.theoreticalData.swaps);
+            document.getElementById('time-complexity-sidebar').textContent = 
+                this.theoreticalData.timeComplexity;
+        }
+    }
+    
     updateButtonStates() {
         const nextBtn = document.getElementById('next-step-btn');
         const prevBtn = document.getElementById('prev-step-btn');
@@ -336,19 +431,14 @@ class ManualDemoController {
         nextBtn.disabled = this.isAutoCompleting || !canGoNext;
         prevBtn.disabled = this.isAutoCompleting || !canGoPrev;
         resetBtn.disabled = this.isAutoCompleting;
-        autoCompleteBtn.disabled = this.isAutoCompleting || isCompleted;
         
-        // 更新按鈕文字
+        // 更新自動完成按鈕
         if (this.isAutoCompleting) {
             autoCompleteBtn.textContent = '⏸ 停止自動';
             autoCompleteBtn.disabled = false;
-            autoCompleteBtn.onclick = () => {
-                this.isAutoCompleting = false;
-                this.updateButtonStates();
-            };
         } else {
             autoCompleteBtn.textContent = '⏩ 自動完成';
-            autoCompleteBtn.onclick = () => this.autoComplete();
+            autoCompleteBtn.disabled = isCompleted;
         }
     }
     
@@ -374,6 +464,7 @@ class ManualDemoController {
             const efficiency = this.calculateEfficiency(stats);
             console.log('排序完成總結:', {
                 case: this.getCaseDisplayName(this.currentCase),
+                direction: this.direction === 'ascending' ? '由小到大' : '由大到小',
                 actualComparisons: stats.comparisons,
                 theoreticalComparisons: this.theoreticalData.comparisons,
                 actualSwaps: stats.swaps,
