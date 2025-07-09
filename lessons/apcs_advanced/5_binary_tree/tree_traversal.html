@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樹走訪動畫 - L5 二元樹與樹走訪</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/tree_traversal_minimal.css">
+</head>
+<body>
+    <div class="container">
+        <h1>第二部分：樹走訪動畫</h1>
+        <div class="lesson-info">
+            學習前序、中序、後序三種走訪方式，通過互動式動畫理解其遞迴過程
+        </div>
+
+        <div class="section">
+            <h2>互動式樹走訪演示</h2>
+            <div class="section-description">
+                選擇走訪方式，然後使用控制按鈕逐步觀看走訪過程。每一步都會顯示當前訪問的節點和走訪順序。
+            </div>
+
+            <!-- 走訪方式選擇 -->
+            <div class="traversal-selection">
+                <div class="method-buttons">
+                    <button class="method-btn active" data-method="preorder" onclick="selectTraversalMethod('preorder')">
+                        前序走訪 (Preorder)
+                    </button>
+                    <button class="method-btn" data-method="inorder" onclick="selectTraversalMethod('inorder')">
+                        中序走訪 (Inorder)
+                    </button>
+                    <button class="method-btn" data-method="postorder" onclick="selectTraversalMethod('postorder')">
+                        後序走訪 (Postorder)
+                    </button>
+                </div>
+            </div>
+
+            <!-- 樹視覺化 -->
+            <div class="tree-visualization">
+                <div class="tree-container">
+                    <svg id="traversalTreeSvg" width="800" height="500">
+                        <g id="traversalLinks"></g>
+                        <g id="traversalNodes"></g>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 控制面板 -->
+            <div class="control-panel">
+                <div class="step-controls">
+                    <button class="control-btn" onclick="startTraversal()" id="startBtn">開始走訪</button>
+                    <button class="control-btn" onclick="previousStep()" id="prevBtn" disabled>上一步</button>
+                    <button class="control-btn" onclick="nextStep()" id="nextBtn" disabled>下一步</button>
+                    <button class="control-btn" onclick="resetTraversal()" id="resetBtn">重置</button>
+                </div>
+                
+                <div class="traversal-info">
+                    <div class="current-step">
+                        <strong>當前步驟：</strong> <span id="currentStepText">點擊「開始走訪」開始演示</span>
+                    </div>
+                    <div class="step-counter">
+                        <strong>進度：</strong> <span id="stepCounter">0 / 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>走訪結果比較</h2>
+            
+            <div class="results-container">
+                <div class="result-display">
+                    <h4>前序走訪結果</h4>
+                    <div class="result-sequence" id="preorderResult">
+                        <div class="sequence-placeholder">開始前序走訪後將顯示結果</div>
+                    </div>
+                    <div class="result-description">
+                        根 → 左子樹 → 右子樹
+                    </div>
+                </div>
+
+                <div class="result-display">
+                    <h4>中序走訪結果</h4>
+                    <div class="result-sequence" id="inorderResult">
+                        <div class="sequence-placeholder">開始中序走訪後將顯示結果</div>
+                    </div>
+                    <div class="result-description">
+                        左子樹 → 根 → 右子樹
+                    </div>
+                </div>
+
+                <div class="result-display">
+                    <h4>後序走訪結果</h4>
+                    <div class="result-sequence" id="postorderResult">
+                        <div class="sequence-placeholder">開始後序走訪後將顯示結果</div>
+                    </div>
+                    <div class="result-description">
+                        左子樹 → 右子樹 → 根
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>走訪方法詳解</h2>
+            
+            <div class="method-explanation">
+                <div class="method-card">
+                    <h4>前序走訪 (Preorder Traversal)</h4>
+                    <div class="method-details">
+                        <p><strong>順序：</strong>根節點 → 左子樹 → 右子樹</p>
+                        <p><strong>特點：</strong>最先訪問根節點，適合用於複製樹或建立樹的前綴表達式</p>
+                        <p><strong>應用：</strong>樹的序列化、前綴表達式求值</p>
+                        <div class="code-example">
+                            <strong>遞迴實作：</strong>
+                            <pre>def preorder(node):
+    if node:
+        print(node.value)  # 訪問根
+        preorder(node.left)   # 遞迴左子樹
+        preorder(node.right)  # 遞迴右子樹</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <h4>中序走訪 (Inorder Traversal)</h4>
+                    <div class="method-details">
+                        <p><strong>順序：</strong>左子樹 → 根節點 → 右子樹</p>
+                        <p><strong>特點：</strong>對於二元搜尋樹，中序走訪會得到排序後的序列</p>
+                        <p><strong>應用：</strong>二元搜尋樹的排序輸出、中綴表達式</p>
+                        <div class="code-example">
+                            <strong>遞迴實作：</strong>
+                            <pre>def inorder(node):
+    if node:
+        inorder(node.left)    # 遞迴左子樹
+        print(node.value)     # 訪問根
+        inorder(node.right)   # 遞迴右子樹</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="method-card">
+                    <h4>後序走訪 (Postorder Traversal)</h4>
+                    <div class="method-details">
+                        <p><strong>順序：</strong>左子樹 → 右子樹 → 根節點</p>
+                        <p><strong>特點：</strong>最後訪問根節點，適合用於刪除樹或計算目錄大小</p>
+                        <p><strong>應用：</strong>樹的刪除、後綴表達式求值、計算檔案大小</p>
+                        <div class="code-example">
+                            <strong>遞迴實作：</strong>
+                            <pre>def postorder(node):
+    if node:
+        postorder(node.left)   # 遞迴左子樹
+        postorder(node.right)  # 遞迴右子樹
+        print(node.value)      # 訪問根</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>互動練習</h2>
+            
+            <div class="practice-section">
+                <div class="practice-description">
+                    <p>現在你已經學會了三種走訪方式，試著預測每種方法的結果：</p>
+                </div>
+                
+                <div class="quiz-container">
+                    <div class="quiz-question">
+                        <h4>思考題：對於我們的範例樹，三種走訪的結果分別是什麼？</h4>
+                        <div class="quiz-options">
+                            <button class="quiz-btn" onclick="showAnswer()">顯示答案</button>
+                            <button class="quiz-btn" onclick="hideAnswer()">隱藏答案</button>
+                        </div>
+                        
+                        <div class="quiz-answer" id="quizAnswer" style="display: none;">
+                            <div class="answer-grid">
+                                <div class="answer-item">
+                                    <strong>前序走訪：</strong> A → B → D → E → C → F
+                                </div>
+                                <div class="answer-item">
+                                    <strong>中序走訪：</strong> D → B → E → A → C → F
+                                </div>
+                                <div class="answer-item">
+                                    <strong>後序走訪：</strong> D → E → B → F → C → A
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="tree_structure.html" class="nav-button prev">← 上一部分：樹狀結構探索</a>
+            <a href="index.html" class="nav-button next">回到主頁 →</a>
+        </div>
+    </div>
+
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="scripts/tree_traversal.js"></script>
+</body>
+</html>

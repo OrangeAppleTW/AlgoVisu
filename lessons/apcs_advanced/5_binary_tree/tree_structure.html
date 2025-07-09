@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樹狀結構探索 - L5 二元樹與樹走訪</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/tree_structure_minimal.css">
+</head>
+<body>
+    <div class="container">
+        <h1>樹狀結構探索</h1>
+        <div class="lesson-info">
+            點擊節點探索二元樹的結構關係，理解父節點、子節點、葉節點等概念
+        </div>
+
+        <div class="section">
+            <h2>🎯 學習重點</h2>
+            <div class="section-description">
+                二元樹是一種重要的資料結構，每個節點最多有兩個子節點。
+                透過互動點擊，你將理解節點之間的父子關係、深度概念，以及樹的基本屬性。
+            </div>
+
+            <div class="tree-container">
+                <!-- 主要樹視覺化區域 -->
+                <div class="tree-section">
+                    <div class="tree-visualization">
+                        <svg id="treeSvg" width="700" height="450">
+                            <!-- 樹的連接線 -->
+                            <g id="treeLinks"></g>
+                            <!-- 樹的節點 -->
+                            <g id="treeNodes"></g>
+                            <!-- 深度標籤 -->
+                            <g id="depthLabels"></g>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- 右側資訊面板 -->
+                <div class="info-panel">
+                    <div class="info-header">
+                        <h3>節點資訊</h3>
+                    </div>
+                    <div class="info-content" id="nodeInfoPanel">
+                        <div class="placeholder">
+                            點擊任意節點查看詳細資訊
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="step-explanation">
+                <h4>💡 重要概念</h4>
+                <p><strong>根節點（Root）</strong>：樹的最頂端節點，沒有父節點</p>
+                <p><strong>葉節點（Leaf）</strong>：沒有子節點的節點</p>
+                <p><strong>深度（Depth）</strong>：從根節點到該節點的距離</p>
+                <p><strong>高度（Height）</strong>：從該節點到最深葉節點的距離</p>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="nav-button prev">← 回到主頁</a>
+            <a href="tree_traversal.html" class="nav-button next">下一部分：樹走訪動畫 →</a>
+        </div>
+    </div>
+
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="scripts/tree_structure.js"></script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+/* 黑白簡約風格 - 樹狀結構探索頁面 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    line-height: 1.6;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    padding-top: 80px;
+    font-weight: 400;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* 標題區域 - 縮小間距 */
+h1 {
+    color: #222;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 2.2em;
+    font-weight: 300;
+}
+
+.lesson-info {
+    text-align: center;
+    color: #666666;
+    font-size: 1.2rem; /* 增加字體大小 */
+    margin-bottom: 25px;
+    font-weight: 300;
+}
+
+/* 區段樣式 - 縮小間距 */
+.section {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.section h2 {
+    color: #222;
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 1.5em;
+    font-weight: 500;
+}
+
+.section-description {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 1.05rem; /* 增加字體大小 */
+}
+
+/* 主要容器 - 縮小間距 */
+.tree-container {
+    display: flex;
+    gap: 25px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+}
+
+/* 左側樹區域 */
+.tree-section {
+    flex: 2.2;
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+.tree-visualization {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 320px;
+    overflow: visible;
+}
+
+#treeSvg {
+    background-color: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #f0f0f0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+}
+
+/* SVG 樹節點樣式 */
+.tree-node {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tree-node circle {
+    fill: #ffffff;
+    stroke: #222;
+    stroke-width: 2px;
+    transition: all 0.3s ease;
+}
+
+.tree-node:hover circle {
+    fill: #f0f0f0;
+    stroke: #000;
+    stroke-width: 3px;
+}
+
+.tree-node.selected circle {
+    fill: #222;
+    stroke: #000;
+    stroke-width: 3px;
+}
+
+.tree-node.selected text {
+    fill: #ffffff;
+}
+
+.tree-node text {
+    font-size: 16px;
+    font-weight: 500;
+    fill: #222;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+}
+
+/* SVG 連接線樣式 */
+.tree-link {
+    fill: none;
+    stroke: #999;
+    stroke-width: 2px;
+    transition: all 0.3s ease;
+}
+
+/* 深度標籤 - 永久顯示 */
+.depth-label {
+    font-size: 13px; /* 增加字體大小 */
+    font-weight: 500;
+    fill: #666;
+    text-anchor: start;
+    opacity: 1;
+}
+
+/* 葉節點路徑 - 永久顯示 */
+.leaf-path {
+    stroke: #ddd;
+    stroke-width: 1px;
+    stroke-dasharray: 3, 3;
+    opacity: 0.6;
+}
+
+/* 右側資訊面板 - 配合樹的高度 */
+.info-panel {
+    flex: 1.2;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    height: 350px;
+}
+
+.info-header {
+    background-color: #222;
+    color: white;
+    padding: 12px 15px;
+    text-align: center;
+}
+
+.info-header h3 {
+    margin: 0;
+    font-size: 1.1em; /* 增加字體大小 */
+    font-weight: 500;
+}
+
+.info-content {
+    padding: 15px;
+    height: 300px;
+    overflow: visible;
+}
+
+.placeholder {
+    color: #666;
+    text-align: center;
+    font-style: italic;
+    padding: 40px 10px;
+    line-height: 1.4;
+    font-size: 1rem; /* 增加字體大小 */
+}
+
+/* 節點詳細資訊 - 緊湊佈局 */
+.node-info {
+    color: #222;
+}
+
+.node-info h4 {
+    margin: 0 0 12px 0;
+    font-size: 1.2em; /* 增加字體大小 */
+    font-weight: 500;
+    color: #222;
+    text-align: center;
+}
+
+.info-item {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #555;
+    font-size: 0.95em; /* 增加字體大小 */
+}
+
+.info-value {
+    color: #222;
+    font-weight: 500;
+    font-size: 0.95em; /* 增加字體大小 */
+    text-align: right;
+    max-width: 120px;
+    word-break: break-word;
+}
+
+/* 重要概念說明 - 縮小間距 */
+.step-explanation {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.step-explanation h4 {
+    color: #222;
+    margin-bottom: 10px;
+    font-size: 1.1em; /* 增加字體大小 */
+    font-weight: 500;
+}
+
+.step-explanation p {
+    margin-bottom: 5px;
+    color: #555;
+    line-height: 1.4;
+    font-size: 1rem; /* 增加字體大小 */
+}
+
+.step-explanation p:last-child {
+    margin-bottom: 0;
+}
+
+.step-explanation strong {
+    color: #222;
+}
+
+/* 導航按鈕 - 縮小間距 */
+.navigation {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.nav-button {
+    padding: 8px 15px;
+    background-color: #ffffff;
+    color: #222;
+    text-decoration: none;
+    border: 1px solid #e0e0e0;
+    font-size: 0.95em; /* 增加字體大小 */
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    min-width: 160px;
+    text-align: center;
+}
+
+.nav-button:hover {
+    background-color: #222;
+    color: #ffffff;
+    border-color: #222;
+}
+
+/* 響應式設計 */
+@media (max-width: 1024px) {
+    .tree-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .info-panel {
+        height: auto;
+        min-height: 280px;
+    }
+    
+    .info-content {
+        height: auto;
+        overflow: visible;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px 15px;
+        margin: 10px;
+    }
+    
+    .section {
+        padding: 15px;
+    }
+    
+    .tree-visualization {
+        height: 250px;
+    }
+    
+    .info-panel {
+        height: 280px;
+    }
+    
+    .navigation {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .nav-button {
+        width: 100%;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+}

@@ -22,44 +22,6 @@
             </div>
 
             <div class="coordinate-container">
-                <!-- 左側控制面板 -->
-                <div class="controls-panel">
-                    <div class="controls">
-                        <div class="control-group">
-                            <h4>🎯 互動式座標系統</h4>
-                            <div class="input-controls">
-                                <div class="matrix-size-control">
-                                    <label>矩陣大小：</label>
-                                    <select id="matrixRows">
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5" selected>5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                    </select>
-                                    <span> × </span>
-                                    <select id="matrixCols">
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5" selected>5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                    </select>
-                                    <button class="btn" onclick="updateMatrixSize()">更新矩陣</button>
-                                </div>
-                                
-                                <div class="matrix-input-control">
-                                    <label>自定義矩陣：</label>
-                                    <textarea id="matrixInput" placeholder="輸入矩陣數值，每行用換行分隔：&#10;1 3 4 5&#10;2 1 4 6&#10;7 8 9 0" rows="4" cols="25"></textarea>
-                                    <button class="btn" onclick="loadCustomMatrix()">載入矩陣</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 中間矩陣區域 -->
                 <div class="matrix-section">
                     <div class="grid-container">
@@ -79,6 +41,44 @@
                     <div class="info-content" id="coordinateInfo">
                         <div class="placeholder">
                             點擊任意格子查看詳細資訊
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部控制面板 -->
+            <div class="controls-panel-bottom">
+                <div class="controls">
+                    <div class="control-group">
+                        <h4>🎯 互動式座標系統</h4>
+                        <div class="input-controls">
+                            <div class="matrix-size-control">
+                                <label>矩陣大小：</label>
+                                <select id="matrixRows">
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5" selected>5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                                <span> × </span>
+                                <select id="matrixCols">
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5" selected>5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                </select>
+                                <button class="btn" onclick="updateMatrixSize()">更新矩陣</button>
+                            </div>
+                            
+                            <div class="matrix-input-control">
+                                <label>自定義矩陣：</label>
+                                <textarea id="matrixInput" placeholder="輸入矩陣數值，每行用換行分隔：&#10;1 3 4 5&#10;2 1 4 6&#10;7 8 9 0" rows="4" cols="50"></textarea>
+                                <button class="btn" onclick="loadCustomMatrix()">載入矩陣</button>
+                            </div>
                         </div>
                     </div>
                 </div>

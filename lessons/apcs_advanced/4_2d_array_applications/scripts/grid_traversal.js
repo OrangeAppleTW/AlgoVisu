@@ -1,48 +1,59 @@
-// 網格搜尋演算法的 JavaScript
+// Flood Fill 演算法動畫演示的 JavaScript
 
 // 全域變數
-let currentCenter = null;
-let isEditMode = false;
-let gridData = [];
+let animationSpeed = 800; // 動畫速度（毫秒） - 放慢一點
 let isAnimating = false;
+
+// 測試網格數據 - 1代表可填充，0代表障礙物
+const testGridData = [
+    [1, 0, 0, 0, 1],
+    [1, 0, 1, 0, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 1, 1, 0],
+    [1, 0, 0, 0, 0]
+];
+
+// 起始點位置
+const startPoint = { row: 2, col: 1 };
 
 // 初始化頁面
 document.addEventListener('DOMContentLoaded', function() {
-    initializeSearchGrid();
+    console.log('Flood Fill 演示頁面載入完成');
+    initializeGrids();
 });
 
-// 初始化搜尋網格
-function initializeSearchGrid() {
-    const grid = document.getElementById('searchGrid');
-    grid.style.gridTemplateColumns = 'repeat(5, 1fr)';
-    
-    // 初始化網格資料（對應範例程式碼）
-    gridData = [
-        [1, 0, 0, 0, 1],
-        [1, 0, 1, 0, 0],
-        [0, 1, 1, 1, 0],
-        [0, 0, 1, 1, 0],
-        [1, 0, 0, 0, 0]
-    ];
-    
-    renderSearchGrid();
+// 初始化兩個網格
+function initializeGrids() {
+    initializeGrid('grid4', 4);
+    initializeGrid('grid8', 8);
 }
 
-// 渲染搜尋網格
-function renderSearchGrid() {
-    const grid = document.getElementById('searchGrid');
+// 初始化單個網格
+function initializeGrid(gridId, neighbors) {
+    const grid = document.getElementById(gridId);
+    if (!grid) {
+        console.error(`找不到網格元素: ${gridId}`);
+        return;
+    }
+    
+    // 設定網格佈局
+    grid.style.gridTemplateColumns = `repeat(5, 1fr)`;
     grid.innerHTML = '';
     
+    // 創建5x5網格
     for (let i = 0; i < 5; i++) {
         for (let j = 0; j < 5; j++) {
             const cell = document.createElement('div');
             cell.className = 'grid-cell';
-            cell.textContent = gridData[i][j];
-            cell.onclick = () => handleCellClick(i, j);
+            cell.dataset.row = i;
+            cell.dataset.col = j;
             
-            // 根據值設定初始外觀
-            if (gridData[i][j] === 0) {
-                cell.classList.add('blocked');
+            // 顯示實際數值（0或1）
+            cell.textContent = testGridData[i][j];
+            
+            // 如果是起始點，先標記為已填充的顏色
+            if (i === startPoint.row && j === startPoint.col) {
+                cell.classList.add('filled');
             }
             
             grid.appendChild(cell);
@@ -50,261 +61,279 @@ function renderSearchGrid() {
     }
 }
 
-// 處理格子點擊
-function handleCellClick(i, j) {
-    if (isAnimating) return;
-    
-    if (isEditMode) {
-        // 編輯模式：切換格子值
-        gridData[i][j] = gridData[i][j] === 1 ? 0 : 1;
-        renderSearchGrid();
-    } else {
-        // 選擇模式：設定中心點
-        setCenter(i, j);
-    }
-}
-
-// 設定中心點
-function setCenter(i, j) {
-    currentCenter = {i, j};
-    resetGridHighlights();
-    
-    const cells = document.querySelectorAll('#searchGrid .grid-cell');
-    const index = i * 5 + j;
-    cells[index].classList.add('current');
-    
-    updateAlgorithmExplanation('center', i, j);
-}
-
-// 顯示相鄰格子
-function showNeighbors(type) {
-    if (!currentCenter) {
-        alert('請先點擊格子選擇中心點！');
+// 開始 Flood Fill 演示
+async function startFloodFill(neighbors) {
+    if (isAnimating) {
+        alert('演示進行中，請稍候...');
         return;
     }
     
-    resetGridHighlights();
-    const {i, j} = currentCenter;
-    
-    // 重新標記中心點
-    const cells = document.querySelectorAll('#searchGrid .grid-cell');
-    cells[i * 5 + j].classList.add('current');
-    
-    if (type === 4) {
-        show4Neighbors(i, j);
-        updateAlgorithmExplanation('4neighbors', i, j);
-    } else if (type === 8) {
-        show8Neighbors(i, j);
-        updateAlgorithmExplanation('8neighbors', i, j);
-    }
-}
-
-// 顯示 4-neighbors
-function show4Neighbors(centerI, centerJ) {
-    const directions = [
-        [-1, 0], [1, 0], [0, -1], [0, 1]  // 上、下、左、右
-    ];
-    
-    const cells = document.querySelectorAll('#searchGrid .grid-cell');
-    
-    directions.forEach(([di, dj]) => {
-        const ni = centerI + di;
-        const nj = centerJ + dj;
-        
-        if (ni >= 0 && ni < 5 && nj >= 0 && nj < 5) {
-            const index = ni * 5 + nj;
-            cells[index].classList.add('neighbor-4');
-        }
-    });
-}
-
-// 顯示 8-neighbors
-function show8Neighbors(centerI, centerJ) {
-    const directions = [
-        [-1, -1], [-1, 0], [-1, 1],  // 上排
-        [0, -1],           [0, 1],   // 中排（左、右）
-        [1, -1],  [1, 0],  [1, 1]    // 下排
-    ];
-    
-    const cells = document.querySelectorAll('#searchGrid .grid-cell');
-    
-    directions.forEach(([di, dj]) => {
-        const ni = centerI + di;
-        const nj = centerJ + dj;
-        
-        if (ni >= 0 && ni < 5 && nj >= 0 && nj < 5) {
-            const index = ni * 5 + nj;
-            cells[index].classList.add('neighbor-8');
-        }
-    });
-}
-
-// 重置網格高亮
-function resetGridHighlights() {
-    document.querySelectorAll('#searchGrid .grid-cell').forEach(cell => {
-        cell.classList.remove('current', 'neighbor-4', 'neighbor-8', 'visited');
-    });
-}
-
-// 重置整個網格
-function resetGrid() {
-    // 重置為原始資料
-    gridData = [
-        [1, 0, 0, 0, 1],
-        [1, 0, 1, 0, 0],
-        [0, 1, 1, 1, 0],
-        [0, 0, 1, 1, 0],
-        [1, 0, 0, 0, 0]
-    ];
-    
-    currentCenter = null;
-    isAnimating = false;
-    renderSearchGrid();
-    updateAlgorithmExplanation('reset');
-}
-
-// 切換編輯模式
-function toggleEditMode() {
-    isEditMode = !isEditMode;
-    const button = document.getElementById('editModeText');
-    button.textContent = isEditMode ? '切換為選擇模式' : '切換為編輯模式';
-    
-    if (isEditMode) {
-        updateAlgorithmExplanation('edit');
-    } else {
-        updateAlgorithmExplanation('select');
-    }
-}
-
-// Flood Fill 演示
-async function startFloodFillDemo() {
-    if (!currentCenter) {
-        alert('請先點擊格子選擇起始點！');
-        return;
-    }
-    
-    if (isAnimating) return;
+    console.log(`開始 ${neighbors}-Neighbors Flood Fill 演示`);
     isAnimating = true;
     
-    resetGridHighlights();
+    const gridId = `grid${neighbors}`;
+    const statusId = `status${neighbors}`;
     
+    // 重置網格
+    resetDemo(neighbors);
+    
+    // 更新狀態
+    updateStatus(statusId, `開始 ${neighbors}-Neighbors Flood Fill 演算法...`);
+    
+    // 創建訪問紀錄
     const visited = Array(5).fill().map(() => Array(5).fill(false));
-    const {i, j} = currentCenter;
     
-    updateAlgorithmExplanation('floodfill');
+    // 執行 Flood Fill
+    const filledCount = await floodFillRecursive(
+        gridId, 
+        testGridData, 
+        visited, 
+        startPoint.row, 
+        startPoint.col, 
+        neighbors
+    );
     
-    await floodFill(gridData, visited, i, j);
+    // 清理所有可能的動畫狀態
+    cleanupAnimation(gridId);
     
-    // 計算連通區域大小
-    const count = visited.reduce((sum, row) => sum + row.reduce((rowSum, cell) => rowSum + (cell ? 1 : 0), 0), 0);
-    updateAlgorithmExplanation('floodfill_complete', count);
+    // 完成通知
+    updateStatus(statusId, `演算法完成！共填充了 ${filledCount} 個格子`);
     
     isAnimating = false;
 }
 
 // 遞迴 Flood Fill 演算法（動畫版本）
-async function floodFill(arr, visited, x, y) {
-    // 邊界檢查
-    if (x < 0 || x >= 5 || y < 0 || y >= 5) {
+async function floodFillRecursive(gridId, grid, visited, row, col, neighbors) {
+    // **先進行邊界檢查，在任何視覺化或陣列存取之前**
+    if (row < 0 || row >= 5 || col < 0 || col >= 5) {
+        await showBoundaryCheck(gridId, row, col, neighbors);
+        return 0;
+    }
+    
+    // 先顯示探訪動畫（讓所有格子都能看到橘色效果）
+    await showVisiting(gridId, row, col, neighbors);
+    
+    // 檢查是否為可填充格子且未訪問
+    if (grid[row][col] !== 1 || visited[row][col]) {
+        await showInvalidCell(gridId, row, col, neighbors, visited[row][col]);
+        return 0;
+    }
+    
+    // 標記為已訪問
+    visited[row][col] = true;
+    
+    // 顯示成功填充的動畫
+    await showSuccessfulFill(gridId, row, col, neighbors);
+    
+    let totalFilled = 1; // 當前格子
+    
+    if (neighbors === 4) {
+        // 4-neighbors: 上、下、左、右
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row - 1, col, neighbors);     // 上
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row + 1, col, neighbors);     // 下
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row, col - 1, neighbors);     // 左
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row, col + 1, neighbors);     // 右
+    } else if (neighbors === 8) {
+        // 8-neighbors: 從正上方開始順時針搜尋所有8個方向
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row - 1, col, neighbors);     // 上
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row - 1, col + 1, neighbors); // 右上
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row, col + 1, neighbors);     // 右
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row + 1, col + 1, neighbors); // 右下
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row + 1, col, neighbors);     // 下
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row + 1, col - 1, neighbors); // 左下
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row, col - 1, neighbors);     // 左
+        totalFilled += await floodFillRecursive(gridId, grid, visited, row - 1, col - 1, neighbors); // 左上
+    }
+    
+    return totalFilled;
+}
+
+// 顯示探訪動畫
+async function showVisiting(gridId, row, col, neighbors) {
+    // 雙重檢查邊界（防止負數索引問題）
+    if (row < 0 || row >= 5 || col < 0 || col >= 5) {
+        console.warn(`showVisiting: 座標超出邊界 (${row}, ${col})`);
         return;
     }
     
-    // 檢查是否為目標格子且未訪問過
-    if (arr[x][y] === 1 && !visited[x][y]) {
-        visited[x][y] = true;
-        
-        // 視覺化當前格子
-        const cells = document.querySelectorAll('#searchGrid .grid-cell');
-        const index = x * 5 + y;
-        cells[index].classList.add('visited');
-        
-        // 等待動畫
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // 遞迴搜尋 4-neighbors
-        await floodFill(arr, visited, x-1, y);  // 上
-        await floodFill(arr, visited, x+1, y);  // 下
-        await floodFill(arr, visited, x, y-1);  // 左
-        await floodFill(arr, visited, x, y+1);  // 右
+    const cell = getCellElement(gridId, row, col);
+    const statusId = `status${neighbors}`;
+    
+    if (cell) {
+        // 添加探訪動畫
+        cell.classList.add('visiting');
+        updateStatus(statusId, `正在探訪位置 (${row}, ${col})...`);
+        // 增加等待時間，讓動畫完整播放
+        await sleep(animationSpeed);
+        // 移除動畫類別，準備下個狀態
+        cell.classList.remove('visiting');
     }
 }
 
-// 更新演算法說明
-function updateAlgorithmExplanation(type, param1 = null, param2 = null) {
-    const explanation = document.getElementById('algorithmExplanation');
+// 顯示邊界檢查結果
+async function showBoundaryCheck(gridId, row, col, neighbors) {
+    const statusId = `status${neighbors}`;
+    updateStatus(statusId, `位置 (${row}, ${col}) 超出邊界，返回`);
+    await sleep(animationSpeed / 3);
+}
+
+// 顯示無效格子
+async function showInvalidCell(gridId, row, col, neighbors, isAlreadyVisited = false) {
+    // 確保座標在有效範圍內（避免負數索引問題）
+    if (row < 0 || row >= 5 || col < 0 || col >= 5) {
+        console.warn(`showInvalidCell: 座標超出邊界 (${row}, ${col})`);
+        return;
+    }
     
-    switch(type) {
-        case 'center':
-            explanation.innerHTML = `
-                <h4>🎯 已選擇中心點</h4>
-                <p>中心點座標：(${param1}, ${param2})</p>
-                <p>現在可以點擊「4-Neighbors」或「8-Neighbors」按鈕來查看相鄰格子</p>
-            `;
-            break;
-            
-        case '4neighbors':
-            explanation.innerHTML = `
-                <h4>🔄 4-Neighbors 搜尋</h4>
-                <p>從中心點 (${param1}, ${param2}) 搜尋上、下、左、右四個方向的相鄰格子</p>
-                <p><strong>方向向量：</strong>(-1,0), (1,0), (0,-1), (0,1)</p>
-                <p>這是最基本的網格搜尋方式，常用於迷宮尋路、連通性檢查等</p>
-            `;
-            break;
-            
-        case '8neighbors':
-            explanation.innerHTML = `
-                <h4>🔄 8-Neighbors 搜尋</h4>
-                <p>從中心點 (${param1}, ${param2}) 搜尋周圍八個方向的相鄰格子</p>
-                <p><strong>方向向量：</strong>(-1,-1), (-1,0), (-1,1), (0,-1), (0,1), (1,-1), (1,0), (1,1)</p>
-                <p>包含對角線方向，搜尋範圍更廣，常用於圖像處理、遊戲AI等</p>
-            `;
-            break;
-            
-        case 'floodfill':
-            explanation.innerHTML = `
-                <h4>🌊 Flood Fill 演算法演示</h4>
-                <p>正在執行連通區域搜尋...</p>
-                <p>演算法會遞迴地搜尋所有相連的值為1的格子</p>
-                <p>綠色格子表示已經被搜尋到的區域</p>
-            `;
-            break;
-            
-        case 'floodfill_complete':
-            explanation.innerHTML = `
-                <h4>✅ Flood Fill 演算法完成</h4>
-                <p>搜尋完成！找到 ${param1} 個連通的格子</p>
-                <p>所有綠色格子組成一個連通區域</p>
-                <p>這就是題目中 marker 陣列標記為 1 的所有位置</p>
-            `;
-            break;
-            
-        case 'edit':
-            explanation.innerHTML = `
-                <h4>✏️ 編輯模式</h4>
-                <p>點擊格子可以切換其值（0 ↔ 1）</p>
-                <p>0 = 障礙物（黑色），1 = 可通行（淺色）</p>
-                <p>設計自己的地圖來測試演算法！</p>
-            `;
-            break;
-            
-        case 'select':
-            explanation.innerHTML = `
-                <h4>👆 選擇模式</h4>
-                <p>點擊格子選擇中心點，然後使用上方按鈕開始演示</p>
-            `;
-            break;
-            
-        case 'reset':
-            explanation.innerHTML = `
-                <h4>🔄 網格已重置</h4>
-                <p>恢復到原始狀態，點擊格子選擇新的中心點開始演示</p>
-            `;
-            break;
-            
-        default:
-            explanation.innerHTML = `
-                <h4>🤔 演算法說明</h4>
-                <p>點擊上方按鈕開始演示不同的搜尋方式</p>
-            `;
+    const cell = getCellElement(gridId, row, col);
+    const statusId = `status${neighbors}`;
+    
+    if (cell) {
+        cell.classList.remove('visiting');
+        
+        if (isAlreadyVisited) {
+            // 已探訪過的格子 - 簡單顯示，不要動畫
+            cell.classList.add('already-visited');
+            updateStatus(statusId, `位置 (${row}, ${col}) 已探訪過，跳過`);
+            await sleep(animationSpeed / 2);
+            cell.classList.remove('already-visited');
+        } else if (testGridData[row] && testGridData[row][col] === 0) {
+            // 障礙物格子 - 只顯示狀態訊息，不改變颜色
+            updateStatus(statusId, `位置 (${row}, ${col}) 的值為 0（障礙物），跳過`);
+            await sleep(animationSpeed / 2);
+        }
+        
+        cell.textContent = testGridData[row][col];
     }
 }
+
+// 顯示成功填充
+async function showSuccessfulFill(gridId, row, col, neighbors) {
+    // 確保座標在有效範圍內（避免負數索引問題）
+    if (row < 0 || row >= 5 || col < 0 || col >= 5) {
+        console.warn(`showSuccessfulFill: 座標超出邊界 (${row}, ${col})`);
+        return;
+    }
+    
+    const cell = getCellElement(gridId, row, col);
+    const statusId = `status${neighbors}`;
+    
+    console.log(`成功填充位置: (${row}, ${col}), 值: ${testGridData[row][col]}`);
+    
+    if (cell) {
+        // 移除所有可能的動畫狀態
+        cell.classList.remove('visiting');
+        
+        // 如果是起始點，更新狀態訊息
+        if (row === startPoint.row && col === startPoint.col) {
+            updateStatus(statusId, `起始點 (${row}, ${col})，值為 ${testGridData[row][col]}，開始填充`);
+            await sleep(animationSpeed);
+        } else {
+            // 非起始點的處理
+            updateStatus(statusId, `成功填充位置 (${row}, ${col})`);
+            await sleep(animationSpeed);
+        }
+        
+        // 確保添加已填充狀態並保持數值
+        cell.classList.add('filled');
+        cell.textContent = testGridData[row][col];
+        
+        await sleep(animationSpeed / 2);
+    }
+}
+
+// 獲取方向向量
+function getDirections(neighbors) {
+    if (neighbors === 4) {
+        // 4-Neighbors: 上、下、左、右
+        return [
+            [-1, 0], [1, 0], [0, -1], [0, 1]
+        ];
+    } else {
+        // 8-Neighbors: 包含對角線
+        return [
+            [-1, -1], [-1, 0], [-1, 1],
+            [0, -1],           [0, 1],
+            [1, -1],  [1, 0],  [1, 1]
+        ];
+    }
+}
+
+// 清理動畫狀態
+function cleanupAnimation(gridId) {
+    const grid = document.getElementById(gridId);
+    if (grid) {
+        const cells = grid.querySelectorAll('.grid-cell');
+        cells.forEach(cell => {
+            // 移除所有動畫狀態，但保持filled狀態
+            cell.classList.remove(
+                'visiting', 
+                'already-visited'
+            );
+        });
+    }
+}
+
+// 獲取指定位置的格子元素
+function getCellElement(gridId, row, col) {
+    const grid = document.getElementById(gridId);
+    if (!grid) {
+        console.warn(`getCellElement: 找不到網格 ${gridId}`);
+        return null;
+    }
+    
+    // **重要：先檢查邊界，避免負數索引被JavaScript誤解為從陣列末尾計算**
+    if (row < 0 || row >= 5 || col < 0 || col >= 5) {
+        console.warn(`getCellElement: 座標超出邊界 (${row}, ${col})`);
+        return null;
+    }
+    
+    const cells = grid.querySelectorAll('.grid-cell');
+    const index = row * 5 + col;
+    
+    // 額外檢查計算出的索引是否在有效範圍內
+    if (index < 0 || index >= cells.length) {
+        console.warn(`getCellElement: 計算出的索引 ${index} 超出範圍`);
+        return null;
+    }
+    
+    return cells[index] || null;
+}
+
+// 重置演示
+function resetDemo(neighbors) {
+    const gridId = `grid${neighbors}`;
+    const statusId = `status${neighbors}`;
+    
+    console.log(`重置 ${neighbors}-Neighbors 演示`);
+    
+    // 清理動畫狀態
+    cleanupAnimation(gridId);
+    
+    // 重新初始化網格
+    initializeGrid(gridId, neighbors);
+    
+    // 重置狀態
+    updateStatus(statusId, `點擊「開始 ${neighbors}-Neighbors 演示」來看演算法過程`);
+}
+
+// 更新狀態訊息
+function updateStatus(statusId, message) {
+    const statusElement = document.getElementById(statusId);
+    if (statusElement) {
+        statusElement.textContent = message;
+    }
+}
+
+// 睡眠函數
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// 錯誤處理
+window.addEventListener('error', function(e) {
+    console.error('發生錯誤:', e.error);
+    isAnimating = false;
+});
+
+console.log('Grid Traversal JavaScript 載入完成');

@@ -1,0 +1,210 @@
+/* 黑白簡約風格 - 二元樹目錄頁 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    line-height: 1.6;
+    background-color: #ffffff;
+    color: #1a1a1a;
+    padding-top: 80px;
+    font-weight: 400;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* 標題區域 */
+h1 {
+    color: #222;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.2em;
+    font-weight: 300;
+}
+
+.lesson-info {
+    text-align: center;
+    color: #666666;
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+    font-weight: 300;
+}
+
+/* 介紹區域 */
+.intro-section {
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    margin-bottom: 40px;
+    border-left: 4px solid #222;
+}
+
+.intro-section h2 {
+    color: #222;
+    margin-top: 0;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+}
+
+.intro-section p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+/* 課程卡片 - 極簡設計 */
+.concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin: 40px 0;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.concept-card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.concept-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #222;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.3em;
+    font-weight: 500;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.card-body p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.card-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.card-features li {
+    position: relative;
+    padding: 8px 0 8px 25px;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.card-features li:before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    color: #999;
+}
+
+.demo-button {
+    display: inline-block;
+    background-color: #222;
+    color: white;
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+.demo-button:hover {
+    background-color: #000;
+}
+
+/* 導航按鈕 - 極簡設計 */
+.navigation {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.nav-button {
+    padding: 12px 25px;
+    background-color: #ffffff;
+    color: #222;
+    text-decoration: none;
+    border: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 5px;
+    min-width: 200px;
+}
+
+.nav-button:hover {
+    background-color: #222;
+    color: #ffffff;
+    border-color: #222;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .concept-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .navigation {
+        flex-direction: column;
+    }
+    
+    .nav-button {
+        width: 100%;
+        text-align: center;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    .intro-section {
+        padding: 20px;
+    }
+}

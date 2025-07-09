@@ -1,0 +1,331 @@
+/* L5 二元樹主頁面樣式 */
+
+.lesson-info {
+    text-align: center;
+    font-size: 1.1em;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.intro-section {
+    background-color: #f8f9fa;
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #2ecc71;
+}
+
+.intro-section h2 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+.intro-section p {
+    line-height: 1.8;
+    margin-bottom: 15px;
+}
+
+.concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.concept-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.concept-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.4em;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.card-body p {
+    margin-bottom: 20px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.card-features {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+.card-features li {
+    padding: 8px 0;
+    position: relative;
+    padding-left: 25px;
+    color: #666;
+}
+
+.card-features li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.demo-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    transition: all 0.3s;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.demo-button:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.learning-objectives {
+    background-color: #fff5f5;
+    padding: 25px;
+    border-radius: 8px;
+    margin: 30px 0;
+    border-left: 4px solid #e74c3c;
+}
+
+.learning-objectives h2 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+.learning-objectives ul {
+    list-style: none;
+    padding: 0;
+}
+
+.learning-objectives li {
+    padding: 10px 0;
+    position: relative;
+    padding-left: 30px;
+    line-height: 1.6;
+}
+
+.learning-objectives li::before {
+    content: "🎯";
+    position: absolute;
+    left: 0;
+    top: 10px;
+}
+
+.tree-preview {
+    background-color: #f0f8ff;
+    padding: 25px;
+    border-radius: 8px;
+    margin: 30px 0;
+    border-left: 4px solid #3498db;
+    text-align: center;
+}
+
+.tree-preview h2 {
+    color: #2c3e50;
+    margin-top: 0;
+}
+
+.tree-diagram {
+    margin: 30px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
+
+.tree-level {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    position: relative;
+}
+
+.tree-level.level-1 {
+    gap: 120px;
+}
+
+.tree-level.level-2 {
+    gap: 40px;
+}
+
+.tree-node {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* 樹的連接線 */
+.tree-level.level-0 .tree-node::after {
+    content: '';
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    width: 2px;
+    height: 25px;
+    background-color: #7f8c8d;
+    transform: translateX(-50%);
+}
+
+.tree-level.level-0 .tree-node::before {
+    content: '';
+    position: absolute;
+    top: 75px;
+    left: 50%;
+    width: 180px;
+    height: 2px;
+    background-color: #7f8c8d;
+    transform: translateX(-50%);
+}
+
+.tree-level.level-1 .tree-node::after {
+    content: '';
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    width: 2px;
+    height: 25px;
+    background-color: #7f8c8d;
+    transform: translateX(-50%);
+}
+
+.tree-level.level-1 .tree-node:first-child::before {
+    content: '';
+    position: absolute;
+    top: 75px;
+    left: 50%;
+    width: 100px;
+    height: 2px;
+    background-color: #7f8c8d;
+    transform: translateX(-50%);
+}
+
+.tree-level.level-1 .tree-node:last-child::before {
+    content: '';
+    position: absolute;
+    top: 75px;
+    right: 50%;
+    width: 100px;
+    height: 2px;
+    background-color: #7f8c8d;
+    transform: translateX(50%);
+}
+
+.traversal-results {
+    margin-top: 30px;
+    text-align: left;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.traversal-result {
+    background-color: white;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.traversal-result strong {
+    color: #2c3e50;
+}
+
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    margin: 40px 0 20px 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    align-items: center;
+}
+
+.nav-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.nav-button:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .concept-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tree-level {
+        gap: 30px;
+    }
+    
+    .tree-level.level-1 {
+        gap: 60px;
+    }
+    
+    .tree-level.level-2 {
+        gap: 20px;
+    }
+    
+    .navigation {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .nav-button {
+        width: 100%;
+        text-align: center;
+    }
+}

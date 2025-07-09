@@ -383,23 +383,366 @@ h1 {
     border: 1px solid #bdc3c7;
 }
 
-/* 座標容器佈局 - 三欄式設計 */
-.coordinate-container {
+/* Flood Fill 演示容器 */
+.flood-fill-container {
     display: grid;
-    grid-template-columns: 300px 1fr 280px;
-    gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
     margin: 30px 0;
-    align-items: flex-start;
-    min-height: 500px;
 }
 
-/* 左側控制面板 */
-.controls-panel {
-    background-color: #f8f9fa;
+.demo-section {
+    background-color: white;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    padding: 0;
-    height: fit-content;
+    padding: 20px;
+    text-align: center;
+}
+
+.demo-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 1.3em;
+}
+
+.demo-info {
+    margin-top: 15px;
+}
+
+.status {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    line-height: 1.4;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* 小型圖例 */
+.legend-mini {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.legend-mini .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.legend-mini .legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    border: 1px solid #ccc;
+}
+
+/* 全局控制區 */
+.global-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.global-controls label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #2c3e50;
+}
+
+.global-controls input[type="range"] {
+    width: 120px;
+}
+
+.global-controls #speedValue {
+    font-weight: bold;
+    color: #3498db;
+    min-width: 50px;
+}
+
+/* 概念比較卡片 */
+.concept-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin: 25px 0;
+}
+
+.concept-card {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.concept-card h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #2c3e50;
+    font-size: 1.2em;
+}
+
+.concept-card p {
+    margin: 8px 0;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+/* 比較要點 */
+.comparison-points {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.comparison-point {
+    background-color: white;
+    padding: 15px;
+    border-left: 4px solid #3498db;
+    border-radius: 0 6px 6px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 方向向量視覺化 */
+.direction-visualization {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 40px;
+    margin: 30px 0;
+}
+
+.direction-demo {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+}
+
+.direction-demo h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+}
+
+.grid-demo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.demo-grid {
+    display: grid;
+    gap: 2px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 2px solid #dee2e6;
+}
+
+.demo-grid.four-neighbors {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.demo-grid.eight-neighbors {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.demo-cell {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    color: #2c3e50;
+    text-align: center;
+    line-height: 1.1;
+}
+
+.demo-cell.empty {
+    background-color: #f8f9fa;
+    border: 1px dashed #dee2e6;
+    opacity: 0.3;
+}
+
+.demo-cell.center {
+    background-color: #e74c3c;
+    color: white;
+    border: 2px solid #c0392b;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.demo-cell.neighbor.cyan {
+    background-color: #17a2b8;
+    color: white;
+    border: 1px solid #138496;
+    font-weight: 700;
+}
+
+.demo-cell.neighbor.yellow {
+    background-color: #ffc107;
+    color: #212529;
+    border: 1px solid #e0a800;
+    font-weight: 700;
+}
+
+.demo-icon {
+    font-size: 2em;
+    margin: 10px 0;
+}
+
+.demo-description {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 15px;
+    font-style: italic;
+}
+
+/* 動畫狀態樣式 */
+.grid-cell.visiting {
+    background-color: #e67e22 !important;
+    color: white;
+    font-weight: bold;
+    animation: visiting-pulse 1.2s ease-in-out;
+}
+
+.grid-cell.invalid-visit {
+    background-color: #34495e !important;
+    color: white;
+    font-weight: bold;
+    animation: invalid-flash 0.4s ease-in-out;
+}
+
+.grid-cell.filled {
+    background-color: #2ecc71 !important;
+    color: white;
+    font-weight: bold;
+    animation: fill-complete 0.6s ease-in-out;
+}
+
+.grid-cell.already-visited {
+    background-color: #95a5a6 !important;
+    color: white;
+    font-weight: bold;
+    /* 移除動畫，保持簡單 */
+}
+
+/* 動畫效果 */
+@keyframes visiting-pulse {
+    0% { 
+        transform: scale(1); 
+        opacity: 0.7;
+        background-color: #e67e22;
+    }
+    25% { 
+        transform: scale(1.15); 
+        opacity: 1;
+        background-color: #d35400;
+    }
+    75% { 
+        transform: scale(1.05); 
+        opacity: 0.9;
+        background-color: #e67e22;
+    }
+    100% { 
+        transform: scale(1); 
+        opacity: 0.8;
+        background-color: #e67e22;
+    }
+}
+
+@keyframes invalid-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes fill-complete {
+    0% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* 響應式設計 */
+@media (max-width: 1024px) {
+    .flood-fill-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .concept-comparison {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .global-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .demo-section {
+        padding: 15px;
+    }
+    
+    .grid-cell {
+        width: 50px;
+        height: 50px;
+        font-size: 12px;
+    }
+    
+    .global-controls label {
+        flex-direction: column;
+        gap: 5px;
+        text-align: center;
+    }
+    
+    .comparison-point {
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    .direction-visualization {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .demo-cell {
+        width: 60px;
+        height: 60px;
+        font-size: 11px;
+    }
+    
+    .direction-demo {
+        padding: 20px;
+    }
+}
+.coordinate-container {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 30px;
+    margin: 30px 0;
+    align-items: flex-start;
 }
 
 /* 中間矩陣區域 */
@@ -410,7 +753,7 @@ h1 {
     background-color: white;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    padding: 20px;
+    padding: 30px;
     min-height: 400px;
 }
 
@@ -421,6 +764,46 @@ h1 {
     border-radius: 8px;
     overflow: hidden;
     height: fit-content;
+}
+
+/* 底部控制面板 */
+.controls-panel-bottom {
+    margin: 30px 0;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0;
+}
+
+.controls-panel-bottom .controls {
+    margin: 0;
+}
+
+.controls-panel-bottom .control-group {
+    margin: 2px;
+    padding: 25px;
+}
+
+.controls-panel-bottom .input-controls {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.controls-panel-bottom .matrix-input-control {
+    flex: 1;
+}
+
+.controls-panel-bottom .matrix-input-control textarea {
+    width: 100%;
+    max-width: 500px;
+    font-size: 14px;
+}
+
+.grid-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .info-header {
@@ -540,16 +923,17 @@ h1 {
         gap: 20px;
     }
     
-    .controls-panel {
+    .matrix-section {
         order: 1;
     }
     
-    .matrix-section {
+    .info-panel {
         order: 2;
     }
     
-    .info-panel {
-        order: 3;
+    .controls-panel-bottom .input-controls {
+        flex-direction: column;
+        gap: 20px;
     }
 }
 
