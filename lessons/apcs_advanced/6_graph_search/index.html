@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L6 圖形搜尋方法 - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>圖形搜尋方法</h1>
+        <div class="lesson-info">
+            學習廣度優先搜尋（BFS）和深度優先搜尋（DFS）的基本概念與應用
+        </div>
+        
+        <div class="intro-section">
+            <h2>什麼是圖形搜尋？</h2>
+            <p>
+                <strong>圖形搜尋（Graph Search）</strong>是在圖形資料結構中尋找特定節點或路徑的演算法。
+                兩種最基本且重要的搜尋方法是廣度優先搜尋（BFS）和深度優先搜尋（DFS），
+                它們使用不同的策略來探索圖形中的節點。
+            </p>
+            <p>
+                透過視覺化演示，你將學會這兩種演算法的執行過程、資料結構運用，
+                以及它們各自的特點和應用場景。理解 <strong>Queue（佇列）</strong> 和 <strong>Stack（堆疊）</strong> 
+                在搜尋演算法中的重要作用。
+            </p>
+        </div>
+        
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>廣度優先搜尋 (BFS)</h3>
+                </div>
+                <div class="card-body">
+                    <p>使用佇列（Queue）資料結構，逐層探索圖形，先探索距離起點較近的節點。</p>
+                    <ul class="card-features">
+                        <li>FIFO（先進先出）佇列機制</li>
+                        <li>層次化搜尋過程</li>
+                        <li>最短路徑保證</li>
+                        <li>逐步動畫演示</li>
+                        <li>佇列狀態視覺化</li>
+                    </ul>
+                    <a href="bfs.html" class="demo-button">學習 BFS</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>深度優先搜尋 (DFS)</h3>
+                </div>
+                <div class="card-body">
+                    <p>使用堆疊（Stack）資料結構，深入探索圖形，先探索一條路徑直到底部。</p>
+                    <ul class="card-features">
+                        <li>LIFO（後進先出）堆疊機制</li>
+                        <li>深度優先探索過程</li>
+                        <li>路徑完整性探索</li>
+                        <li>逐步動畫演示</li>
+                        <li>堆疊狀態視覺化</li>
+                    </ul>
+                    <a href="dfs.html" class="demo-button">學習 DFS</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section">
+            <h2>BFS vs DFS 快速比較</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>資料結構</h4>
+                    <p><strong>BFS:</strong> Queue (佇列)</p>
+                    <p><strong>DFS:</strong> Stack (堆疊)</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>搜尋策略</h4>
+                    <p><strong>BFS:</strong> 層層搜尋，先淺後深</p>
+                    <p><strong>DFS:</strong> 深入搜尋，先深後淺</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>主要應用</h4>
+                    <p><strong>BFS:</strong> 最短路徑、層次遍歷</p>
+                    <p><strong>DFS:</strong> 拓撲排序、連通性檢測</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="../5_binary_tree/index.html" class="nav-button">← 上一課：二元樹與樹走訪</a>
+            <a href="bfs.html" class="nav-button">開始學習 →</a>
+        </div>
+    </div>
+    
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

@@ -3,262 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>老鼠走迷宮 - 遞迴概念視覺化</title>
+    <title>L1 遞迴函式 - APCS進階班</title>
     <link rel="stylesheet" href="../../../styles/styles.css">
-    <style>
-        /* 黑白簡約風格 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-
-        h1 {
-            color: #222;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.2em;
-            font-weight: 300;
-        }
-
-        .intro-section {
-            background-color: #f8f9fa;
-            padding: 30px;
-            border-radius: 8px;
-            margin-bottom: 40px;
-            border-left: 4px solid #222;
-        }
-
-        .intro-section h2 {
-            color: #222;
-            margin-top: 0;
-            font-size: 1.5em;
-        }
-
-        .intro-section p {
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-
-        .concept-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin: 40px 0;
-        }
-
-        .concept-card {
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .concept-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-header {
-            background-color: #222;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .card-header h3 {
-            margin: 0;
-            font-size: 1.3em;
-            font-weight: 500;
-        }
-
-        .card-body {
-            padding: 25px;
-        }
-
-        .card-body p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .card-features {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .card-features li {
-            position: relative;
-            padding: 8px 0 8px 25px;
-            color: #555;
-            font-size: 0.95em;
-        }
-
-        .card-features li:before {
-            content: "🐭";
-            position: absolute;
-            left: 0;
-            top: 8px;
-        }
-
-        .demo-button {
-            display: inline-block;
-            background-color: #222;
-            color: white;
-            text-decoration: none;
-            padding: 12px 25px;
-            border-radius: 5px;
-            font-weight: 500;
-            transition: background-color 0.3s ease;
-            margin-top: 15px;
-        }
-
-        .demo-button:hover {
-            background-color: #000;
-        }
-
-        .learning-path {
-            background-color: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 30px;
-            margin: 40px 0;
-        }
-
-        .learning-path h2 {
-            color: #222;
-            margin-top: 0;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .path-steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .step {
-            text-align: center;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
-        }
-
-        .step-number {
-            display: inline-block;
-            background-color: #222;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            line-height: 40px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .step h3 {
-            color: #222;
-            margin: 10px 0;
-            font-size: 1.1em;
-        }
-
-        .step p {
-            color: #666;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        @media (max-width: 768px) {
-            .concept-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            
-            .path-steps {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- 導覽列將由 JavaScript 動態載入 -->
-    
     <div class="container">
-        <h1>📚 遞迴教學工具 - 老鼠走迷宮</h1>
+        <h1>遞迴函式</h1>
+        <div class="lesson-info">
+            透過老鼠走迷宮的視覺化演示，學習遞迴函式的基本概念與回溯技巧
+        </div>
         
         <div class="intro-section">
             <h2>什麼是遞迴？</h2>
             <p>
-                <strong>遞迴</strong>是程式設計中的一個重要概念，簡單來說就是<strong>「函數呼叫自己」</strong>。
+                <strong>遞迴（Recursion）</strong>是程式設計中的一個重要概念，簡單來說就是<strong>「函數呼叫自己」</strong>。
                 想像一隻聰明的老鼠在迷宮中尋找出口，當牠遇到岔路時，會選擇一條路探索，
                 如果走不通，就回到原點再嘗試其他路線。
             </p>
             <p>
                 透過老鼠走迷宮的視覺化演示，你將直觀地理解遞迴的三個核心概念：
                 <strong>探索（遞迴呼叫）</strong>、<strong>回溯（返回）</strong>和<strong>終止條件（找到出口）</strong>。
+                理解 <strong>Stack（堆疊）</strong> 在遞迴呼叫中的作用。
             </p>
         </div>
         
         <div class="concept-grid">
-            <div class="concept-card">
+            <div class="concept-card single-concept">
                 <div class="card-header">
-                    <h3>📚 教學輔助工具</h3>
+                    <h3>📚 老鼠走迷宮 - 遞迴教學工具</h3>
                 </div>
                 <div class="card-body">
                     <p>為老師設計的互動式教學工具，可以手動控制老鼠與標記死路，完美示範遞迴概念。</p>
                     <ul class="card-features">
-                        <li>手動控制老鼠移動</li>
-                        <li>Hover 顯示思考步驟</li>
-                        <li>步驟標記功能</li>
-                        <li>回溯概念示範</li>
-                        <li>適合課堂教學</li>
+                        <li>手動控制老鼠移動方向</li>
+                        <li>Hover 顯示遞迴思考步驟</li>
+                        <li>死路標記與回溯功能</li>
+                        <li>堆疊狀態視覺化展示</li>
+                        <li>適合課堂互動教學</li>
+                        <li>遞迴概念具體化演示</li>
                     </ul>
-                    <a href="interactive-maze.html" class="demo-button">開始教學</a>
+                    <a href="interactive-maze.html" class="demo-button">開始學習遞迴</a>
                 </div>
             </div>
         </div>
 
-        <div class="learning-path">
-            <h2>📚 教學流程</h2>
-            <div class="path-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>概念講解</h3>
-                    <p>向學生解釋遞迴的六個思考步驟，介紹老鼠在每一格的決策過程</p>
+        <div class="comparison-section">
+            <h2>遞迴學習重點</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>遞迴三要素</h4>
+                    <p><strong>Base Case:</strong> 終止條件（找到出口）</p>
+                    <p><strong>Recursive Case:</strong> 遞迴呼叫（探索相鄰格子）</p>
+                    <p><strong>Progress:</strong> 狀態改變（移動位置）</p>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>互動操作</h3>
-                    <p>使用 Hover 提示框示範每個步驟，讓學生看到具體的思考流程</p>
+                <div class="comparison-item">
+                    <h4>回溯機制</h4>
+                    <p><strong>探索失敗:</strong> 標記為死路</p>
+                    <p><strong>返回上層:</strong> 回到前一個位置</p>
+                    <p><strong>嘗試其他:</strong> 探索其他方向</p>
                 </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>回溯演示</h3>
-                    <p>示範老鼠遇到死路時的回溯過程，強調狀態記憶的重要性</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <h3>步驟標記</h3>
-                    <p>手動標記已執行的步驟，讓學生理解「回到上一格從下一步開始」</p>
+                <div class="comparison-item">
+                    <h4>實際應用</h4>
+                    <p><strong>樹遍歷:</strong> 二元樹、N-ary樹</p>
+                    <p><strong>圖搜尋:</strong> DFS深度優先搜尋</p>
+                    <p><strong>分治演算法:</strong> 快速排序、合併排序</p>
                 </div>
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
-            <h3 style="color: #222; margin-bottom: 15px;">🎯 教學目標</h3>
-            <p style="color: #666; line-height: 1.6; max-width: 600px; margin: 0 auto;">
-                這個教學工具能幫助老師生動地示範遞迴和回溯的概念，
-                透過互動操作讓學生直觀理解抽象的演算法思維，
-                為後續學習更複雜的程式設計概念奠定堅實的基礎。
-            </p>
+        <div class="extension-topics">
+            <div class="topic-card">
+                <h4>🎯 教學流程建議</h4>
+                <p>先講解遞迴概念，再用迷宮視覺化示範，最後讓學生動手操作並觀察回溯過程。</p>
+                <div class="practice-hints">
+                    <strong>教學重點：</strong>
+                    <ul>
+                        <li>強調遞迴的三個核心要素</li>
+                        <li>用 Hover 提示展示思考過程</li>
+                        <li>示範回溯時的狀態恢復</li>
+                        <li>解釋堆疊在遞迴中的作用</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic-card">
+                <h4>💡 學習要點</h4>
+                <p>理解遞迴不只是技巧，更是一種解決問題的思維方式，適用於樹狀結構的問題。</p>
+                <div class="practice-hints">
+                    <strong>練習方向：</strong>
+                    <ul>
+                        <li>手動追蹤遞迴呼叫堆疊</li>
+                        <li>識別不同問題的遞迴結構</li>
+                        <li>練習設計遞迴終止條件</li>
+                        <li>理解遞迴與迴圈的差異</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="../index.html" class="nav-button">← 回到課程大綱</a>
+            <a href="interactive-maze.html" class="nav-button">開始學習 →</a>
         </div>
     </div>
     

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樹狀結構邏輯修復驗證</title>
+    <link rel="stylesheet" href="focus-mode-styles.css">
+</head>
+<body>
+    <div class="focus-container">
+        <!-- 左側：樹狀圖視覺化區域 -->
+        <div class="tree-section">
+            <h2 class="section-title">🌳 組合搜尋樹視覺化 - 邏輯修復版</h2>
+            <div class="tree-visualization">
+                <div id="combination-tree" class="tree-container">
+                    <!-- 樹狀圖節點會在這裡動態生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：控制面板 -->
+        <div class="control-section">
+            <h2 class="section-title">🔧 邊連接邏輯驗證</h2>
+            
+            <!-- 修復說明 -->
+            <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #856404;">🚨 發現的問題</h4>
+                <ul style="margin: 0; padding-left: 20px; color: #856404; font-size: 0.9em;">
+                    <li>邊的連接邏輯不完整</li>
+                    <li>{1,2} 的左子葉錯誤顯示為 {3}</li>
+                    <li>缺少多個重要的邊連接</li>
+                    <li>樹狀結構不符合組合枚舉邏輯</li>
+                </ul>
+            </div>
+
+            <!-- 預期的正確結構 -->
+            <div style="background: #d4edda; border: 2px solid #28a745; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #155724;">✅ 修復後的正確結構</h4>
+                <div style="font-size: 0.85em; color: #155724; font-family: monospace;">
+                    <div><strong>根節點 {} 應該連接到：</strong></div>
+                    <div>├─ 選擇1 → {1}</div>
+                    <div>└─ 跳過1 → {}</div>
+                    <br>
+                    <div><strong>{1,2} 應該連接到：</strong></div>
+                    <div>├─ 選擇3 → <span style="background: #28a745; color: white; padding: 2px 4px; border-radius: 3px;">{1,2,3}</span></div>
+                    <div>└─ 跳過3 → {1,2}</div>
+                    <br>
+                    <div><strong>所有第2層節點都應該有完整的子節點</strong></div>
+                </div>
+            </div>
+
+            <!-- 檢查結果 -->
+            <div id="verification-results" style="background: white; border-radius: 8px; padding: 15px; margin-top: 15px;">
+                <h4 style="margin: 0 0 10px 0; color: #2c3e50;">檢查結果</h4>
+                <div id="results-content">正在檢查邊連接...</div>
+            </div>
+
+            <!-- 手動檢查按鈕 -->
+            <button onclick="checkTreeStructure()" style="width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 8px; font-size: 1em; font-weight: bold; margin-top: 15px; cursor: pointer;">
+                🔍 重新檢查樹狀結構
+            </button>
+        </div>
+    </div>
+
+    <!-- 引入相關腳本 -->
+    <script src="combinations-tree.js"></script>
+    
+    <script>
+        let treeVisualizer = null;
+        
+        function updateResult(message, type = 'info') {
+            const resultsContent = document.getElementById('results-content');
+            const color = type === 'success' ? '#28a745' : (type === 'error' ? '#dc3545' : '#007bff');
+            resultsContent.innerHTML += `<div style="padding: 3px 0; color: ${color}; font-size: 0.9em;">${message}</div>`;
+            resultsContent.scrollTop = resultsContent.scrollHeight;
+        }
+
+        function checkTreeStructure() {
+            const resultsContent = document.getElementById('results-content');
+            resultsContent.innerHTML = '';
+            
+            updateResult('🚀 開始檢查樹狀結構...', 'info');
+            
+            // 檢查關鍵的邊連接
+            const expectedEdges = [
+                // 檢查 {1,2} 的連接
+                { from: '1s_2s', to: '1s_2s_3s', description: '{1,2} → {1,2,3} (選擇3)' },
+                { from: '1s_2s', to: '1s_2s_3n', description: '{1,2} → {1,2} (跳過3)' },
+                
+                // 檢查 {1} 的連接
+                { from: '1s_2n', to: '1s_2n_3s', description: '{1} → {1,3} (選擇3)' },
+                { from: '1s_2n', to: '1s_2n_3n', description: '{1} → {1} (跳過3)' },
+                
+                // 檢查 {2} 的連接
+                { from: '1n_2s', to: '1n_2s_3s', description: '{2} → {2,3} (選擇3)' },
+                { from: '1n_2s', to: '1n_2s_3n', description: '{2} → {2} (跳過3)' },
+                
+                // 檢查 {} 的連接
+                { from: '1n_2n', to: '1n_2n_3s', description: '{} → {3} (選擇3)' },
+                { from: '1n_2n', to: '1n_2n_3n', description: '{} → {} (跳過3)' }
+            ];
+            
+            let passedChecks = 0;
+            let totalChecks = expectedEdges.length;
+            
+            expectedEdges.forEach(expected => {
+                const edgeId = `edge-${expected.from}-${expected.to}`;
+                const edge = document.getElementById(edgeId);
+                
+                if (edge) {
+                    updateResult(`✅ ${expected.description}`, 'success');
+                    passedChecks++;
+                } else {
+                    updateResult(`❌ 缺失: ${expected.description}`, 'error');
+                }
+            });
+            
+            // 檢查節點內容
+            const nodeChecks = [
+                { id: 'node-1s_2s', expected: '{1,2}', description: '第2層左側節點' },
+                { id: 'node-1s_2s_3s', expected: '{1,2,3}', description: '{1,2} 的左子節點' },
+                { id: 'node-1s_2s_3n', expected: '{1,2}', description: '{1,2} 的右子節點' }
+            ];
+            
+            updateResult('📋 檢查節點內容...', 'info');
+            nodeChecks.forEach(check => {
+                const node = document.getElementById(check.id);
+                if (node) {
+                    const content = node.textContent;
+                    if (content === check.expected) {
+                        updateResult(`✅ ${check.description}: ${content}`, 'success');
+                        passedChecks++;
+                    } else {
+                        updateResult(`❌ ${check.description}: 期望 ${check.expected}, 實際 ${content}`, 'error');
+                    }
+                } else {
+                    updateResult(`❌ ${check.description}: 節點不存在`, 'error');
+                }
+                totalChecks++;
+            });
+            
+            // 總結
+            const successRate = ((passedChecks / totalChecks) * 100).toFixed(1);
+            updateResult(`📊 檢查完成: ${passedChecks}/${totalChecks} 通過 (${successRate}%)`, 
+                       passedChecks === totalChecks ? 'success' : 'error');
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            updateResult('🚀 初始化樹狀圖視覺化器...', 'info');
+            
+            try {
+                // 創建測試用的父類模擬
+                const mockParent = {
+                    combinationTree: document.getElementById('combination-tree'),
+                    elements: [1, 2, 3],
+                    m: 2,
+                    treeNodes: {},
+                    treeEdges: []
+                };
+                
+                // 創建樹狀圖視覺化器
+                treeVisualizer = new CombinationTreeVisualizer(mockParent);
+                updateResult('✅ 樹狀圖視覺化器創建成功', 'success');
+                
+                // 創建樹狀結構
+                treeVisualizer.createTreeStructure();
+                updateResult('✅ 樹狀圖結構創建成功', 'success');
+                
+                // 延遲執行檢查，等待DOM渲染
+                setTimeout(checkTreeStructure, 500);
+                
+            } catch (error) {
+                updateResult(`❌ 初始化失敗: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

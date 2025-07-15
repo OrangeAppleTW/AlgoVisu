@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合併排序法視覺化 - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="merge_sort_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>合併排序法視覺化</h1>
+        <div class="lesson-info">
+            透過樹狀結構學習分治法的核心概念：切割、遞迴求解、合併
+        </div>
+
+        <div class="algorithm-container">
+            <h2>合併排序樹狀演示</h2>
+            
+            <!-- 固定數列顯示 -->
+            <div class="input-section">
+                <h3 style="margin-top: 0; color: #333;">示範數列</h3>
+                <div style="text-align: center; font-size: 18px; font-weight: bold; color: #2d3748; padding: 10px; background-color: #f7fafc; border-radius: 6px;">
+                    [5, 3, 8, 6, 2, 7, 1, 4]
+                </div>
+                <p style="text-align: center; color: #666; margin-top: 10px;">
+                    使用上一步/下一步按鈕來觀看合併排序的每個階段
+                </p>
+            </div>
+
+            <!-- 步驟導航 -->
+            <div class="step-navigation">
+                <button class="nav-btn" id="prev-btn" disabled>← 上一步</button>
+                <div class="step-counter-display" id="step-display">步驟 1 / 12</div>
+                <button class="nav-btn" id="next-btn">下一步 →</button>
+            </div>
+
+            <!-- 視覺化區域 -->
+            <div class="visualization-area">
+                <div class="step-info">
+                    <div id="step-description">開始分治法演示：觀察如何將大問題分解成小問題</div>
+                </div>
+                <div id="merge-sort-tree" class="merge-sort-tree"></div>
+            </div>
+
+            <!-- 控制按鈕 -->
+            <div class="controls-section">
+                <button class="btn" id="auto-play-btn">自動播放</button>
+                <button class="btn btn-secondary" id="reset-btn">重置到開始</button>
+                <button class="btn btn-secondary" id="jump-to-end-btn">跳到結尾</button>
+            </div>
+
+            <!-- 狀態顯示 -->
+            <div class="status-display" id="status-display">
+                準備開始合併排序演示 - 點擊「下一步」開始
+            </div>
+
+            <!-- 圖例 -->
+            <div class="legend-container">
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #f9f9f9; opacity: 0.3;"></div>
+                    <span>尚未處理</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e0f7f5;"></div>
+                    <span>當前步驟</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffe0e0;"></div>
+                    <span>分割中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #fff3e0;"></div>
+                    <span>合併中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #e0f2ff;"></div>
+                    <span>已完成</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="algorithm-explanation">
+            <h2>分治法樹狀結構說明</h2>
+            <div class="concept-explanation">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>分割階段 (Divide)</h4>
+                        <p>從頂部開始，每次將陣列從中點分成兩半，直到每個子陣列只有一個元素。</p>
+                        <p><strong>觀察重點：</strong>樹的高度為 log n，這裡是 log 8 = 3 層</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>基礎情況 (Base Case)</h4>
+                        <p>當子陣列只有一個元素時，它天然已經是有序的，這是遞迴的終止條件。</p>
+                        <p><strong>觀察重點：</strong>樹的最底層都是單一元素</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>合併階段 (Combine)</h4>
+                        <p>從底部往上，將兩個有序的子陣列合併成一個更大的有序陣列。</p>
+                        <p><strong>觀察重點：</strong>每一層都需要 O(n) 時間來合併所有元素</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="complexity-analysis">
+            <h2>時間複雜度分析</h2>
+            <p>
+                從樹狀結構可以清楚看出合併排序的時間複雜度為 <strong>O(n log n)</strong>：
+            </p>
+            <ul>
+                <li><strong>樹的高度：</strong> log n = log 8 = 3 層（分割層數）</li>
+                <li><strong>每層合併：</strong> 每一層都需要處理所有 n 個元素</li>
+                <li><strong>總時間：</strong> O(log n) × O(n) = O(n log n)</li>
+            </ul>
+            <p>
+                這個視覺化清楚展示了為什麼合併排序能保持穩定的 O(n log n) 效能。
+            </p>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="nav-button">← 回到課程首頁</a>
+            <a href="comparison.html" class="nav-button">策略比較 →</a>
+        </div>
+    </div>
+
+    <!-- 載入JavaScript模組 -->
+    <script src="merge_sort_tree_data.js"></script>
+    <script src="merge_sort_tree_renderer.js"></script>
+    <script src="merge_sort_tree_controller.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

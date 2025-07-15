@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試標籤顯示修正</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/graph-search.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 標籤顯示修正測試</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            測試修正後的節點標籤顯示邏輯
+        </p>
+
+        <!-- BFS 測試區域 -->
+        <div class="algorithm-container">
+            <h2>廣度優先搜尋 (BFS) - 修正測試</h2>
+            
+            <div class="concept-explanation">
+                <h3>🎯 修正內容</h3>
+                <p>節點標籤現在只在被加入 Queue 的步驟中才顯示，而不是在演算法開始時就全部顯示。</p>
+                <ul>
+                    <li><strong>之前的問題：</strong>點擊開始就會顯示所有標籤</li>
+                    <li><strong>修正後：</strong>只有當節點實際被加入 Queue 時才顯示標籤</li>
+                    <li><strong>標籤分配：</strong>按照加入 Queue 的順序分配 A, B, C, D, E, F</li>
+                </ul>
+            </div>
+
+            <!-- BFS 視覺化區域 -->
+            <div class="visualization-section">
+                <div class="visualization-container">
+                    <div class="graph-area">
+                        <h4>圖形結構</h4>
+                        <svg id="bfs-graph" class="graph-svg"></svg>
+                    </div>
+                    <div class="queue-area">
+                        <h4>Queue (佇列) 狀態</h4>
+                        <div id="bfs-queue" class="queue-container">
+                            <div class="queue-label">Queue:</div>
+                            <div class="queue-items"></div>
+                            <div class="current-node-display">
+                                <div class="current-node-label">當前取出節點:</div>
+                                <div id="bfs-current-node" class="current-node-item">無</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 控制面板 -->
+            <div class="controls-section">
+                <button class="btn" id="bfs-start">開始 BFS</button>
+                <button class="btn btn-secondary" id="bfs-step">單步執行</button>
+                <button class="btn btn-secondary" id="bfs-reset">重置</button>
+                <button class="btn btn-secondary" id="bfs-random">隨機圖形</button>
+            </div>
+
+            <!-- 速度控制 -->
+            <div class="speed-control">
+                <label for="bfs-speed">執行速度：</label>
+                <input type="range" id="bfs-speed" class="speed-slider" min="1" max="10" value="5">
+                <span>快</span>
+            </div>
+
+            <!-- 狀態顯示 -->
+            <div class="status-display" id="bfs-status">
+                點擊「開始 BFS」開始搜尋演算法演示
+            </div>
+
+            <!-- 訪問順序顯示 -->
+            <div class="visit-order">
+                <h4>訪問順序：</h4>
+                <div id="bfs-visit-order" class="visit-sequence"></div>
+            </div>
+
+            <!-- 圖例說明 -->
+            <div class="legend-container">
+                <div class="legend-item">
+                    <div class="legend-color default"></div>
+                    <span>未訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color in-queue"></div>
+                    <span>在佇列中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color current"></div>
+                    <span>當前處理</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color visited"></div>
+                    <span>已訪問</span>
+                </div>
+            </div>
+
+            <!-- 測試說明 -->
+            <div class="concept-explanation">
+                <h3>🧪 測試步驟</h3>
+                <ol>
+                    <li>點擊「重置」確保圖形處於初始狀態</li>
+                    <li>確認只有 S 節點顯示標籤，其他節點不顯示標籤</li>
+                    <li>點擊「單步執行」觀察每一步的標籤顯示變化</li>
+                    <li>或點擊「開始 BFS」觀察自動執行過程</li>
+                    <li>確認節點標籤只在被加入 Queue 時才出現</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 檔案 -->
+    <script src="scripts/graph-structure.js"></script>
+    <script src="scripts/renderers.js"></script>
+    <script src="scripts/bfs-algorithm.js"></script>
+    <script src="scripts/dfs-algorithm.js"></script>
+    <script src="scripts/graph-search-ui.js"></script>
+</body>
+</html>

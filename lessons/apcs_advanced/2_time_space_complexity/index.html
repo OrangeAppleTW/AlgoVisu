@@ -3,405 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L2: 時間與空間複雜度 - APCS進階班</title>
+    <title>L2 複雜度 - APCS進階班</title>
     <link rel="stylesheet" href="../../../styles/styles.css">
-    <style>
-        /* 課程介紹頁面樣式 */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #fafafa;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        h1 {
-            font-size: 2.2em;
-            text-align: center;
-            margin-bottom: 15px;
-            color: #222;
-            font-weight: 400;
-        }
-
-        .lesson-subtitle {
-            text-align: center;
-            font-size: 1em;
-            color: #666;
-            margin-bottom: 40px;
-        }
-
-        .intro-section {
-            background-color: white;
-            border-radius: 8px;
-            border-left: 4px solid #333;
-            padding: 30px;
-            margin-bottom: 40px;
-        }
-
-        .intro-section h2 {
-            margin-top: 0;
-            color: #222;
-            font-size: 1.4em;
-        }
-
-        .intro-section p {
-            color: #666;
-            line-height: 1.7;
-            margin-bottom: 15px;
-        }
-
-        .learning-objectives {
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            padding: 20px;
-            margin: 30px 0;
-        }
-
-        .learning-objectives h3 {
-            color: #333;
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-
-        .learning-objectives ul {
-            color: #555;
-            padding-left: 20px;
-        }
-
-        .learning-objectives li {
-            margin-bottom: 8px;
-        }
-
-        /* 功能模組卡片 */
-        .modules-section {
-            margin: 40px 0;
-        }
-
-        .modules-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .module-card {
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .module-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-            border-color: #333;
-        }
-
-        .module-icon {
-            width: 100%;
-            height: 120px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .module-content {
-            padding: 20px;
-        }
-
-        .module-title {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #222;
-            margin: 0 0 10px 0;
-        }
-
-        .module-description {
-            color: #666;
-            font-size: 0.9em;
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-
-        .module-features {
-            font-size: 0.8em;
-            color: #888;
-        }
-
-        .module-features ul {
-            margin: 0;
-            padding-left: 15px;
-        }
-
-        .module-features li {
-            margin-bottom: 3px;
-        }
-
-        /* 氣泡排序概念介紹 */
-        .algorithm-intro {
-            background-color: white;
-            border-radius: 8px;
-            padding: 30px;
-            margin: 40px 0;
-            border: 1px solid #e0e0e0;
-        }
-
-        .algorithm-intro h2 {
-            color: #222;
-            margin-top: 0;
-            margin-bottom: 20px;
-        }
-
-        .complexity-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background-color: white;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid #e0e0e0;
-        }
-
-        .complexity-table th,
-        .complexity-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .complexity-table th {
-            background-color: #333;
-            color: white;
-            font-weight: 500;
-        }
-
-        .complexity-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .complexity-table tr:nth-child(even) {
-            background-color: #fafafa;
-        }
-
-        /* 導航按鈕 */
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            margin: 50px 0 20px 0;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .nav-button {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
-        }
-
-        .nav-button:hover {
-            background-color: #555;
-        }
-
-        /* 響應式設計 */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px 15px;
-            }
-
-            .modules-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .navigation {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            .nav-button {
-                text-align: center;
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- 導覽列將由 JavaScript 動態載入 -->
-    
     <div class="container">
-        <h1>🕐 L2: 時間與空間複雜度</h1>
-        <p class="lesson-subtitle">透過氣泡排序學習演算法複雜度分析</p>
+        <h1>時間與空間複雜度</h1>
+        <div class="lesson-info">
+            透過氣泡排序演算法學習時間複雜度和空間複雜度的分析方法
+        </div>
         
         <div class="intro-section">
-            <h2>📖 課程簡介</h2>
+            <h2>什麼是演算法複雜度？</h2>
             <p>
-                時間複雜度和空間複雜度是評估演算法效率的重要指標。本課程將透過氣泡排序這個經典演算法，
-                讓你深入理解如何分析演算法的執行時間和記憶體使用量。
+                <strong>演算法複雜度（Algorithm Complexity）</strong>是評估演算法效率的重要指標，包含時間複雜度和空間複雜度。
+                時間複雜度衡量演算法執行所需的時間，空間複雜度衡量演算法執行所需的記憶體空間。
             </p>
             <p>
-                氣泡排序是一個簡單但重要的排序演算法，雖然效率不高，但非常適合用來學習複雜度分析的概念。
-                透過視覺化的方式，你將清楚看到每個步驟的比較和交換操作，並學會計算演算法的複雜度。
+                透過氣泡排序這個經典演算法，你將學會如何分析最佳、最差和平均情況下的複雜度，
+                理解 <strong>Big O 記號</strong> 的意義，以及如何計算比較次數和交換次數來評估演算法效能。
             </p>
         </div>
+        
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>🚀 自動演示模式</h3>
+                </div>
+                <div class="card-body">
+                    <p>觀看氣泡排序的完整自動執行過程，可調整速度並切換排序方向。</p>
+                    <ul class="card-features">
+                        <li>最佳、最差、平均案例演示</li>
+                        <li>可調整執行速度控制</li>
+                        <li>支援向左/向右排序</li>
+                        <li>即時顯示比較和交換次數</li>
+                        <li>複雜度分析視覺化</li>
+                    </ul>
+                    <a href="auto_demo.html" class="demo-button">自動演示</a>
+                </div>
+            </div>
 
-        <div class="learning-objectives">
-            <h3>🎯 學習目標</h3>
-            <ul>
-                <li>理解時間複雜度和空間複雜度的定義與重要性</li>
-                <li>掌握氣泡排序演算法的工作原理和實作方法</li>
-                <li>學會分析最佳、最差和平均情況下的複雜度</li>
-                <li>透過計算比較次數和交換次數來理解複雜度計算</li>
-                <li>培養分析其他演算法複雜度的能力</li>
-            </ul>
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>👆 手動步進模式</h3>
+                </div>
+                <div class="card-body">
+                    <p>逐步執行氣泡排序，讓老師可以詳細講解每個步驟的邏輯。</p>
+                    <ul class="card-features">
+                        <li>單步執行精確控制</li>
+                        <li>詳細的步驟邏輯說明</li>
+                        <li>可隨時重置和回溯</li>
+                        <li>突出顯示當前比較元素</li>
+                        <li>適合課堂教學演示</li>
+                    </ul>
+                    <a href="manual_demo.html" class="demo-button">手動演示</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>✏️ 互動練習</h3>
+                </div>
+                <div class="card-body">
+                    <p>讓學生自己輸入數字來實際操作氣泡排序，加深理解。</p>
+                    <ul class="card-features">
+                        <li>自訂5個數字進行排序</li>
+                        <li>學生主導執行步驟</li>
+                        <li>即時驗證操作正確性</li>
+                        <li>計算並顯示操作統計</li>
+                        <li>錯誤提示與引導</li>
+                    </ul>
+                    <a href="interactive_practice.html" class="demo-button">開始練習</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>📊 複雜度分析工具</h3>
+                </div>
+                <div class="card-body">
+                    <p>深入分析不同資料規模下氣泡排序的效能表現。</p>
+                    <ul class="card-features">
+                        <li>不同陣列大小效能比較</li>
+                        <li>複雜度公式實際驗證</li>
+                        <li>視覺化的效能圖表</li>
+                        <li>理論值與實際值對比</li>
+                        <li>Big O 記號應用</li>
+                    </ul>
+                    <a href="complexity_analysis.html" class="demo-button">分析工具</a>
+                </div>
+            </div>
         </div>
 
-        <div class="algorithm-intro">
-            <h2>🫧 氣泡排序演算法</h2>
-            <p>
-                氣泡排序是一種簡單的排序演算法，它重複地遍歷要排序的陣列，比較相鄰的元素並在順序錯誤時交換它們。
-                這個過程會重複進行，直到不再需要交換為止。
-            </p>
+        <div class="comparison-section">
+            <h2>氣泡排序複雜度分析</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>最佳情況 O(n)</h4>
+                    <p><strong>比較次數:</strong> n-1</p>
+                    <p><strong>交換次數:</strong> 0</p>
+                    <p><strong>條件:</strong> 陣列已經排序完成</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>平均情況 O(n²)</h4>
+                    <p><strong>比較次數:</strong> n(n-1)/2</p>
+                    <p><strong>交換次數:</strong> n(n-1)/4</p>
+                    <p><strong>條件:</strong> 隨機排列的陣列</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>最差情況 O(n²)</h4>
+                    <p><strong>比較次數:</strong> n(n-1)/2</p>
+                    <p><strong>交換次數:</strong> n(n-1)/2</p>
+                    <p><strong>條件:</strong> 陣列反向排序</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="extension-topics">
+            <div class="topic-card">
+                <h4>📈 複雜度分析重點</h4>
+                <p>理解如何計算最佳、最差、平均情況，以及 Big O 記號在實際應用中的意義。</p>
+                <div class="practice-hints">
+                    <strong>分析要點：</strong>
+                    <ul>
+                        <li>掌握巢狀迴圈的複雜度計算</li>
+                        <li>理解常數項在 Big O 中被忽略</li>
+                        <li>區別時間複雜度與實際執行時間</li>
+                        <li>學會比較不同演算法的效率</li>
+                    </ul>
+                </div>
+            </div>
             
-            <h3>複雜度分析</h3>
-            <table class="complexity-table">
-                <thead>
-                    <tr>
-                        <th>情況</th>
-                        <th>時間複雜度</th>
-                        <th>比較次數</th>
-                        <th>交換次數</th>
-                        <th>說明</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>最佳情況</td>
-                        <td>O(n)</td>
-                        <td>n-1</td>
-                        <td>0</td>
-                        <td>陣列已經排序好</td>
-                    </tr>
-                    <tr>
-                        <td>平均情況</td>
-                        <td>O(n²)</td>
-                        <td>n(n-1)/2</td>
-                        <td>n(n-1)/4</td>
-                        <td>隨機排列的陣列</td>
-                    </tr>
-                    <tr>
-                        <td>最差情況</td>
-                        <td>O(n²)</td>
-                        <td>n(n-1)/2</td>
-                        <td>n(n-1)/2</td>
-                        <td>陣列反向排序</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><strong>空間複雜度：</strong> O(1) - 只需要常數額外空間</p>
-        </div>
-
-        <div class="modules-section">
-            <h2>📚 學習模組</h2>
-            <div class="modules-grid">
-                <a href="auto_demo.html" class="module-card">
-                    <div class="module-icon">🚀</div>
-                    <div class="module-content">
-                        <h3 class="module-title">自動演示模式</h3>
-                        <p class="module-description">
-                            觀看氣泡排序的完整自動執行過程，可以調整速度並切換排序方向
-                        </p>
-                        <div class="module-features">
-                            <ul>
-                                <li>最佳、最差、平均案例演示</li>
-                                <li>可調整執行速度</li>
-                                <li>支援向左/向右排序</li>
-                                <li>即時顯示比較和交換次數</li>
-                            </ul>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="manual_demo.html" class="module-card">
-                    <div class="module-icon">👆</div>
-                    <div class="module-content">
-                        <h3 class="module-title">手動步進模式</h3>
-                        <p class="module-description">
-                            逐步執行氣泡排序，讓老師可以詳細講解每個步驟的邏輯
-                        </p>
-                        <div class="module-features">
-                            <ul>
-                                <li>單步執行控制</li>
-                                <li>詳細的步驟說明</li>
-                                <li>可隨時重置和回到上一步</li>
-                                <li>突出顯示當前比較的元素</li>
-                            </ul>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="interactive_practice.html" class="module-card">
-                    <div class="module-icon">✏️</div>
-                    <div class="module-content">
-                        <h3 class="module-title">互動練習</h3>
-                        <p class="module-description">
-                            讓學生自己輸入數字來實際操作氣泡排序，加深理解
-                        </p>
-                        <div class="module-features">
-                            <ul>
-                                <li>自訂5個數字進行排序</li>
-                                <li>學生可自己決定執行步驟</li>
-                                <li>即時驗證操作正確性</li>
-                                <li>計算並顯示操作統計</li>
-                            </ul>
-                        </div>
-                    </div>
-                </a>
-
-                <a href="complexity_analysis.html" class="module-card">
-                    <div class="module-icon">📊</div>
-                    <div class="module-content">
-                        <h3 class="module-title">複雜度分析工具</h3>
-                        <p class="module-description">
-                            深入分析不同資料規模下氣泡排序的效能表現
-                        </p>
-                        <div class="module-features">
-                            <ul>
-                                <li>不同陣列大小的效能比較</li>
-                                <li>複雜度公式驗證</li>
-                                <li>視覺化的效能圖表</li>
-                                <li>理論值與實際值比較</li>
-                            </ul>
-                        </div>
-                    </div>
-                </a>
+            <div class="topic-card">
+                <h4>🎯 教學建議</h4>
+                <p>先用自動演示展示整體流程，再用手動模式詳細講解，最後讓學生實際操作。</p>
+                <div class="practice-hints">
+                    <strong>教學流程：</strong>
+                    <ul>
+                        <li>介紹複雜度的基本概念</li>
+                        <li>展示氣泡排序的執行過程</li>
+                        <li>計算不同情況下的複雜度</li>
+                        <li>比較理論分析與實際測量</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
         <div class="navigation">
-            <a href="../index.html" class="nav-button">← 回到課程列表</a>
-            <a href="../3_enumeration/index.html" class="nav-button" style="background-color: #ccc; pointer-events: none;">下一課：枚舉與遍歷 →</a>
+            <a href="../1_maze_recursion/index.html" class="nav-button">← 上一課：遞迴函式</a>
+            <a href="auto_demo.html" class="nav-button">開始學習 →</a>
         </div>
     </div>
     

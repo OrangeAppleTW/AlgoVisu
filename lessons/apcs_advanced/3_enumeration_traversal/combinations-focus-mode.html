@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>組合枚舉 - 專注教學模式</title>
+    <link rel="stylesheet" href="focus-mode-styles.css">
+</head>
+<body>
+    <div class="focus-container">
+        <!-- 樹狀圖視覺化區域 (70%) -->
+        <div class="tree-section">
+            <h2 class="section-title">🌳 組合搜尋樹視覺化</h2>
+            <div class="tree-visualization">
+                <div class="tree-container" id="combination-tree">
+                    <!-- 樹狀圖將在這裡動態生成 -->
+                    <!-- 已移除左下角的顏色提示圖例 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 控制區域 (30%) -->
+        <div class="control-section">
+            <h2 class="section-title">🎮 控制面板</h2>
+            
+            <div class="problem-setup">
+                <div class="setup-row">
+                    <span>從集合選擇：</span>
+                    <div class="elements-display">
+                        <div class="element-item">1</div>
+                        <div class="element-item">2</div>
+                        <div class="element-item">3</div>
+                    </div>
+                </div>
+                <div class="setup-row">
+                    <span>選擇數量：</span>
+                    <div>
+                        <select id="m-selector" class="m-selector">
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                        </select>
+                        <span id="combination-formula">C(3,2) = 3</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="current-combination">
+                <h4 style="text-align: center; margin-bottom: 10px;">當前組合</h4>
+                <div class="combination-slots" id="combination-slots">
+                    <div class="slot">?</div>
+                    <div class="slot">?</div>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    起始位置：<span id="start-position">0</span>
+                </div>
+            </div>
+
+            <div class="pruning-info" id="pruning-info">
+                🚫 剪枝：剩餘元素不足，提前終止
+            </div>
+
+            <div class="status-display" id="status">
+                準備開始 C(3,2) 組合枚舉
+            </div>
+
+            <div class="control-buttons">
+                <button class="control-button primary" id="start-btn">開始枚舉</button>
+                <button class="control-button secondary" id="reset-btn">重新開始</button>
+                <button class="control-button primary" id="step-btn" disabled>下一步</button>
+                <button class="control-button secondary" id="auto-btn" disabled>自動執行</button>
+            </div>
+
+            <div class="combination-counter">
+                已找到組合：<span id="combination-count">0</span> / 3
+            </div>
+            
+            <!-- 添加缺少的組合顯示區域 -->
+            <div class="combinations-list-container" style="max-height: 150px; overflow-y: auto; margin-top: 10px; border: 1px solid #ddd; border-radius: 4px; padding: 5px;">
+                <div id="combinations-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 載入所有JavaScript檔案 -->
+    <script src="combinations-core.js"></script>
+    <script src="combinations-steps.js"></script>
+    <script src="combinations-tree.js"></script>
+    <script src="combinations-ui.js"></script>
+    <!-- 不載入 combinations-init.js 避免衝突 -->
+    <script src="focus-combinations-init.js"></script>
+    <script src="focus-mode-sync.js"></script>
+    <script src="focus-mode-init.js"></script>
+    <script src="focus-mode-debug.js"></script>
+</body>
+</html>

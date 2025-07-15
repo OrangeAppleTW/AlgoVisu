@@ -31,7 +31,7 @@ class BinaryTreeVisualizer {
     }
 
     createSampleTree() {
-        // 建立範例樹: A(B(D,E), C(F,G))
+        // 建立範例樹: A(B(D,E), C(null,F))
         const root = new TreeNode('A');
         
         root.left = new TreeNode('B');
@@ -42,12 +42,11 @@ class BinaryTreeVisualizer {
         
         root.left.left = new TreeNode('D');
         root.left.right = new TreeNode('E');
-        root.right.left = new TreeNode('F');
-        root.right.right = new TreeNode('G');
+        root.right.left = null; // C 沒有左子節點
+        root.right.right = new TreeNode('F');
         
         root.left.left.parent = root.left;
         root.left.right.parent = root.left;
-        root.right.left.parent = root.right;
         root.right.right.parent = root.right;
         
         return root;
@@ -61,7 +60,7 @@ class BinaryTreeVisualizer {
             [
                 {node: this.tree.left.left, x: 140},
                 {node: this.tree.left.right, x: 260},
-                {node: this.tree.right.left, x: 340},
+                // C 只有右子節點 F
                 {node: this.tree.right.right, x: 460}
             ]
         ];

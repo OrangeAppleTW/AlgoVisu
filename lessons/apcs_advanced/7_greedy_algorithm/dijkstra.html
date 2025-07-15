@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dijkstra's Algorithm - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="dijkstra_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Dijkstra's Algorithm 最短路徑演算法</h1>
+        
+        <div class="lesson-info">
+            學習 Dijkstra 演算法如何找出從起點到所有其他節點的最短路徑
+        </div>
+
+        <div class="algorithm-explanation">
+            <h2>演算法概念</h2>
+            <p>
+                <strong>Dijkstra's Algorithm</strong> 是一種用於在加權圖中尋找單一起點到所有其他節點最短路徑的貪心演算法。
+                此演算法由荷蘭電腦科學家 Edsger Dijkstra 於 1956 年發明。
+            </p>
+            <div class="algorithm-steps">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>初始化</h4>
+                        <p>設定起點距離為 0，其他所有節點距離為無限大</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>選擇節點</h4>
+                        <p>從未處理的節點中選擇距離最小的節點</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>更新距離</h4>
+                        <p>更新該節點所有鄰居的最短距離</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>重複</h4>
+                        <p>重複步驟 2-3 直到所有節點都被處理</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualization-container">
+            <div class="visualization-panel">
+                <h3>圖形視覺化</h3>
+                <div class="graph-container">
+                    <svg id="graph-svg" width="600" height="400"></svg>
+                </div>
+                
+                <div class="controls">
+                    <button id="reset-btn" class="control-button">重設</button>
+                    <button id="next-step-btn" class="control-button primary">下一步</button>
+                    <button id="prev-step-btn" class="control-button">上一步</button>
+                    <button id="auto-play-btn" class="control-button">自動播放</button>
+                </div>
+                
+                <div class="step-info">
+                    <h4>當前步驟：</h4>
+                    <p id="step-description">初始化：設定起點 A 的距離為 0，其他節點距離為無限大</p>
+                </div>
+            </div>
+
+            <div class="table-panel">
+                <h3>距離表格</h3>
+                <div class="table-container">
+                    <table id="distance-table" class="algorithm-table">
+                        <thead>
+                            <tr>
+                                <th>城市</th>
+                                <th>權重</th>
+                                <th>結果</th>
+                                <th>路徑</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-node="A">
+                                <td>A</td>
+                                <td class="weight">0</td>
+                                <td class="result">0</td>
+                                <td class="path">A</td>
+                            </tr>
+                            <tr data-node="B">
+                                <td>B</td>
+                                <td class="weight">∞</td>
+                                <td class="result">∞</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="C">
+                                <td>C</td>
+                                <td class="weight">∞</td>
+                                <td class="result">∞</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="D">
+                                <td>D</td>
+                                <td class="weight">∞</td>
+                                <td class="result">∞</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="E">
+                                <td>E</td>
+                                <td class="weight">∞</td>
+                                <td class="result">∞</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="F">
+                                <td>F</td>
+                                <td class="weight">∞</td>
+                                <td class="result">∞</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="G">
+                                <td>G</td>
+                                <td class="weight">∞</td>
+                                <td class="result">∞</td>
+                                <td class="path">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="legend">
+                    <h4>圖例說明：</h4>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-color start"></div>
+                            <span>起點</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color current"></div>
+                            <span>當前處理</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color visited"></div>
+                            <span>已處理</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color unvisited"></div>
+                            <span>未處理</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="complexity-analysis">
+            <h2>時間複雜度分析</h2>
+            <div class="complexity-grid">
+                <div class="complexity-item">
+                    <h4>基本實作</h4>
+                    <p><strong>O(V²)</strong></p>
+                    <p>使用陣列實作，適合稠密圖</p>
+                </div>
+                <div class="complexity-item">
+                    <h4>堆積優化</h4>
+                    <p><strong>O((V + E) log V)</strong></p>
+                    <p>使用最小堆積，適合稀疏圖</p>
+                </div>
+                <div class="complexity-item">
+                    <h4>費波納契堆積</h4>
+                    <p><strong>O(V log V + E)</strong></p>
+                    <p>理論最佳，但實作複雜</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="nav-button">← 回到貪心演算法</a>
+            <a href="comparison.html" class="nav-button">策略比較 →</a>
+        </div>
+    </div>
+    
+    <script src="dijkstra_data.js"></script>
+    <script src="dijkstra_renderer.js"></script>
+    <script src="dijkstra_algorithm.js"></script>
+    <script src="dijkstra_controller.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

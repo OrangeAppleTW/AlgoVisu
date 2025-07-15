@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>L5 二元樹與樹走訪 - APCS進階班</title>
     <link rel="stylesheet" href="../../../styles/styles.css">
-    <link rel="stylesheet" href="styles/index_minimal.css">
 </head>
 <body>
     <div class="container">
@@ -23,7 +22,7 @@
             <p>
                 透過視覺化演示，你將學會如何理解樹的結構，並掌握三種重要的樹走訪方法：
                 <strong>前序走訪（Preorder）</strong>、<strong>中序走訪（Inorder）</strong>、
-                以及<strong>後序走訪（Postorder）</strong>。
+                以及<strong>後序走訪（Postorder）</strong>，理解遞迴在樹結構中的應用。
             </p>
         </div>
         
@@ -35,10 +34,11 @@
                 <div class="card-body">
                     <p>理解二元樹的節點關係，學會辨識父節點、子節點、葉節點等概念。</p>
                     <ul class="card-features">
-                        <li>互動式節點點擊</li>
-                        <li>節點關係視覺化</li>
-                        <li>樹的深度與高度</li>
-                        <li>節點路徑展示</li>
+                        <li>互動式節點點擊探索</li>
+                        <li>節點關係視覺化標示</li>
+                        <li>樹的深度與高度計算</li>
+                        <li>根節點到葉節點路徑</li>
+                        <li>子樹識別與標記</li>
                     </ul>
                     <a href="tree_structure.html" class="demo-button">探索樹結構</a>
                 </div>
@@ -46,18 +46,72 @@
 
             <div class="concept-card">
                 <div class="card-header">
-                    <h3>樹走訪動畫</h3>
+                    <h3>樹走訪動畫演示</h3>
                 </div>
                 <div class="card-body">
                     <p>學習前序、中序、後序三種走訪方式，理解其遞迴過程和應用場景。</p>
                     <ul class="card-features">
-                        <li>逐步走訪動畫</li>
-                        <li>三種方式比較</li>
-                        <li>走訪順序展示</li>
-                        <li>結果序列對比</li>
-                        <li>互動式控制</li>
+                        <li>逐步走訪動畫展示</li>
+                        <li>三種走訪方式比較</li>
+                        <li>走訪順序即時顯示</li>
+                        <li>結果序列對比分析</li>
+                        <li>速度控制與暫停功能</li>
                     </ul>
-                    <a href="tree_traversal.html" class="demo-button">開始走訪</a>
+                    <a href="tree_traversal.html" class="demo-button">學習樹走訪</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section">
+            <h2>三種樹走訪方式比較</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>前序走訪 (Preorder)</h4>
+                    <p><strong>順序:</strong> 根 → 左子樹 → 右子樹</p>
+                    <p><strong>特點:</strong> 先處理根節點</p>
+                    <p><strong>應用:</strong> 複製樹、前綴表達式</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>中序走訪 (Inorder)</h4>
+                    <p><strong>順序:</strong> 左子樹 → 根 → 右子樹</p>
+                    <p><strong>特點:</strong> 根節點在中間處理</p>
+                    <p><strong>應用:</strong> 二元搜尋樹排序</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>後序走訪 (Postorder)</h4>
+                    <p><strong>順序:</strong> 左子樹 → 右子樹 → 根</p>
+                    <p><strong>特點:</strong> 最後處理根節點</p>
+                    <p><strong>應用:</strong> 刪除樹、後綴表達式</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="extension-topics">
+            <div class="topic-card">
+                <h4>🌳 樹結構基本概念</h4>
+                <p>理解樹的基本術語和性質，為後續學習圖論和進階資料結構奠定基礎。</p>
+                <div class="practice-hints">
+                    <strong>重要概念：</strong>
+                    <ul>
+                        <li>節點(Node)、邊(Edge)、根(Root)的定義</li>
+                        <li>樹的高度、深度、層級的計算</li>
+                        <li>完全二元樹與滿二元樹的區別</li>
+                        <li>二元樹的陣列表示法</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic-card">
+                <h4>🔄 遞迴思維應用</h4>
+                <p>樹走訪是遞迴思維的經典應用，理解遞迴在樹結構中的自然表現。</p>
+                <div class="practice-hints">
+                    <strong>遞迴要點：</strong>
+                    <ul>
+                        <li>每個子樹都可以獨立處理</li>
+                        <li>走訪順序決定處理時機</li>
+                        <li>堆疊在遞迴中的自動管理</li>
+                        <li>迭代與遞迴實作的比較</li>
+                    </ul>
                 </div>
             </div>
         </div>

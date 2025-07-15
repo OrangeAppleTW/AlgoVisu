@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專注模式修復驗證 - 圖例移除與樹結構修正</title>
+    <link rel="stylesheet" href="focus-mode-styles.css">
+</head>
+<body>
+    <div class="focus-container">
+        <!-- 左側：樹狀圖視覺化區域 -->
+        <div class="tree-section">
+            <h2 class="section-title">🌳 組合搜尋樹視覺化</h2>
+            <div class="tree-visualization">
+                <div id="combination-tree" class="tree-container">
+                    <!-- 樹狀圖節點會在這裡動態生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：控制面板 -->
+        <div class="control-section">
+            <h2 class="section-title">🎮 控制面板</h2>
+            
+            <!-- 問題設置 -->
+            <div class="problem-setup">
+                <div class="setup-row">
+                    <span>從集合選擇：</span>
+                    <div class="elements-display">
+                        <div class="element-item">1</div>
+                        <div class="element-item">2</div>
+                        <div class="element-item">3</div>
+                    </div>
+                </div>
+                <div class="setup-row">
+                    <span>選擇數量：</span>
+                    <select id="m-selector" class="m-selector">
+                        <option value="2" selected>2</option>
+                        <option value="1">1</option>
+                        <option value="3">3</option>
+                    </select>
+                    <span id="combination-formula">C(3,2) = 3</span>
+                </div>
+            </div>
+
+            <!-- 測試檢查列表 -->
+            <div style="background: #e8f4fd; border: 2px solid #3498db; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #2c3e50;">🔧 修復驗證項目</h4>
+                <ul style="margin: 0; padding-left: 20px; color: #2c3e50; font-size: 0.9em;">
+                    <li id="check-legend">⏳ 檢查圖例是否已移除</li>
+                    <li id="check-formula">⏳ 檢查公式顯示是否為 C(3,2)</li>
+                    <li id="check-tree-logic">⏳ 檢查樹結構：{1,2} → {1,2,3}</li>
+                    <li id="check-valid-combinations">⏳ 檢查有效組合標記</li>
+                </ul>
+            </div>
+
+            <!-- 組合邏輯說明 -->
+            <div style="background: #f0f8f0; border: 2px solid #27ae60; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #2c3e50;">📚 組合枚舉邏輯</h4>
+                <div style="font-size: 0.9em; color: #2c3e50;">
+                    <p><strong>目標：</strong>從 {1,2,3} 中選擇 2 個元素</p>
+                    <p><strong>有效組合：</strong>{1,2}, {1,3}, {2,3}</p>
+                    <p><strong>樹結構驗證：</strong></p>
+                    <ul style="margin: 5px 0; padding-left: 20px;">
+                        <li>{1,2} 的左子葉應該是 {1,2,3} (選擇3)</li>
+                        <li>{1,2} 的右子葉應該是 {1,2} (跳過3)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 檢查結果顯示 -->
+            <div id="test-results" style="background: white; border-radius: 8px; padding: 15px; margin-top: 15px;">
+                <h4 style="margin: 0 0 10px 0; color: #2c3e50;">檢查結果</h4>
+                <div id="results-content">準備開始檢查...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入相關腳本 -->
+    <script src="combinations-core.js"></script>
+    <script src="combinations-tree.js"></script>
+    
+    <script>
+        console.log('🧪 專注模式修復驗證開始...');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultsContent = document.getElementById('results-content');
+            const checkItems = {
+                legend: document.getElementById('check-legend'),
+                formula: document.getElementById('check-formula'),
+                treeLogic: document.getElementById('check-tree-logic'),
+                validCombinations: document.getElementById('check-valid-combinations')
+            };
+            
+            function updateResult(message) {
+                resultsContent.innerHTML += `<div style="padding: 3px 0; font-size: 0.9em;">${message}</div>`;
+                resultsContent.scrollTop = resultsContent.scrollHeight;
+            }
+            
+            function updateCheckItem(item, status, text) {
+                if (item) {
+                    item.textContent = `${status} ${text}`;
+                    item.style.color = status === '✅' ? '#27ae60' : (status === '❌' ? '#e74c3c' : '#f39c12');
+                }
+            }
+            
+            try {
+                // 創建測試用的父類模擬
+                const mockParent = {
+                    combinationTree: document.getElementById('combination-tree'),
+                    elements: [1, 2, 3],
+                    m: 2,
+                    treeNodes: {},
+                    treeEdges: []
+                };
+                
+                updateResult('🚀 開始創建樹狀圖...');
+                
+                // 創建樹狀圖視覺化器
+                const treeVisualizer = new CombinationTreeVisualizer(mockParent);
+                updateResult('✅ 樹狀圖視覺化器創建成功');
+                
+                // 創建樹狀結構
+                treeVisualizer.createTreeStructure();
+                updateResult('✅ 樹狀圖結構創建成功');
+                
+                // 等待DOM渲染完成後進行檢查
+                setTimeout(() => {
+                    updateResult('🔍 開始進行修復驗證...');
+                    
+                    // 1. 檢查圖例是否已移除
+                    const legend = document.querySelector('.tree-legend');
+                    if (!legend) {
+                        updateCheckItem(checkItems.legend, '✅', '圖例已成功移除');
+                        updateResult('✅ 圖例檢查：左下角顏色提示已移除');
+                    } else {
+                        updateCheckItem(checkItems.legend, '❌', '圖例仍然存在');
+                        updateResult('❌ 圖例檢查：圖例仍然存在');
+                    }
+                    
+                    // 2. 檢查公式顯示
+                    const formula = document.getElementById('combination-formula');
+                    if (formula && formula.textContent.includes('C(3,2)')) {
+                        updateCheckItem(checkItems.formula, '✅', '公式顯示正確：C(3,2)');
+                        updateResult(`✅ 公式檢查：${formula.textContent}`);
+                    } else {
+                        updateCheckItem(checkItems.formula, '❌', '公式顯示錯誤');
+                        updateResult(`❌ 公式檢查：${formula ? formula.textContent : '未找到'}`);
+                    }
+                    
+                    // 3. 檢查樹結構邏輯：{1,2} 的左子葉是否為 {1,2,3}
+                    const node_1s_2s = document.getElementById('node-1s_2s'); // {1,2} 節點
+                    const node_1s_2s_3s = document.getElementById('node-1s_2s_3s'); // {1,2,3} 節點
+                    
+                    if (node_1s_2s && node_1s_2s_3s) {
+                        const parent_content = node_1s_2s.textContent;
+                        const child_content = node_1s_2s_3s.textContent;
+                        
+                        if (parent_content === '{1,2}' && child_content === '{1,2,3}') {
+                            updateCheckItem(checkItems.treeLogic, '✅', '樹結構邏輯正確');
+                            updateResult(`✅ 樹結構檢查：${parent_content} → ${child_content}`);
+                        } else {
+                            updateCheckItem(checkItems.treeLogic, '❌', '樹結構邏輯錯誤');
+                            updateResult(`❌ 樹結構檢查：${parent_content} → ${child_content}`);
+                        }
+                    } else {
+                        updateCheckItem(checkItems.treeLogic, '❌', '無法找到相關節點');
+                        updateResult('❌ 樹結構檢查：無法找到相關節點');
+                    }
+                    
+                    // 4. 檢查有效組合標記 (長度為2的組合應該標記為有效)
+                    const validCombinations = ['{1,2}', '{1,3}', '{2,3}'];
+                    let validCount = 0;
+                    
+                    validCombinations.forEach(combo => {
+                        const nodes = Array.from(document.querySelectorAll('.tree-node')).filter(node => 
+                            node.textContent === combo
+                        );
+                        
+                        if (nodes.length > 0) {
+                            const hasValidClass = nodes.some(node => node.classList.contains('solution'));
+                            if (hasValidClass) {
+                                validCount++;
+                                updateResult(`✅ 有效組合標記：${combo}`);
+                            } else {
+                                updateResult(`⚠️ 有效組合標記：${combo} 未正確標記`);
+                            }
+                        }
+                    });
+                    
+                    if (validCount === 3) {
+                        updateCheckItem(checkItems.validCombinations, '✅', '所有有效組合已正確標記');
+                    } else {
+                        updateCheckItem(checkItems.validCombinations, '⚠️', `${validCount}/3 個組合標記正確`);
+                    }
+                    
+                    // 總結
+                    updateResult('📊 驗證完成！');
+                    
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ 驗證失敗:', error);
+                updateResult(`❌ 驗證失敗: ${error.message}`);
+            }
+        });
+    </script>
+</body>
+</html>

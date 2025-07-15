@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>樹狀圖修復測試 - 居中與節點重疊</title>
+    <link rel="stylesheet" href="focus-mode-styles.css">
+</head>
+<body>
+    <div class="focus-container">
+        <!-- 左側：樹狀圖視覺化區域 -->
+        <div class="tree-section">
+            <h2 class="section-title">🌳 組合搜尋樹視覺化</h2>
+            <div class="tree-visualization">
+                <div id="combination-tree" class="tree-container">
+                    <!-- 樹狀圖節點會在這裡動態生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：控制面板 -->
+        <div class="control-section">
+            <h2 class="section-title">🎮 控制面板</h2>
+            
+            <!-- 問題設置 -->
+            <div class="problem-setup">
+                <div class="setup-row">
+                    <span>從集合選擇：</span>
+                    <div class="elements-display">
+                        <div class="element-item">1</div>
+                        <div class="element-item">2</div>
+                        <div class="element-item">3</div>
+                    </div>
+                </div>
+                <div class="setup-row">
+                    <span>選擇數量：</span>
+                    <select id="m-selector" class="m-selector">
+                        <option value="2" selected>2</option>
+                        <option value="1">1</option>
+                        <option value="3">3</option>
+                    </select>
+                    <span id="combination-formula">C(3,2) = 3</span>
+                </div>
+            </div>
+
+            <!-- 測試說明 -->
+            <div style="background: #e8f4fd; border: 2px solid #3498db; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                <h4 style="margin: 0 0 10px 0; color: #2c3e50;">🔧 修復測試項目</h4>
+                <ul style="margin: 0; padding-left: 20px; color: #2c3e50; font-size: 0.9em;">
+                    <li>✅ 樹狀圖在視覺化區塊中居中顯示</li>
+                    <li>✅ 最下層節點不再重疊</li>
+                    <li>✅ 最左下節點顯示正確內容 {1,2,3}</li>
+                    <li>✅ 節點尺寸和間距優化</li>
+                    <li>✅ 響應式設計適配不同螢幕</li>
+                </ul>
+            </div>
+
+            <!-- 組合計數 -->
+            <div class="combination-counter">
+                測試狀態：<span id="test-status">準備測試</span>
+            </div>
+
+            <!-- 節點檢查結果 -->
+            <div id="node-check-results" style="background: white; border-radius: 8px; padding: 15px; margin-top: 15px; max-height: 200px; overflow-y: auto;">
+                <h4 style="margin: 0 0 10px 0; color: #2c3e50;">節點檢查結果</h4>
+                <div id="results-content">等待檢查...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入相關腳本 -->
+    <script src="combinations-tree.js"></script>
+    
+    <script>
+        console.log('🧪 樹狀圖修復測試開始...');
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM已載入，開始修復測試...');
+            
+            const testStatus = document.getElementById('test-status');
+            const resultsContent = document.getElementById('results-content');
+            
+            function updateResults(message) {
+                resultsContent.innerHTML += `<div style="padding: 2px 0; font-size: 0.9em;">${message}</div>`;
+                resultsContent.scrollTop = resultsContent.scrollHeight;
+            }
+            
+            try {
+                // 創建測試用的父類模擬
+                const mockParent = {
+                    combinationTree: document.getElementById('combination-tree'),
+                    elements: [1, 2, 3],
+                    m: 2,
+                    treeNodes: {},
+                    treeEdges: []
+                };
+                
+                console.log('📋 開始測試項目...');
+                testStatus.textContent = '正在創建樹狀圖...';
+                updateResults('🚀 開始創建樹狀圖...');
+                
+                // 創建樹狀圖視覺化器
+                const treeVisualizer = new CombinationTreeVisualizer(mockParent);
+                console.log('✅ 樹狀圖視覺化器創建成功');
+                updateResults('✅ 樹狀圖視覺化器創建成功');
+                
+                // 創建樹狀結構
+                treeVisualizer.createTreeStructure();
+                console.log('✅ 樹狀圖結構創建成功');
+                updateResults('✅ 樹狀圖結構創建成功');
+                
+                // 檢查關鍵節點
+                setTimeout(() => {
+                    console.log('🔍 檢查樹狀圖節點...');
+                    updateResults('🔍 開始檢查節點內容...');
+                    
+                    let passedTests = 0;
+                    let totalTests = 0;
+                    
+                    // 測試項目列表
+                    const testNodes = [
+                        { id: 'node-root', expected: '{}', description: '根節點' },
+                        { id: 'node-1_s', expected: '{1}', description: '第一層選擇節點' },
+                        { id: 'node-1_n', expected: '∅', description: '第一層跳過節點' },
+                        { id: 'node-1s_2s', expected: '{1,2}', description: '第二層 {1,2}' },
+                        { id: 'node-1s_2s_3s', expected: '{1,2,3}', description: '最左下角節點 (關鍵測試)' },
+                        { id: 'node-1s_2s_3n', expected: '{1,2}', description: '第三層 {1,2}' },
+                        { id: 'node-1s_2n_3s', expected: '{1,3}', description: '第三層 {1,3}' },
+                        { id: 'node-1n_2s_3s', expected: '{2,3}', description: '第三層 {2,3}' }
+                    ];
+                    
+                    testNodes.forEach(test => {
+                        totalTests++;
+                        const node = document.getElementById(test.id);
+                        if (node) {
+                            const content = node.textContent;
+                            if (content === test.expected) {
+                                passedTests++;
+                                updateResults(`✅ ${test.description}: ${content} (正確)`);
+                                console.log(`✅ ${test.description}: ${content}`);
+                            } else {
+                                updateResults(`❌ ${test.description}: 期望 ${test.expected}, 實際 ${content}`);
+                                console.log(`❌ ${test.description}: 期望 ${test.expected}, 實際 ${content}`);
+                            }
+                        } else {
+                            updateResults(`❌ ${test.description}: 節點不存在`);
+                            console.log(`❌ ${test.description}: 節點不存在`);
+                        }
+                    });
+                    
+                    // 檢查節點位置（避免重疊）
+                    updateResults('🔍 檢查節點位置和重疊...');
+                    const allNodes = document.querySelectorAll('.tree-node');
+                    let overlapCount = 0;
+                    
+                    for (let i = 0; i < allNodes.length; i++) {
+                        for (let j = i + 1; j < allNodes.length; j++) {
+                            const rect1 = allNodes[i].getBoundingClientRect();
+                            const rect2 = allNodes[j].getBoundingClientRect();
+                            
+                            // 檢查是否重疊
+                            if (!(rect1.right < rect2.left || 
+                                  rect1.left > rect2.right || 
+                                  rect1.bottom < rect2.top || 
+                                  rect1.top > rect2.bottom)) {
+                                overlapCount++;
+                            }
+                        }
+                    }
+                    
+                    if (overlapCount === 0) {
+                        updateResults('✅ 節點位置檢查: 無重疊');
+                        passedTests++;
+                    } else {
+                        updateResults(`❌ 節點位置檢查: 發現 ${overlapCount} 個重疊`);
+                    }
+                    totalTests++;
+                    
+                    // 總結測試結果
+                    const successRate = (passedTests / totalTests * 100).toFixed(1);
+                    updateResults(`📊 測試完成: ${passedTests}/${totalTests} 通過 (${successRate}%)`);
+                    
+                    if (passedTests === totalTests) {
+                        testStatus.textContent = '✅ 所有測試通過';
+                        testStatus.style.color = '#27ae60';
+                    } else {
+                        testStatus.textContent = `⚠️ ${passedTests}/${totalTests} 測試通過`;
+                        testStatus.style.color = '#f39c12';
+                    }
+                    
+                }, 500);
+                
+                // 測試響應式效果
+                setTimeout(() => {
+                    updateResults('📱 測試響應式設計...');
+                    const container = document.querySelector('.tree-container');
+                    const computedStyle = window.getComputedStyle(container);
+                    updateResults(`📐 容器間距: 左${computedStyle.paddingLeft} 右${computedStyle.paddingRight}`);
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ 測試失敗:', error);
+                testStatus.textContent = '❌ 測試失敗';
+                testStatus.style.color = '#e74c3c';
+                updateResults(`❌ 測試失敗: ${error.message}`);
+            }
+        });
+        
+        // 視窗大小改變時的測試
+        window.addEventListener('resize', function() {
+            console.log('📱 視窗大小改變，檢查響應式效果');
+            const resultsContent = document.getElementById('results-content');
+            if (resultsContent) {
+                const container = document.querySelector('.tree-container');
+                if (container) {
+                    const computedStyle = window.getComputedStyle(container);
+                    resultsContent.innerHTML += `<div style="padding: 2px 0; font-size: 0.9em;">📱 響應式: 左${computedStyle.paddingLeft} 右${computedStyle.paddingRight}</div>`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

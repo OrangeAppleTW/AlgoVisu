@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>貪心 vs 分治策略比較 - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <style>
+        .comparison-container {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .strategy-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            background-color: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .strategy-card:hover {
+            border-color: #4ecdc4;
+            box-shadow: 0 4px 12px rgba(78, 205, 196, 0.1);
+        }
+
+        .strategy-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .strategy-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .strategy-subtitle {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .characteristics-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .characteristics-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #444;
+        }
+
+        .characteristics-list li:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #ffffff;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .comparison-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .algorithm-examples {
+            background-color: #f0f8ff;
+            border: 1px solid #d1e7dd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .example-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .example-item {
+            background-color: #ffffff;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .highlight-box {
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .highlight-box.success {
+            background-color: #f0fff4;
+            border-color: #c6f6d5;
+        }
+
+        .highlight-box.info {
+            background-color: #ebf8ff;
+            border-color: #bee3f8;
+        }
+
+        @media (max-width: 768px) {
+            .strategy-grid,
+            .example-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .comparison-table {
+                font-size: 14px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>貪心 vs 分治策略比較</h1>
+        <div class="lesson-info">
+            深入了解兩種重要演算法設計策略的差異、特點與應用場景
+        </div>
+
+        <div class="comparison-container">
+            <h2>策略概覽</h2>
+            <div class="strategy-grid">
+                <div class="strategy-card">
+                    <div class="strategy-header">
+                        <div class="strategy-title">🎯 貪心演算法</div>
+                        <div class="strategy-subtitle">Greedy Algorithm</div>
+                    </div>
+                    <ul class="characteristics-list">
+                        <li><strong>核心思想：</strong>每步都選擇當前最優解</li>
+                        <li><strong>決策方式：</strong>局部最優，不回頭修改</li>
+                        <li><strong>時間複雜度：</strong>通常較低（O(n) 或 O(n log n)）</li>
+                        <li><strong>空間複雜度：</strong>通常 O(1)</li>
+                        <li><strong>適用條件：</strong>具有貪心選擇性質</li>
+                        <li><strong>結果保證：</strong>不一定得到全域最優解</li>
+                    </ul>
+                </div>
+
+                <div class="strategy-card">
+                    <div class="strategy-header">
+                        <div class="strategy-title">🌳 分治演算法</div>
+                        <div class="strategy-subtitle">Divide and Conquer</div>
+                    </div>
+                    <ul class="characteristics-list">
+                        <li><strong>核心思想：</strong>分割問題，遞迴求解，合併結果</li>
+                        <li><strong>決策方式：</strong>將大問題分解成小問題</li>
+                        <li><strong>時間複雜度：</strong>O(n log n) 較常見</li>
+                        <li><strong>空間複雜度：</strong>O(log n) 遞迴堆疊</li>
+                        <li><strong>適用條件：</strong>問題可以分解成相似的子問題</li>
+                        <li><strong>結果保證：</strong>可以得到最優解</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-container">
+            <h2>詳細比較表</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>比較項目</th>
+                        <th>貪心演算法</th>
+                        <th>分治演算法</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>設計策略</strong></td>
+                        <td>每步選擇局部最優</td>
+                        <td>分割 → 遞迴 → 合併</td>
+                    </tr>
+                    <tr>
+                        <td><strong>問題分解</strong></td>
+                        <td>不分解，逐步構建解</td>
+                        <td>分解成較小的相似子問題</td>
+                    </tr>
+                    <tr>
+                        <td><strong>決策撤回</strong></td>
+                        <td>不允許，決策不可逆</td>
+                        <td>可以重新考慮子問題的解</td>
+                    </tr>
+                    <tr>
+                        <td><strong>記憶體使用</strong></td>
+                        <td>通常較低</td>
+                        <td>需要遞迴堆疊空間</td>
+                    </tr>
+                    <tr>
+                        <td><strong>實作難度</strong></td>
+                        <td>相對簡單</td>
+                        <td>需要考慮遞迴和合併邏輯</td>
+                    </tr>
+                    <tr>
+                        <td><strong>效能穩定性</strong></td>
+                        <td>依問題特性而定</td>
+                        <td>通常較穩定</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="algorithm-examples">
+            <h2>經典演算法範例</h2>
+            <div class="example-grid">
+                <div class="example-item">
+                    <h4>🎯 貪心演算法範例</h4>
+                    <ul>
+                        <li><strong>硬幣找零問題</strong> - 總是選擇最大面額</li>
+                        <li><strong>活動選擇問題</strong> - 選擇最早結束的活動</li>
+                        <li><strong>霍夫曼編碼</strong> - 頻率最低的節點先合併</li>
+                        <li><strong>最小生成樹</strong> - Kruskal、Prim 演算法</li>
+                        <li><strong>單源最短路徑</strong> - Dijkstra 演算法</li>
+                    </ul>
+                </div>
+
+                <div class="example-item">
+                    <h4>🌳 分治演算法範例</h4>
+                    <ul>
+                        <li><strong>合併排序</strong> - 分割陣列後合併</li>
+                        <li><strong>快速排序</strong> - 選擇基準值分割</li>
+                        <li><strong>二元搜尋</strong> - 每次排除一半元素</li>
+                        <li><strong>大整數乘法</strong> - Karatsuba 演算法</li>
+                        <li><strong>最近點對問題</strong> - 平面幾何應用</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="highlight-box info">
+            <h3>🔍 合併排序中的分治法體現</h3>
+            <p>
+                在我們剛才學習的合併排序中，分治法的三個步驟清楚地展現：
+            </p>
+            <ol>
+                <li><strong>分割 (Divide)：</strong>將陣列從中點分成兩半</li>
+                <li><strong>征服 (Conquer)：</strong>遞迴地對子陣列進行排序</li>
+                <li><strong>合併 (Combine)：</strong>將兩個有序的子陣列合併成一個有序陣列</li>
+            </ol>
+            <p>
+                這種方法保證了 O(n log n) 的時間複雜度，且在任何情況下都能得到正確的排序結果。
+            </p>
+        </div>
+
+        <div class="highlight-box success">
+            <h3>💡 如何選擇適合的策略？</h3>
+            <p><strong>選擇貪心演算法的情況：</strong></p>
+            <ul>
+                <li>問題具有貪心選擇性質（局部最優能導致全域最優）</li>
+                <li>需要簡單快速的解決方案</li>
+                <li>記憶體資源有限</li>
+            </ul>
+            <p><strong>選擇分治演算法的情況：</strong></p>
+            <ul>
+                <li>問題可以自然地分解成相似的子問題</li>
+                <li>需要穩定的效能保證</li>
+                <li>要求得到最優解</li>
+            </ul>
+        </div>
+
+        <div class="highlight-box">
+            <h3>⚠️ 常見誤區</h3>
+            <ul>
+                <li><strong>誤區1：</strong>認為貪心演算法總是比分治法快 - 實際上要看具體問題</li>
+                <li><strong>誤區2：</strong>以為分治法一定使用更多記憶體 - 有些實作可以優化空間複雜度</li>
+                <li><strong>誤區3：</strong>覺得貪心演算法都不能得到最優解 - 在特定問題上貪心法是最優的</li>
+            </ul>
+        </div>
+
+        <div class="navigation">
+            <a href="merge_sort.html" class="nav-button">← 回到合併排序</a>
+            <a href="index.html" class="nav-button">回到課程首頁</a>
+        </div>
+    </div>
+
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

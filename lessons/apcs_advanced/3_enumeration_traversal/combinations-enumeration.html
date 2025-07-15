@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>組合枚舉演示 - L3 枚舉與遍歷</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <style>
+        .enumeration-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .algorithm-display {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .tree-visualization {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 600px;
+            border: 2px solid #e0e0e0;
+            overflow: auto;
+            position: relative;
+        }
+
+        .control-panel {
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .problem-setup {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .setup-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .elements-display {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .element-item {
+            width: 40px;
+            height: 40px;
+            border: 2px solid white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: white;
+            color: #333;
+        }
+
+        .element-item.selected {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .element-item.available {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .element-item.excluded {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+            opacity: 0.6;
+        }
+
+        .current-combination {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #e0e0e0;
+        }
+
+        .combination-display {
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .combination-slots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .slot {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            background: #f8f9fa;
+            color: #666;
+        }
+
+        .slot.filled {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .slot.current {
+            background: #f39c12;
+            color: white;
+            border-color: #e67e22;
+            animation: pulse-orange 1s infinite;
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .pruning-info {
+            background: #fff3e0;
+            border: 1px solid #ffcc02;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #f57c00;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+        }
+
+        .m-selector {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 1em;
+            color: #333;
+            margin: 0 10px;
+        }
+
+        .pruning-info.show {
+            display: block;
+        }
+
+        /* 樹狀圖相關樣式 - 縮小版本（普通頁面專用） */
+        .tree-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: auto;
+            min-height: 500px;  /* 從 600px 縮小到 500px */
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .tree-node {
+            position: absolute;
+            background: white;  /* 初始狀態為白色 */
+            border: 2px solid #333;
+            border-radius: 50%;
+            width: 36px;   /* 從 40px 縮小到 36px */
+            height: 36px;  /* 從 40px 縮小到 36px */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.7em;  /* 從 0.75em 縮小到 0.7em */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-family: 'Courier New', monospace;
+            color: #333;
+        }
+
+        .tree-node.root {
+            background: #333;
+            color: white;
+            border-color: #000;
+            width: 42px;   /* 從 45px 縮小到 42px */
+            height: 42px;  /* 從 45px 縮小到 42px */
+            font-size: 0.85em;  /* 從 0.9em 縮小到 0.85em */
+        }
+
+        /* 節點狀態樣式 - 使用顏色變化而非透明度 */
+        .tree-node.unvisited {
+            background: white;
+            color: #333;
+            border-color: #333;
+        }
+
+        .tree-node.current {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+        }
+
+        .tree-node.visited {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .tree-node.solution {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+            font-weight: bold;
+        }
+
+        .tree-node.pruned {
+            background: #95a5a6;
+            color: white;
+            border-color: #7f8c8d;
+            /* 移除 opacity，改用顏色表示 */
+        }
+
+        .tree-node.backtracked {
+            background: #f39c12;
+            color: white;
+            border-color: #e67e22;
+        }
+
+        .tree-edge {
+            position: absolute;
+            background: #999;
+            transform-origin: left center;
+            z-index: 5;
+            height: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .tree-edge.select {
+            background: #2ecc71;
+        }
+
+        .tree-edge.skip {
+            background: #e74c3c;
+        }
+
+        .tree-edge.active {
+            background: #f39c12;
+            height: 3px;
+            box-shadow: 0 0 5px rgba(243, 156, 18, 0.5);
+        }
+
+        .tree-edge.completed {
+            background: #2ecc71;
+            height: 3px;
+        }
+
+        .tree-level-indicator {
+            position: absolute;
+            left: 15px;
+            background: #333;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #555;
+        }
+
+        .tree-path-info {
+            position: absolute;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 20px;
+            border-radius: 4px;
+            border: 2px solid #333;
+            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-width: 300px;
+            max-width: 600px;
+            white-space: nowrap;
+        }
+
+        .tree-legend {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 4px;
+            border: 2px solid #333;
+            font-size: 0.8em;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            margin-right: 8px;
+            border: 2px solid #333;
+        }
+
+        .solutions-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+        }
+
+        .solution-item {
+            background: white;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .solution-number {
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-button.primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .control-button.primary:hover:not(:disabled) {
+            background: #2980b9;
+        }
+
+        .control-button.secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .control-button.secondary:hover:not(:disabled) {
+            background: #7f8c8d;
+        }
+
+        .control-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .status-display {
+            background: #e8f5e8;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .algorithm-info {
+            background: #f0f8ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .algorithm-info h3 {
+            color: #2c5aa0;
+            margin-bottom: 15px;
+        }
+
+        .algorithm-info p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .code-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .focus-mode-button {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            text-transform: none;
+            min-width: 200px;
+        }
+
+        .focus-mode-button:hover {
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .focus-mode-button:active {
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .algorithm-display {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .control-panel {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>組合枚舉演示</h1>
+        <div class="lesson-info">
+            學習 C(3,2) 組合枚舉：從 [1,2,3] 中選出 2 個數字的所有方法
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button id="focus-mode-btn" class="focus-mode-button">
+                🎯 專注教學模式
+            </button>
+        </div>
+
+        <div class="algorithm-info">
+            <h3>📚 演算法說明</h3>
+            <p><strong>問題：</strong>從集合 [1,2,3] 中選出 2 個數字，列出所有可能的組合。</p>
+            <p><strong>方法：</strong>使用遞迴與回溯，確保選出的數字按遞增順序且不重複。</p>
+            <p><strong>解空間：</strong>總共有 C(3,2) = 3 種組合。</p>
+            <p><strong>剪枝優化：</strong>當剩餘元素數量不足時提前終止，避免無效搜尋。</p>
+        </div>
+
+        <div class="enumeration-container">
+            <div class="algorithm-display">
+                <div class="tree-visualization">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🌳 組合搜尋樹視覺化</h3>
+                    <div class="tree-container" id="combination-tree">
+                        <!-- 樹狀圖將在這裡動態生成 -->
+                        <div class="tree-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #333; border-color: #000;"></div>
+                                <span>根節點</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #2ecc71; border-color: #27ae60;"></div>
+                                <span>已選擇</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f39c12; border-color: #e67e22;"></div>
+                                <span>正在考慮</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #95a5a6; border-color: #7f8c8d;"></div>
+                                <span>剪枝</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-panel">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🎮 控制面板</h3>
+                    
+                    <div class="problem-setup">
+                        <div class="setup-row">
+                            <span>從集合選擇：</span>
+                            <div class="elements-display">
+                                <div class="element-item">1</div>
+                                <div class="element-item">2</div>
+                                <div class="element-item">3</div>
+                            </div>
+                        </div>
+                        <div class="setup-row">
+                            <span>選擇數量：</span>
+                            <select id="m-selector" class="m-selector">
+                                <option value="1">1</option>
+                                <option value="2" selected>2</option>
+                                <option value="3">3</option>
+                            </select>
+                            <span id="combination-formula">C(3,2) = 3</span>
+                        </div>
+                    </div>
+
+                    <div class="current-combination">
+                        <h4>當前組合</h4>
+                        <div class="combination-slots" id="combination-slots">
+                            <div class="slot">?</div>
+                            <div class="slot">?</div>
+                        </div>
+                        <div>起始位置：<span id="start-position">0</span></div>
+                    </div>
+
+                    <div class="pruning-info" id="pruning-info">
+                        🚫 剪枝：剩餘元素不足，提前終止
+                    </div>
+
+                    <div class="status-display" id="status">
+                        準備開始 C(3,2) 組合枚舉
+                    </div>
+
+                    <div class="control-buttons">
+                        <button class="control-button primary" id="start-btn">開始枚舉</button>
+                        <button class="control-button secondary" id="reset-btn">重新開始</button>
+                        <button class="control-button primary" id="step-btn" disabled>下一步</button>
+                        <button class="control-button secondary" id="auto-btn" disabled>自動執行</button>
+                    </div>
+
+                    <div style="text-align: center; margin: 20px 0;">
+                        <strong>已找到組合：<span id="combination-count">0</span> / 3</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="solutions-display">
+                <h3>✅ 找到的組合</h3>
+                <div id="combinations-list"></div>
+            </div>
+        </div>
+
+        <div class="code-display">
+            <div style="color: #81c784; margin-bottom: 10px;">// 組合枚舉演算法的Python實作</div>
+def enumerate_combinations(elements, m):
+    n = len(elements)
+    subset = []
+
+    def backtrack(start):
+        if len(subset) == m:  # 已選滿 m 個元素
+            print(subset)
+            return
+
+        # 剪枝：如果剩餘元素全部選取也無法湊滿 m
+        if start >= n:
+            return
+
+        # 遍歷從 start 開始的每個候選元素
+        for i in range(start, n):
+            subset.append(elements[i])  # 選取元素 i
+            backtrack(i + 1)  # 遞迴選取下一個之後的元素
+            subset.pop()  # 回溯：移除剛選取的元素
+
+    backtrack(0)
+
+# 使用範例：C(3,2)
+enumerate_combinations([1, 2, 3], 2)
+        </div>
+
+        <div class="navigation">
+            <a href="subsets-enumeration.html" class="nav-button">← 上一個：子集枚舉</a>
+            <a href="permutations-enumeration.html" class="nav-button">下一個：排列枚舉 →</a>
+        </div>
+    </div>
+
+    <script src="combinations-core.js"></script>
+    <script src="combinations-steps.js"></script>
+    <script src="combinations-tree.js"></script>
+    <script src="combinations-ui.js"></script>
+    <script src="combinations-init.js"></script>
+    <script src="focus-mode-launcher.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+    
+    <script>
+        // 提供給專注模式視窗的狀態獲取函數
+        window.getCurrentState = function() {
+            if (window.combinationEnumerator) {
+                return {
+                    n: window.combinationEnumerator.n,
+                    m: window.combinationEnumerator.m,
+                    currentStep: window.combinationEnumerator.currentStep,
+                    solutions: window.combinationEnumerator.solutions,
+                    isRunning: window.combinationEnumerator.isRunning,
+                    currentCombination: window.combinationEnumerator.currentCombination,
+                    startPosition: window.combinationEnumerator.startPosition
+                };
+            }
+            return null;
+        };
+    </script>
+</body>
+</html>

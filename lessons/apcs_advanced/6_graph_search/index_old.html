@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L6: 圖形搜尋方法 - BFS 與 DFS</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/graph-search.css">
+</head>
+<body>
+    <!-- 導覽列將由 JavaScript 動態載入 -->
+    
+    <div class="container">
+        <h1>🔍 L6: 圖形搜尋方法</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            學習廣度優先搜尋 (BFS) 和深度優先搜尋 (DFS) 的基本概念與應用
+        </p>
+
+        <!-- 分頁導航 -->
+        <div class="tabs">
+            <div class="tab active" data-tab="bfs">廣度優先搜尋 (BFS)</div>
+            <div class="tab" data-tab="dfs">深度優先搜尋 (DFS)</div>
+            <div class="tab" data-tab="comparison">比較與應用</div>
+        </div>
+
+        <!-- BFS 頁面 -->
+        <div id="bfs" class="tab-content active">
+            <div class="algorithm-container">
+                <h2>廣度優先搜尋 (Breadth-First Search)</h2>
+                
+                <div class="concept-explanation">
+                    <h3>🎯 核心概念</h3>
+                    <p>BFS 使用 <strong>Queue (佇列)</strong> 資料結構，按照 FIFO (先進先出) 的原則逐層探索圖形。</p>
+                    <ul>
+                        <li><strong>特點：</strong>先探索距離起點較近的節點</li>
+                        <li><strong>應用：</strong>最短路徑、層次遍歷</li>
+                        <li><strong>資料結構：</strong>Queue (佇列)</li>
+                    </ul>
+                </div>
+
+                <!-- BFS 視覺化區域 -->
+                <div class="visualization-section">
+                    <div class="visualization-container">
+                        <div class="graph-area">
+                            <h4>圖形結構</h4>
+                            <svg id="bfs-graph" class="graph-svg"></svg>
+                        </div>
+                        <div class="queue-area">
+                            <h4>Queue (佇列) 狀態</h4>
+                            <div id="bfs-queue" class="queue-container">
+                                <div class="queue-label">Queue:</div>
+                                <div class="queue-items"></div>
+                                <div class="current-node-display">
+                                    <div class="current-node-label">當前取出節點:</div>
+                                    <div id="bfs-current-node" class="current-node-item">無</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 控制面板 -->
+                <div class="controls-section">
+                    <button class="btn" id="bfs-start">開始 BFS</button>
+                    <button class="btn btn-secondary" id="bfs-step">單步執行</button>
+                    <button class="btn btn-secondary" id="bfs-reset">重置</button>
+                    <button class="btn btn-secondary" id="bfs-random">隨機圖形</button>
+                </div>
+
+                <!-- 速度控制 -->
+                <div class="speed-control">
+                    <label for="bfs-speed">執行速度：</label>
+                    <input type="range" id="bfs-speed" class="speed-slider" min="1" max="10" value="5">
+                    <span>快</span>
+                </div>
+
+                <!-- 狀態顯示 -->
+                <div class="status-display" id="bfs-status">
+                    點擊「開始 BFS」開始搜尋演算法演示
+                </div>
+
+                <!-- 訪問順序顯示 -->
+                <div class="visit-order">
+                    <h4>訪問順序：</h4>
+                    <div id="bfs-visit-order" class="visit-sequence"></div>
+                </div>
+
+                <!-- 圖例說明 -->
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-color default"></div>
+                        <span>未訪問</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color in-queue"></div>
+                        <span>在佇列中</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color current"></div>
+                        <span>當前處理</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color visited"></div>
+                        <span>已訪問</span>
+                    </div>
+                </div>
+
+                <!-- 程式碼顯示 -->
+                <div class="code-container">
+                    <div class="code-tabs">
+                        <div class="code-tab active" data-code="python">Python</div>
+                        <div class="code-tab" data-code="cpp">C++</div>
+                        <div class="code-tab" data-code="pseudocode">虛擬碼</div>
+                    </div>
+                    
+                    <div id="python" class="code-view active">
+def bfs(graph, start):
+    visited = set()
+    queue = [start]
+    result = []
+    
+    while queue:
+        node = queue.pop(0)  # 從前端取出
+        
+        if node not in visited:
+            visited.add(node)
+            result.append(node)
+            
+            # 將鄰接節點加入 queue
+            for neighbor in graph[node]:
+                if neighbor not in visited:
+                    queue.append(neighbor)
+    
+    return result</div>
+                    
+                    <div id="cpp" class="code-view">
+#include &lt;queue&gt;
+#include &lt;vector&gt;
+#include &lt;unordered_set&gt;
+using namespace std;
+
+vector&lt;int&gt; bfs(vector&lt;vector&lt;int&gt;&gt;& graph, int start) {
+    unordered_set&lt;int&gt; visited;
+    queue&lt;int&gt; q;
+    vector&lt;int&gt; result;
+    
+    q.push(start);
+    
+    while (!q.empty()) {
+        int node = q.front();
+        q.pop();
+        
+        if (visited.find(node) == visited.end()) {
+            visited.insert(node);
+            result.push_back(node);
+            
+            for (int neighbor : graph[node]) {
+                if (visited.find(neighbor) == visited.end()) {
+                    q.push(neighbor);
+                }
+            }
+        }
+    }
+    
+    return result;
+}</div>
+                    
+                    <div id="pseudocode" class="code-view">
+BFS(圖G, 起始節點s):
+1. 初始化: visited = 空集合, queue = 空佇列
+2. 將起始節點s加入queue
+3. WHILE queue不為空:
+4.     從queue前端取出節點u
+5.     IF u未被訪問過:
+6.         標記u為已訪問
+7.         處理節點u
+8.         FOR u的每個鄰接節點v:
+9.             IF v未被訪問過:
+10.                將v加入queue後端
+11. END</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DFS 頁面 -->
+        <div id="dfs" class="tab-content">
+            <div class="algorithm-container">
+                <h2>深度優先搜尋 (Depth-First Search)</h2>
+                
+                <div class="concept-explanation">
+                    <h3>🎯 核心概念</h3>
+                    <p>DFS 使用 <strong>Stack (堆疊)</strong> 資料結構，按照 LIFO (後進先出) 的原則深入探索圖形。</p>
+                    <ul>
+                        <li><strong>特點：</strong>先深入探索一條路徑到底</li>
+                        <li><strong>應用：</strong>拓撲排序、連通性檢測</li>
+                        <li><strong>資料結構：</strong>Stack (堆疊) 或 遞迴</li>
+                    </ul>
+                </div>
+
+                <!-- DFS 視覺化區域 -->
+                <div class="visualization-section">
+                    <div class="visualization-container">
+                        <div class="graph-area">
+                            <h4>圖形結構</h4>
+                            <svg id="dfs-graph" class="graph-svg"></svg>
+                        </div>
+                        <div class="stack-area">
+                            <h4>Stack (堆疊) 狀態</h4>
+                            <div id="dfs-stack" class="stack-container">
+                                <div class="stack-label">Stack:</div>
+                                <div class="stack-items"></div>
+                                <div class="current-node-display">
+                                    <div class="current-node-label">當前取出節點:</div>
+                                    <div id="dfs-current-node" class="current-node-item">無</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 控制面板 -->
+                <div class="controls-section">
+                    <button class="btn" id="dfs-start">開始 DFS</button>
+                    <button class="btn btn-secondary" id="dfs-step">單步執行</button>
+                    <button class="btn btn-secondary" id="dfs-reset">重置</button>
+                    <button class="btn btn-secondary" id="dfs-random">隨機圖形</button>
+                </div>
+
+                <!-- 速度控制 -->
+                <div class="speed-control">
+                    <label for="dfs-speed">執行速度：</label>
+                    <input type="range" id="dfs-speed" class="speed-slider" min="1" max="10" value="5">
+                    <span>快</span>
+                </div>
+
+                <!-- 狀態顯示 -->
+                <div class="status-display" id="dfs-status">
+                    點擊「開始 DFS」開始搜尋演算法演示
+                </div>
+
+                <!-- 訪問順序顯示 -->
+                <div class="visit-order">
+                    <h4>訪問順序：</h4>
+                    <div id="dfs-visit-order" class="visit-sequence"></div>
+                </div>
+
+                <!-- 圖例說明 -->
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-color default"></div>
+                        <span>未訪問</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color in-stack"></div>
+                        <span>在堆疊中</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color current"></div>
+                        <span>當前處理</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color visited"></div>
+                        <span>已訪問</span>
+                    </div>
+                </div>
+
+                <!-- DFS 程式碼 -->
+                <div class="code-container">
+                    <div class="code-tabs">
+                        <div class="code-tab active" data-code="dfs-python">Python</div>
+                        <div class="code-tab" data-code="dfs-cpp">C++</div>
+                        <div class="code-tab" data-code="dfs-pseudocode">虛擬碼</div>
+                    </div>
+                    
+                    <div id="dfs-python" class="code-view active">
+def dfs(graph, start):
+    visited = set()
+    stack = [start]
+    result = []
+    
+    while stack:
+        node = stack.pop()  # 從後端取出
+        
+        if node not in visited:
+            visited.add(node)
+            result.append(node)
+            
+            # 將鄰接節點加入 stack (反序)
+            for neighbor in reversed(graph[node]):
+                if neighbor not in visited:
+                    stack.append(neighbor)
+    
+    return result</div>
+                    
+                    <div id="dfs-cpp" class="code-view">
+#include &lt;stack&gt;
+#include &lt;vector&gt;
+#include &lt;unordered_set&gt;
+using namespace std;
+
+vector&lt;int&gt; dfs(vector&lt;vector&lt;int&gt;&gt;& graph, int start) {
+    unordered_set&lt;int&gt; visited;
+    stack&lt;int&gt; st;
+    vector&lt;int&gt; result;
+    
+    st.push(start);
+    
+    while (!st.empty()) {
+        int node = st.top();
+        st.pop();
+        
+        if (visited.find(node) == visited.end()) {
+            visited.insert(node);
+            result.push_back(node);
+            
+            for (int neighbor : graph[node]) {
+                if (visited.find(neighbor) == visited.end()) {
+                    st.push(neighbor);
+                }
+            }
+        }
+    }
+    
+    return result;
+}</div>
+                    
+                    <div id="dfs-pseudocode" class="code-view">
+DFS(圖G, 起始節點s):
+1. 初始化: visited = 空集合, stack = 空堆疊
+2. 將起始節點s加入stack
+3. WHILE stack不為空:
+4.     從stack頂端取出節點u
+5.     IF u未被訪問過:
+6.         標記u為已訪問
+7.         處理節點u
+8.         FOR u的每個鄰接節點v (反序):
+9.             IF v未被訪問過:
+10.                將v加入stack頂端
+11. END</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 比較頁面 -->
+        <div id="comparison" class="tab-content">
+            <div class="algorithm-container">
+                <h2>BFS vs DFS 比較與應用</h2>
+                
+                <div class="comparison-table">
+                    <table class="dp-table">
+                        <thead>
+                            <tr>
+                                <th>特性</th>
+                                <th>BFS (廣度優先)</th>
+                                <th>DFS (深度優先)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>資料結構</strong></td>
+                                <td>Queue (佇列)</td>
+                                <td>Stack (堆疊) 或遞迴</td>
+                            </tr>
+                            <tr>
+                                <td><strong>搜尋策略</strong></td>
+                                <td>層層搜尋，先淺後深</td>
+                                <td>深入搜尋，先深後淺</td>
+                            </tr>
+                            <tr>
+                                <td><strong>時間複雜度</strong></td>
+                                <td>O(V + E)</td>
+                                <td>O(V + E)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>空間複雜度</strong></td>
+                                <td>O(V)</td>
+                                <td>O(V)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>最短路徑</strong></td>
+                                <td>✅ 適合無權重圖</td>
+                                <td>❌ 不保證最短</td>
+                            </tr>
+                            <tr>
+                                <td><strong>記憶體使用</strong></td>
+                                <td>較高 (廣度搜尋)</td>
+                                <td>較低 (深度搜尋)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="applications-section">
+                    <div class="application-card">
+                        <h3>🎯 BFS 應用場景</h3>
+                        <ul>
+                            <li><strong>最短路徑：</strong>在無權重圖中找最短路徑</li>
+                            <li><strong>層次遍歷：</strong>樹的層次遍歷</li>
+                            <li><strong>社交網路：</strong>找出朋友關係的層級</li>
+                            <li><strong>網頁爬蟲：</strong>按深度層級爬取網頁</li>
+                            <li><strong>迷宮問題：</strong>找出最短出口路徑</li>
+                        </ul>
+                    </div>
+
+                    <div class="application-card">
+                        <h3>🎯 DFS 應用場景</h3>
+                        <ul>
+                            <li><strong>拓撲排序：</strong>有向無環圖的排序</li>
+                            <li><strong>連通性檢測：</strong>檢查圖的連通性</li>
+                            <li><strong>路徑枚舉：</strong>找出所有可能路徑</li>
+                            <li><strong>回溯演算法：</strong>解決組合問題</li>
+                            <li><strong>強連通分量：</strong>找出強連通子圖</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="practice-section">
+                    <h3>📝 練習題目</h3>
+                    <div class="practice-card">
+                        <h4>基礎題：圖形遍歷</h4>
+                        <p>給定一個無向圖，實作BFS和DFS演算法，並比較它們的遍歷順序差異。</p>
+                    </div>
+                    <div class="practice-card">
+                        <h4>進階題：最短路徑</h4>
+                        <p>使用BFS在網格地圖中找出從起點到終點的最短路徑，考慮障礙物的影響。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 導航區域 -->
+        <div class="navigation">
+            <a href="../5_binary_tree/index.html" class="nav-button">← L5: 二元樹與樹走訪</a>
+            <a href="../index.html" class="nav-button">回到課程列表</a>
+            <a href="#" class="nav-button">L7: 貪心演算法 →</a>
+        </div>
+    </div>
+
+    <!-- JavaScript 檔案 -->
+    <script src="../../../components/navbar-loader.js"></script>
+    <script src="scripts/graph-structure.js"></script>
+    <script src="scripts/renderers.js"></script>
+    <script src="scripts/bfs-algorithm.js"></script>
+    <script src="scripts/dfs-algorithm.js"></script>
+    <script src="scripts/graph-search-ui.js"></script>
+</body>
+</html>

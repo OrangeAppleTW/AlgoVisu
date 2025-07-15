@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFS動畫測試</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/graph-search.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>BFS 動畫測試頁面</h1>
+        
+        <div class="test-section">
+            <h2>測試說明</h2>
+            <p>此頁面用於測試BFS動畫功能：</p>
+            <ul>
+                <li>一開始只顯示S標籤</li>
+                <li>當節點被搜索到並加入Queue時才顯示標籤A~F</li>
+                <li>BFS會先搜索左葉才是右葉</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 BFS 視覺化測試</h2>
+            
+            <!-- BFS 視覺化區域 -->
+            <div class="visualization-section">
+                <div class="visualization-container">
+                    <div class="graph-area">
+                        <h4>圖形結構</h4>
+                        <svg id="bfs-graph" class="graph-svg"></svg>
+                    </div>
+                    <div class="queue-area">
+                        <h4>Queue (佇列) 狀態</h4>
+                        <div id="bfs-queue" class="queue-container">
+                            <div class="queue-label">Queue:</div>
+                            <div class="queue-items"></div>
+                            <div class="current-node-display">
+                                <div class="current-node-label">當前取出節點:</div>
+                                <div id="bfs-current-node" class="current-node-item">無</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 控制面板 -->
+            <div class="controls-section">
+                <button class="btn" id="bfs-start">開始 BFS</button>
+                <button class="btn btn-secondary" id="bfs-step">單步執行</button>
+                <button class="btn btn-secondary" id="bfs-reset">重置</button>
+            </div>
+
+            <!-- 速度控制 -->
+            <div class="speed-control">
+                <label for="bfs-speed">執行速度：</label>
+                <input type="range" id="bfs-speed" class="speed-slider" min="1" max="10" value="5">
+                <span>快</span>
+            </div>
+
+            <!-- 狀態顯示 -->
+            <div class="status-display" id="bfs-status">
+                點擊「開始 BFS」開始搜尋演算法演示
+            </div>
+
+            <!-- 訪問順序顯示 -->
+            <div class="visit-order">
+                <h4>訪問順序：</h4>
+                <div id="bfs-visit-order" class="visit-sequence"></div>
+            </div>
+
+            <!-- 圖例說明 -->
+            <div class="legend-container">
+                <div class="legend-item">
+                    <div class="legend-color default"></div>
+                    <span>未訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color in-queue"></div>
+                    <span>在佇列中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color current"></div>
+                    <span>當前處理</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color visited"></div>
+                    <span>已訪問</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>測試步驟</h2>
+            <ol>
+                <li>點擊「重置」確保初始狀態正確</li>
+                <li>觀察初始狀態：只有S節點顯示標籤</li>
+                <li>點擊「開始 BFS」或「單步執行」</li>
+                <li>觀察節點標籤是否按照搜索順序顯示</li>
+                <li>確認搜索順序為：S → A, B → C, D, E, F</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- JavaScript 檔案 -->
+    <script src="scripts/bfs-graph-structure.js"></script>
+    <script src="scripts/renderers.js"></script>
+    <script src="scripts/bfs-algorithm.js"></script>
+    <script>
+        // 測試頁面專用初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化組件
+            const graph = new BFSGraphStructure();
+            graph.initializeGraph();
+
+            const svgRenderer = new SVGRenderer('bfs-graph', graph);
+            const queueRenderer = new QueueRenderer('bfs-queue');
+            const algorithm = new BFSAlgorithm(graph, svgRenderer, queueRenderer);
+
+            // 初始渲染
+            svgRenderer.render();
+
+            // 設置事件監聽器
+            document.getElementById('bfs-start')?.addEventListener('click', () => {
+                algorithm.start();
+            });
+
+            document.getElementById('bfs-step')?.addEventListener('click', () => {
+                algorithm.step();
+            });
+
+            document.getElementById('bfs-reset')?.addEventListener('click', () => {
+                algorithm.reset();
+            });
+
+            document.getElementById('bfs-speed')?.addEventListener('input', (e) => {
+                algorithm.setSpeed(parseInt(e.target.value));
+            });
+
+            console.log('BFS 動畫測試頁面已初始化');
+        });
+    </script>
+</body>
+</html>

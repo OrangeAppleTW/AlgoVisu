@@ -1,0 +1,347 @@
+class TuplesEnumeration {
+    constructor() {
+        this.N = 3; // 值域大小 {1,2,3}
+        this.k = 3; // 元組長度
+        this.currentTuple = [0, 0, 0];
+        this.allTuples = [];
+        this.isRunning = false;
+        this.isAutoMode = false;
+        this.autoInterval = null;
+        this.recursionSteps = [];
+        this.stepIndex = 0;
+        this.maxDisplay = 20; // 最多顯示的元組數量
+        
+        this.initializeElements();
+        this.bindEvents();
+        this.generateAllSteps();
+        this.updateDisplay();
+    }
+
+    initializeElements() {
+        this.tupleSlots = document.getElementById('tuple-slots');
+        this.currentPosition = document.getElementById('current-position');
+        this.status = document.getElementById('status');
+        this.startBtn = document.getElementById('start-btn');
+        this.resetBtn = document.getElementById('reset-btn');
+        this.stepBtn = document.getElementById('step-btn');
+        this.autoBtn = document.getElementById('auto-btn');
+        this.tupleCount = document.getElementById('tuple-count');
+        this.tuplesList = document.getElementById('tuples-list');
+        this.tupleTree = document.getElementById('tuple-tree');
+    }
+
+    bindEvents() {
+        this.startBtn.addEventListener('click', () => this.start());
+        this.resetBtn.addEventListener('click', () => this.reset());
+        this.stepBtn.addEventListener('click', () => this.nextStep());
+        this.autoBtn.addEventListener('click', () => this.toggleAuto());
+    }
+
+    // 預先生成所有步驟
+    generateAllSteps() {
+        this.recursionSteps = [];
+        this.allTuples = [];
+        this.generateStepsRecursive(0, [0, 0, 0]);
+    }
+
+    generateStepsRecursive(pos, currentTuple) {
+        // 記錄進入函式的步驟
+        const enterStep = {
+            type: 'enter',
+            position: pos,
+            tuple: [...currentTuple],
+            description: `進入 backtrack(${pos})`
+        };
+        this.recursionSteps.push(enterStep);
+
+        // 檢查終止條件：已填滿所有位置
+        if (pos === this.k) {
+            const tuple = [...currentTuple];
+            this.allTuples.push(tuple);
+            
+            const solutionStep = {
+                type: 'solution',
+                position: pos,
+                tuple: tuple,
+                description: `找到元組: (${tuple.join(', ')})`,
+                solutionIndex: this.allTuples.length
+            };
+            this.recursionSteps.push(solutionStep);
+            return;
+        }
+
+        // 依序嘗試可以放的所有值
+        for (let num = 1; num <= this.N; num++) {
+            // 記錄嘗試值的步驟
+            const tryStep = {
+                type: 'try',
+                position: pos,
+                value: num,
+                tuple: [...currentTuple],
+                description: `在位置${pos}嘗試值${num}`
+            };
+            this.recursionSteps.push(tryStep);
+
+            // 設置值
+            currentTuple[pos] = num;
+            
+            const setStep = {
+                type: 'set',
+                position: pos,
+                value: num,
+                tuple: [...currentTuple],
+                description: `設置 tuple[${pos}] = ${num}`
+            };
+            this.recursionSteps.push(setStep);
+
+            // 遞迴處理下一個位置
+            this.generateStepsRecursive(pos + 1, currentTuple);
+
+            // 記錄返回步驟
+            const returnStep = {
+                type: 'return',
+                position: pos,
+                value: num,
+                tuple: [...currentTuple],
+                description: `從 backtrack(${pos + 1}) 返回`
+            };
+            this.recursionSteps.push(returnStep);
+        }
+    }
+
+    start() {
+        this.isRunning = true;
+        this.startBtn.disabled = true;
+        this.stepBtn.disabled = false;
+        this.autoBtn.disabled = false;
+        this.status.textContent = '開始元組枚舉...';
+        this.updateDisplay();
+    }
+
+    nextStep() {
+        if (this.stepIndex >= this.recursionSteps.length) {
+            this.status.textContent = '枚舉完成！找到所有 27 個元組';
+            this.stepBtn.disabled = true;
+            this.autoBtn.disabled = true;
+            return;
+        }
+
+        const step = this.recursionSteps[this.stepIndex];
+        this.executeStep(step);
+        this.stepIndex++;
+        this.updateDisplay();
+    }
+
+    executeStep(step) {
+        this.currentStep = step;
+        
+        switch (step.type) {
+            case 'enter':
+                this.status.textContent = step.description;
+                this.currentPos = step.position;
+                break;
+            case 'try':
+                this.status.textContent = step.description;
+                this.currentTryValue = step.value;
+                break;
+            case 'set':
+                this.status.textContent = step.description;
+                this.currentTuple = [...step.tuple];
+                break;
+            case 'return':
+                this.status.textContent = step.description;
+                break;
+            case 'solution':
+                this.status.textContent = step.description;
+                this.addTupleToDisplay(step.tuple, step.solutionIndex);
+                break;
+        }
+    }
+
+    addTupleToDisplay(tuple, index) {
+        if (index <= this.maxDisplay) {
+            const tupleElement = document.createElement('div');
+            tupleElement.className = 'solution-item';
+            tupleElement.innerHTML = `
+                <span class="solution-number">${index}</span>
+                <span>(${tuple.join(', ')})</span>
+            `;
+            this.tuplesList.appendChild(tupleElement);
+        }
+    }
+
+    toggleAuto() {
+        if (this.isAutoMode) {
+            this.stopAuto();
+        } else {
+            this.startAuto();
+        }
+    }
+
+    startAuto() {
+        this.isAutoMode = true;
+        this.autoBtn.textContent = '暫停自動';
+        this.stepBtn.disabled = true;
+        
+        this.autoInterval = setInterval(() => {
+            this.nextStep();
+            if (this.stepIndex >= this.recursionSteps.length) {
+                this.stopAuto();
+            }
+        }, 600);
+    }
+
+    stopAuto() {
+        this.isAutoMode = false;
+        this.autoBtn.textContent = '自動執行';
+        this.stepBtn.disabled = false;
+        
+        if (this.autoInterval) {
+            clearInterval(this.autoInterval);
+            this.autoInterval = null;
+        }
+    }
+
+    reset() {
+        this.stopAuto();
+        this.currentTuple = [0, 0, 0];
+        this.currentStep = null;
+        this.stepIndex = 0;
+        this.isRunning = false;
+        this.currentPos = 0;
+        this.currentTryValue = null;
+        
+        this.startBtn.disabled = false;
+        this.stepBtn.disabled = true;
+        this.autoBtn.disabled = true;
+        this.autoBtn.textContent = '自動執行';
+        
+        this.status.textContent = '準備開始元組枚舉';
+        this.tuplesList.innerHTML = '';
+        
+        this.updateDisplay();
+    }
+
+    updateDisplay() {
+        this.updateTupleSlots();
+        this.updateCurrentPosition();
+        this.updateTupleCount();
+        this.updateTupleTree();
+    }
+
+    updateTupleSlots() {
+        const slots = this.tupleSlots.children;
+        for (let i = 0; i < this.k; i++) {
+            const slot = slots[i];
+            slot.className = 'slot';
+            
+            if (this.currentTuple[i] > 0) {
+                slot.firstChild.textContent = this.currentTuple[i];
+                slot.classList.add('filled');
+            } else if (this.currentStep && this.currentStep.position === i && this.currentStep.type === 'try') {
+                slot.firstChild.textContent = this.currentStep.value;
+                slot.classList.add('current');
+            } else {
+                slot.firstChild.textContent = '?';
+            }
+        }
+    }
+
+    updateCurrentPosition() {
+        if (this.currentStep) {
+            this.currentPosition.textContent = this.currentStep.position || 0;
+        } else {
+            this.currentPosition.textContent = '0';
+        }
+    }
+
+    updateTupleCount() {
+        let count = 0;
+        if (this.currentStep && this.currentStep.type === 'solution') {
+            count = this.currentStep.solutionIndex;
+        } else {
+            // 計算到目前為止找到的元組數量
+            for (let i = 0; i <= this.stepIndex; i++) {
+                if (this.recursionSteps[i] && this.recursionSteps[i].type === 'solution') {
+                    count = this.recursionSteps[i].solutionIndex;
+                }
+            }
+        }
+        this.tupleCount.textContent = count;
+    }
+
+    updateTupleTree() {
+        if (!this.currentStep) {
+            this.tupleTree.innerHTML = '<div style="text-align: center; color: #666;">等待開始...</div>';
+            return;
+        }
+
+        // 構建元組生成樹的視覺化
+        let treeHTML = '<div class="tree-display">';
+        
+        // 顯示當前狀態
+        const currentPos = this.currentStep.position || 0;
+        
+        for (let level = 0; level <= Math.min(currentPos, this.k - 1); level++) {
+            treeHTML += `<div class="tree-level">`;
+            treeHTML += `<div class="level-header">位置 ${level}</div>`;
+            
+            if (level < currentPos) {
+                // 已經確定的位置
+                treeHTML += `<div>已選擇值：<strong>${this.currentTuple[level]}</strong></div>`;
+            } else if (level === currentPos && level < this.k) {
+                // 當前正在處理的位置
+                treeHTML += `<div>可選擇的值：</div>`;
+                treeHTML += `<div class="choice-options">`;
+                
+                for (let val = 1; val <= this.N; val++) {
+                    let optionClass = 'choice-option';
+                    if (this.currentStep.type === 'try' && this.currentStep.value === val) {
+                        optionClass += ' current';
+                    } else {
+                        optionClass += ' available';
+                    }
+                    treeHTML += `<div class="${optionClass}">${val}</div>`;
+                }
+                treeHTML += `</div>`;
+                
+                if (this.currentStep.type === 'try') {
+                    treeHTML += `<div style="margin-top: 10px; color: #e74c3c; font-weight: bold;">
+                                正在嘗試：${this.currentStep.value}
+                              </div>`;
+                }
+            }
+            
+            treeHTML += `</div>`;
+        }
+
+        // 顯示當前元組狀態
+        if (currentPos < this.k) {
+            treeHTML += `<div class="tree-level">`;
+            treeHTML += `<div class="level-header">當前元組狀態</div>`;
+            treeHTML += `<div style="font-family: monospace; font-size: 1.1em; text-align: center;">`;
+            treeHTML += `(`;
+            for (let i = 0; i < this.k; i++) {
+                if (i > 0) treeHTML += ', ';
+                if (this.currentTuple[i] > 0) {
+                    treeHTML += `<span style="color: #2ecc71; font-weight: bold;">${this.currentTuple[i]}</span>`;
+                } else if (i === currentPos && this.currentStep.type === 'try') {
+                    treeHTML += `<span style="color: #e74c3c; font-weight: bold;">${this.currentStep.value}</span>`;
+                } else {
+                    treeHTML += `<span style="color: #666;">?</span>`;
+                }
+            }
+            treeHTML += `)`;
+            treeHTML += `</div>`;
+            treeHTML += `</div>`;
+        }
+
+        treeHTML += '</div>';
+        this.tupleTree.innerHTML = treeHTML;
+    }
+}
+
+// 當頁面載入完成時初始化
+document.addEventListener('DOMContentLoaded', () => {
+    new TuplesEnumeration();
+});

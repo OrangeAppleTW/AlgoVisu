@@ -1,0 +1,629 @@
+.element-item {
+    width: 40px;
+    height: 35px;
+    background: #3498db;
+    color: white;
+    border: 2px solid #2980b9;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.element-item.current {
+    background: #f39c12;
+    border-color: #e67e22;
+    transform: scale(1.1);
+}
+
+.element-item.selected {
+    background: #2ecc71;
+    border-color: #27ae60;
+}
+
+.element-item.excluded {
+    background: #95a5a6;
+    border-color: #7f8c8d;
+    opacity: 0.6;
+}
+
+.choice-indicator {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7em;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.slot {
+    width: 45px;
+    height: 45px;
+    background: #f8f9fa;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.slot.filled {
+    background: #2ecc71;
+    color: white;
+    border-color: #27ae60;
+}
+
+.pruning-info {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #f5c6cb;
+    margin: 10px 0;
+    display: none;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+.pruning-info.show {
+    display: block;
+}
+
+/* 專注教學模式樣式 - 16:9 比例優化 */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.focus-container {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    height: 100vh;
+    gap: 0;
+}
+
+.tree-section {
+    background: white;
+    padding: 20px;
+    border-right: 3px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+}
+
+.control-section {
+    background: #f8f9fa;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.section-title {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #3498db;
+}
+
+/* 樹狀圖視覺化區域 */
+.tree-visualization {
+    flex: 1;
+    background: #fafafa;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    position: relative;
+    overflow: auto;
+    min-height: 500px;
+}
+
+/* 控制面板樣式 */
+.problem-setup {
+    background: linear-gradient(135deg, #333 0%, #555 100%);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.setup-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+    flex-wrap: wrap;
+}
+
+.elements-display {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.element-item {
+    width: 35px;
+    height: 35px;
+    border: 2px solid white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    background: white;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.element-item.selected {
+    background: #2ecc71;
+    color: white;
+    border-color: #27ae60;
+}
+
+.element-item.available {
+    background: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+.element-item.excluded {
+    background: #e74c3c;
+    color: white;
+    border-color: #c0392b;
+    opacity: 0.6;
+}
+
+.m-selector {
+    background: white;
+    border: 2px solid #333;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-weight: bold;
+    font-size: 1em;
+    color: #333;
+    margin: 0 5px;
+}
+
+.current-combination {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 2px solid #e0e0e0;
+}
+
+.combination-slots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.slot {
+    width: 45px;
+    height: 45px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    background: #f8f9fa;
+    color: #666;
+}
+
+.slot.filled {
+    background: #2ecc71;
+    color: white;
+    border-color: #27ae60;
+}
+
+.slot.current {
+    background: #f39c12;
+    color: white;
+    border-color: #e67e22;
+    animation: pulse-orange 1s infinite;
+}
+
+@keyframes pulse-orange {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.status-display {
+    background: #e8f5e8;
+    border: 2px solid #c8e6c9;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+    color: #2e7d32;
+    font-size: 1.1em;
+}
+
+.control-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.control-button {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-button.primary {
+    background: #3498db;
+    color: white;
+}
+
+.control-button.primary:hover:not(:disabled) {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
+.control-button.secondary {
+    background: #95a5a6;
+    color: white;
+}
+
+.control-button.secondary:hover:not(:disabled) {
+    background: #7f8c8d;
+    transform: translateY(-1px);
+}
+
+.control-button:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.pruning-info {
+    background: #fff3e0;
+    border: 2px solid #ffcc02;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    color: #f57c00;
+    font-weight: bold;
+    text-align: center;
+    display: none;
+    font-size: 1em;
+}
+
+.pruning-info.show {
+    display: block;
+}
+
+.combination-counter {
+    background: white;
+    border: 2px solid #3498db;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* 樹狀圖相關樣式 - 專注模式優化 */
+.tree-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: auto;
+    background-color: #fafafa;
+    border-radius: 6px;
+    /* 調整樹狀圖容器，居中顯示並為更寬的樹狀圖提供空間 */
+    padding-left: 30px;  /* 減少左側間距以容納更寬的樹 */
+    padding-right: 30px; /* 右側間距保持居中 */
+    padding-top: 40px;
+    padding-bottom: 120px; /* 為圖例留出空間 */
+}
+
+.tree-node {
+    position: absolute;
+    background: #f0f0f0;
+    border: 3px solid #333;
+    border-radius: 50%;
+    /* 放大節點尺寸以容納更多文字 */
+    width: 60px;  /* 從 40px 增加到 60px */
+    height: 60px; /* 從 40px 增加到 60px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9em; /* 從 0.8em 增加到 0.9em */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    font-family: 'Courier New', monospace;
+    color: #333;
+    /* 確保文字不會溢出 */
+    word-wrap: break-word;
+    text-align: center;
+    line-height: 1.1;
+}
+
+.tree-node.root {
+    background: #333;
+    color: white;
+    border-color: #000;
+    /* 放大根節點 */
+    width: 70px;  /* 從 45px 增加到 70px */
+    height: 70px; /* 從 45px 增加到 70px */
+    font-size: 1.1em; /* 從 1em 增加到 1.1em */
+}
+
+/* 樹狀圖節點狀態樣式 - 使用顏色變化而非透明度 */
+.tree-node.unvisited {
+    background: white;
+    color: #333;
+    border-color: #333;
+}
+
+.tree-node.current {
+    background: #e74c3c;
+    color: white;
+    border-color: #c0392b;
+    transform: scale(1.15);
+    box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+}
+
+.tree-node.visited {
+    background: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+.tree-node.solution {
+    background: #2ecc71;
+    color: white;
+    border-color: #27ae60;
+    font-weight: bold;
+}
+
+.tree-node.pruned {
+    background: #95a5a6;
+    color: white;
+    border-color: #7f8c8d;
+    /* 移除 opacity，改用顏色表示 */
+}
+
+.tree-node.backtracked {
+    background: #f39c12;
+    color: white;
+    border-color: #e67e22;
+}
+
+/* 普通模式樹狀圖節點尺寸調整 */
+.tree-visualization .tree-node {
+    width: 45px;
+    height: 45px;
+    font-size: 0.8em;
+}
+
+.tree-visualization .tree-node.root {
+    width: 50px;
+    height: 50px;
+    font-size: 0.9em;
+}
+
+/* 專注模式樹狀圖節點 - 固定尺寸 */
+.focus-container .tree-node {
+    width: 60px !important;
+    height: 60px !important;
+    font-size: 0.9em !important;
+}
+
+.focus-container .tree-node.root {
+    width: 70px !important;
+    height: 70px !important;
+    font-size: 1.1em !important;
+}
+
+.tree-edge {
+    position: absolute;
+    background: #999;
+    transform-origin: left center;
+    z-index: 5;
+    height: 3px;
+    transition: all 0.3s ease;
+}
+
+.tree-edge.select {
+    background: #2ecc71;
+}
+
+.tree-edge.skip {
+    background: #e74c3c;
+}
+
+.tree-edge.active {
+    background: #f39c12;
+    height: 4px;
+    box-shadow: 0 0 8px rgba(243, 156, 18, 0.5);
+}
+
+.tree-edge.completed {
+    background: #2ecc71;
+    height: 4px;
+}
+
+.tree-level-indicator {
+    position: absolute;
+    left: 15px;
+    background: #333;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 1em;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    border: 2px solid #555;
+}
+
+.tree-path-info {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 25px;
+    border-radius: 6px;
+    border: 3px solid #333;
+    font-size: 1.1em;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    min-width: 350px;
+    max-width: 700px;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.tree-legend {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 6px;
+    border: 3px solid #333;
+    font-size: 0.95em;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 10px;
+    border: 2px solid #333;
+}
+
+/* 響應式設計 - 專注模式優化 */
+@media (max-width: 1200px) {
+    .focus-container {
+        grid-template-columns: 65% 35%;
+    }
+    
+    .tree-container {
+        padding-left: 25px; /* 減少左側內間距 */
+        padding-right: 25px;
+    }
+    
+    .tree-node {
+        width: 50px;  /* 調整節點尺寸 */
+        height: 50px;
+        font-size: 0.8em;
+    }
+    
+    .tree-node.root {
+        width: 60px;
+        height: 60px;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 900px) {
+    .focus-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60% 40%;
+    }
+    
+    .tree-section {
+        border-right: none;
+        border-bottom: 3px solid #e0e0e0;
+    }
+    
+    .tree-container {
+        padding-left: 20px; /* 進一步減少內間距 */
+        padding-right: 20px;
+        padding-top: 20px;
+    }
+    
+    .tree-node {
+        width: 45px;  /* 小螢幕適用尺寸 */
+        height: 45px;
+        font-size: 0.75em;
+    }
+    
+    .tree-node.root {
+        width: 55px;
+        height: 55px;
+        font-size: 0.9em;
+    }
+    
+    .setup-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .control-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .tree-container {
+        padding-left: 15px;
+        padding-right: 15px;
+        padding-top: 15px;
+        padding-bottom: 100px;
+    }
+    
+    .tree-node {
+        width: 40px;
+        height: 40px;
+        font-size: 0.7em;
+    }
+    
+    .tree-node.root {
+        width: 50px;
+        height: 50px;
+        font-size: 0.8em;
+    }
+    
+    .section-title {
+        font-size: 1.4em;
+    }
+}

@@ -1,0 +1,465 @@
+/* 比較分析頁面專用樣式 */
+
+.comparison-container {
+    margin: 20px 0;
+}
+
+.performance-stats {
+    margin-bottom: 40px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-card h4 {
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.recursive-stats {
+    border-left: 4px solid #dc3545;
+}
+
+.recursive-stats h4 {
+    color: #dc3545;
+}
+
+.dp-stats {
+    border-left: 4px solid #28a745;
+}
+
+.dp-stats h4 {
+    color: #28a745;
+}
+
+.improvement-stats {
+    border-left: 4px solid #007bff;
+}
+
+.improvement-stats h4 {
+    color: #007bff;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stat-label {
+    font-weight: 500;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: #333;
+}
+
+.method-selector {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.method-selector label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.visualization-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.method-visualization {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.method-visualization h3 {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.execution-info {
+    margin-bottom: 20px;
+}
+
+.legend {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.legend-item.first-call {
+    background: #d4edda;
+    color: #155724;
+}
+
+.legend-item.repeated-call {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.legend-item.base-case {
+    background: #cce5ff;
+    color: #0056b3;
+}
+
+.legend-item.computed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.legend-item.computing {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.legend-item.lookup {
+    background: #cce5ff;
+    color: #0056b3;
+}
+
+.recursive-tree {
+    min-height: 300px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    padding: 15px;
+    overflow: auto;
+}
+
+.call-sequence {
+    margin-top: 20px;
+}
+
+.sequence-container {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.call-item {
+    padding: 5px 10px;
+    margin: 2px 0;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.call-item.first {
+    background: #d4edda;
+}
+
+.call-item.repeated {
+    background: #f8d7da;
+}
+
+.call-item.base {
+    background: #cce5ff;
+}
+
+.dp-execution {
+    min-height: 300px;
+}
+
+.comparison-dp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.comparison-dp-table th,
+.comparison-dp-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.comparison-dp-table th {
+    background: #007bff;
+    color: white;
+}
+
+.comparison-dp-table td.empty {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.comparison-dp-table td.filled {
+    background: #d4edda;
+    color: #155724;
+    font-weight: bold;
+}
+
+.comparison-dp-table td.current {
+    background: #fff3cd;
+    color: #856404;
+    animation: pulse 1s infinite;
+}
+
+.execution-steps {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.execution-step {
+    padding: 8px;
+    margin: 4px 0;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+.execution-step.current {
+    background: #fff3cd;
+    border-left: 3px solid #ffc107;
+}
+
+.execution-step.completed {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.duplication-analysis {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.analysis-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.duplication-chart {
+    height: 250px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+}
+
+.duplication-details {
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+}
+
+.complexity-growth {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.growth-chart {
+    height: 300px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    margin: 20px 0;
+    position: relative;
+    background: linear-gradient(to top, #f8f9fa 0%, white 100%);
+}
+
+.growth-explanation {
+    background: #e7f3ff;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+.key-concepts {
+    margin-bottom: 30px;
+}
+
+.concepts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.concept-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.concept-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.concept-card h4 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.code-comparison {
+    margin-bottom: 30px;
+}
+
+.code-blocks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.code-block {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.code-block h4 {
+    background: #007bff;
+    color: white;
+    padding: 15px;
+    margin: 0;
+    font-size: 1.1em;
+}
+
+.code-block pre {
+    margin: 0;
+    padding: 20px;
+    background: #2d3748;
+    color: #e2e8f0;
+    overflow-x: auto;
+}
+
+.code-block code {
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    line-height: 1.6;
+}
+
+/* 響應式設計 */
+@media (max-width: 1024px) {
+    .visualization-comparison {
+        grid-template-columns: 1fr;
+    }
+    
+    .analysis-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .code-blocks {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .concepts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .method-selector {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* 動畫效果 */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.call-item.new {
+    animation: slideIn 0.3s ease;
+}
+
+.execution-step.new {
+    animation: slideIn 0.3s ease;
+}
+
+/* 工具提示樣式 */
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+.tooltip:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #333;
+    z-index: 1000;
+}

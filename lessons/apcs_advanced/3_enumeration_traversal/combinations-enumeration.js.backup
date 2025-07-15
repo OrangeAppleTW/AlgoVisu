@@ -1,0 +1,814 @@
+class CombinationsEnumeration {
+    constructor() {
+        this.elements = [1, 2, 3, 4, 5];
+        this.m = 3; // 要選擇的元素數量
+        this.currentCombination = [];
+        this.allCombinations = [];
+        this.isRunning = false;
+        this.isAutoMode = false;
+        this.autoInterval = null;
+        this.recursionSteps = [];
+        this.stepIndex = 0;
+        
+        this.initializeElements();
+        this.bindEvents();
+        this.generateAllSteps();
+        this.updateDisplay();
+    }
+
+    initializeElements() {
+        this.combinationSlots = document.getElementById('combination-slots');
+        this.startPosition = document.getElementById('start-position');
+        this.status = document.getElementById('status');
+        this.startBtn = document.getElementById('start-btn');
+        this.resetBtn = document.getElementById('reset-btn');
+        this.stepBtn = document.getElementById('step-btn');
+        this.autoBtn = document.getElementById('auto-btn');
+        this.combinationCount = document.getElementById('combination-count');
+        this.combinationsList = document.getElementById('combinations-list');
+        this.combinationTree = document.getElementById('combination-tree');
+        this.pruningInfo = document.getElementById('pruning-info');
+    }
+
+    bindEvents() {
+        this.startBtn.addEventListener('click', () => this.start());
+        this.resetBtn.addEventListener('click', () => this.reset());
+        this.stepBtn.addEventListener('click', () => this.nextStep());
+        this.autoBtn.addEventListener('click', () => this.toggleAuto());
+    }
+
+    // 預先生成所有步驟
+    generateAllSteps() {
+        this.recursionSteps = [];
+        this.allCombinations = [];
+        this.generateStepsRecursive(0, []);
+    }
+
+    generateStepsRecursive(start, currentCombination) {
+        // 記錄進入函式的步驟
+        const enterStep = {
+            type: 'enter',
+            start: start,
+            combination: [...currentCombination],
+            description: `進入 backtrack(${start})，當前組合長度：${currentCombination.length}`
+        };
+        this.recursionSteps.push(enterStep);
+
+        // 檢查終止條件：已選滿 m 個元素
+        if (currentCombination.length === this.m) {
+            const combination = [...currentCombination];
+            this.allCombinations.push(combination);
+            
+            const solutionStep = {
+                type: 'solution',
+                start: start,
+                combination: combination,
+                description: `找到組合: [${combination.join(', ')}]`,
+                solutionIndex: this.allCombinations.length
+            };
+            this.recursionSteps.push(solutionStep);
+            return;
+        }
+
+        // 剪枝檢查：如果剩餘元素不足
+        const remaining = this.elements.length - start;
+        const needed = this.m - currentCombination.length;
+        if (remaining < needed) {
+            const pruneStep = {
+                type: 'prune',
+                start: start,
+                combination: [...currentCombination],
+                remaining: remaining,
+                needed: needed,
+                description: `剪枝：剩餘${remaining}個元素，還需要${needed}個，無法滿足`
+            };
+            this.recursionSteps.push(pruneStep);
+            return;
+        }
+
+        // 遍歷從 start 開始的每個候選元素
+        for (let i = start; i < this.elements.length; i++) {
+            // 記錄嘗試選擇元素的步驟
+            const tryStep = {
+                type: 'try',
+                start: start,
+                index: i,
+                element: this.elements[i],
+                combination: [...currentCombination],
+                description: `嘗試選擇元素 ${this.elements[i]} (位置 ${i})`
+            };
+            this.recursionSteps.push(tryStep);
+
+            // 選取元素
+            currentCombination.push(this.elements[i]);
+            
+            const selectStep = {
+                type: 'select',
+                start: start,
+                index: i,
+                element: this.elements[i],
+                combination: [...currentCombination],
+                description: `選擇元素 ${this.elements[i]}，組合變成 [${currentCombination.join(', ')}]`
+            };
+            this.recursionSteps.push(selectStep);
+
+            // 遞迴處理下一個位置
+            this.generateStepsRecursive(i + 1, currentCombination);
+
+            // 回溯：移除剛選取的元素
+            currentCombination.pop();
+            
+            const backtrackStep = {
+                type: 'backtrack',
+                start: start,
+                index: i,
+                element: this.elements[i],
+                combination: [...currentCombination],
+                description: `回溯：移除元素 ${this.elements[i]}，組合回到 [${currentCombination.join(', ') || '空'}]`
+            };
+            this.recursionSteps.push(backtrackStep);
+        }
+    }
+
+    start() {
+        this.isRunning = true;
+        this.startBtn.disabled = true;
+        this.stepBtn.disabled = false;
+        this.autoBtn.disabled = false;
+        this.status.textContent = '開始 C(5,3) 組合枚舉...';
+        this.updateDisplay();
+    }
+
+    nextStep() {
+        if (this.stepIndex >= this.recursionSteps.length) {
+            this.status.textContent = '枚舉完成！找到所有 10 個組合';
+            this.stepBtn.disabled = true;
+            this.autoBtn.disabled = true;
+            return;
+        }
+
+        const step = this.recursionSteps[this.stepIndex];
+        this.executeStep(step);
+        this.stepIndex++;
+        this.updateDisplay();
+    }
+
+    executeStep(step) {
+        this.currentStep = step;
+        
+        switch (step.type) {
+            case 'enter':
+                this.status.textContent = step.description;
+                this.currentStart = step.start;
+                break;
+            case 'try':
+                this.status.textContent = step.description;
+                this.currentTryIndex = step.index;
+                break;
+            case 'select':
+                this.status.textContent = step.description;
+                this.currentCombination = [...step.combination];
+                break;
+            case 'backtrack':
+                this.status.textContent = step.description;
+                this.currentCombination = [...step.combination];
+                break;
+            case 'prune':
+                this.status.textContent = step.description;
+                this.showPruning = true;
+                break;
+            case 'solution':
+                this.status.textContent = step.description;
+                this.addCombinationToDisplay(step.combination, step.solutionIndex);
+                this.showPruning = false;
+                break;
+            default:
+                this.showPruning = false;
+                break;
+        }
+    }
+
+    addCombinationToDisplay(combination, index) {
+        const combinationElement = document.createElement('div');
+        combinationElement.className = 'solution-item';
+        combinationElement.innerHTML = `
+            <span class="solution-number">${index}</span>
+            <span>[${combination.join(', ')}]</span>
+        `;
+        this.combinationsList.appendChild(combinationElement);
+    }
+
+    toggleAuto() {
+        if (this.isAutoMode) {
+            this.stopAuto();
+        } else {
+            this.startAuto();
+        }
+    }
+
+    startAuto() {
+        this.isAutoMode = true;
+        this.autoBtn.textContent = '暫停自動';
+        this.stepBtn.disabled = true;
+        
+        this.autoInterval = setInterval(() => {
+            this.nextStep();
+            if (this.stepIndex >= this.recursionSteps.length) {
+                this.stopAuto();
+            }
+        }, 1000);
+    }
+
+    stopAuto() {
+        this.isAutoMode = false;
+        this.autoBtn.textContent = '自動執行';
+        this.stepBtn.disabled = false;
+        
+        if (this.autoInterval) {
+            clearInterval(this.autoInterval);
+            this.autoInterval = null;
+        }
+    }
+
+    reset() {
+        this.stopAuto();
+        this.currentCombination = [];
+        this.currentStep = null;
+        this.stepIndex = 0;
+        this.isRunning = false;
+        this.currentStart = 0;
+        this.currentTryIndex = -1;
+        this.showPruning = false;
+        
+        this.startBtn.disabled = false;
+        this.stepBtn.disabled = true;
+        this.autoBtn.disabled = true;
+        this.autoBtn.textContent = '自動執行';
+        
+        this.status.textContent = '準備開始 C(5,3) 組合枚舉';
+        this.combinationsList.innerHTML = '';
+        
+        // 重新創建樹狀結構
+        this.createTreeStructure();
+        this.updateDisplay();
+    }
+
+    updateDisplay() {
+        this.updateCombinationSlots();
+        this.updateStartPosition();
+        this.updateCombinationCount();
+        this.updatePruningInfo();
+    }
+
+    updateCombinationSlots() {
+        const slots = this.combinationSlots.children;
+        for (let i = 0; i < this.m; i++) {
+            const slot = slots[i];
+            slot.className = 'slot';
+            
+            if (i < this.currentCombination.length) {
+                slot.textContent = this.currentCombination[i];
+                slot.classList.add('filled');
+            } else if (i === this.currentCombination.length && this.currentStep && this.currentStep.type === 'try') {
+                slot.textContent = this.currentStep.element;
+                slot.classList.add('current');
+            } else {
+                slot.textContent = '?';
+            }
+        }
+    }
+
+    updateStartPosition() {
+        if (this.currentStep) {
+            this.startPosition.textContent = this.currentStep.start || 0;
+        } else {
+            this.startPosition.textContent = '0';
+        }
+    }
+
+    updateCombinationCount() {
+        let count = 0;
+        if (this.currentStep && this.currentStep.type === 'solution') {
+            count = this.currentStep.solutionIndex;
+        } else {
+            // 計算到目前為止找到的組合數量
+            for (let i = 0; i <= this.stepIndex; i++) {
+                if (this.recursionSteps[i] && this.recursionSteps[i].type === 'solution') {
+                    count = this.recursionSteps[i].solutionIndex;
+                }
+            }
+        }
+        this.combinationCount.textContent = count;
+    }
+
+    updatePruningInfo() {
+        if (this.showPruning) {
+            this.pruningInfo.classList.add('show');
+        } else {
+            this.pruningInfo.classList.remove('show');
+        }
+    }
+
+    resetTreeHighlights() {
+        // 重置所有節點的樣式
+        Object.entries(this.treeNodes).forEach(([nodeId, node]) => {
+            node.className = node.className.replace(/\s*(current|exploring|completed|solution|pruned)/g, '');
+            
+            // 重設為初始狀態
+            if (nodeId === 'root') {
+                node.style.backgroundColor = '#333';
+                node.style.borderColor = '#000';
+                node.style.color = 'white';
+            } else {
+                node.style.backgroundColor = '#f0f0f0';
+                node.style.borderColor = '#333';
+                node.style.color = '#333';
+            }
+        });
+        
+        // 重置所有邊的樣式
+        this.treeEdges.forEach(edge => {
+            edge.className = edge.className.replace(/\s*(active|completed|pruned)/g, '');
+            edge.className = 'tree-edge';
+        });
+    }
+
+    highlightCurrentPath(path) {
+        if (!path || path.length === 0) {
+            // 高亮根節點
+            if (this.treeNodes['root']) {
+                this.treeNodes['root'].classList.add('current');
+            }
+            this.updatePathDisplay(this.pathToString(path));
+    }
+
+    highlightSolutionPath(path) {
+        // 重置所有高亮
+        this.resetTreeHighlights();
+        
+        // 高亮根節點
+        if (this.treeNodes['root']) {
+            this.treeNodes['root'].classList.add('completed');
+        }
+
+        // 高亮整個解路徑
+        let currentPath = '';
+        for (let i = 0; i < path.length; i++) {
+            if (i > 0) currentPath += ',';
+            currentPath += path[i];
+            
+            const node = this.treeNodes[currentPath];
+            if (node) {
+                node.classList.add('completed');
+                // 根據決策類型設置顏色
+                if (path[i] === 'select') {
+                    node.style.backgroundColor = '#2ecc71';
+                    node.style.borderColor = '#27ae60';
+                    node.style.color = 'white';
+                } else {
+                    node.style.backgroundColor = '#e74c3c';
+                    node.style.borderColor = '#c0392b';
+                    node.style.color = 'white';
+                }
+            }
+            
+            // 高亮邊
+            if (i === 0) {
+                const edge = document.getElementById(`edge-root-${path[0]}`);
+                if (edge) edge.classList.add('completed');
+            } else {
+                const prevPath = path.slice(0, i).join(',');
+                const edge = document.getElementById(`edge-${prevPath}-${currentPath}`);
+                if (edge) edge.classList.add('completed');
+            }
+        }
+
+        this.updatePathDisplay(`解: ${this.pathToString(path)}`);
+    }
+
+    highlightPrunedPath(path) {
+        this.resetTreeHighlights();
+        
+        // 高亮根節點
+        if (this.treeNodes['root']) {
+            this.treeNodes['root'].classList.add('completed');
+        }
+
+        // 高亮剪枝路徑
+        let currentPath = '';
+        for (let i = 0; i < path.length; i++) {
+            if (i > 0) currentPath += ',';
+            currentPath += path[i];
+            
+            const node = this.treeNodes[currentPath];
+            if (node) {
+                if (i === path.length - 1) {
+                    node.classList.add('pruned');
+                    node.style.backgroundColor = '#95a5a6';
+                    node.style.borderColor = '#7f8c8d';
+                    node.style.color = 'white';
+                } else {
+                    node.classList.add('completed');
+                    // 根據決策類型設置顏色
+                    if (path[i] === 'select') {
+                        node.style.backgroundColor = '#2ecc71';
+                        node.style.borderColor = '#27ae60';
+                        node.style.color = 'white';
+                    } else {
+                        node.style.backgroundColor = '#e74c3c';
+                        node.style.borderColor = '#c0392b';
+                        node.style.color = 'white';
+                    }
+                }
+            }
+            
+            // 高亮邊
+            if (i === 0) {
+                const edge = document.getElementById(`edge-root-${path[0]}`);
+                if (edge) {
+                    if (i === path.length - 1) {
+                        edge.classList.add('pruned');
+                    } else {
+                        edge.classList.add('active');
+                    }
+                }
+            } else {
+                const prevPath = path.slice(0, i).join(',');
+                const edge = document.getElementById(`edge-${prevPath}-${currentPath}`);
+                if (edge) {
+                    if (i === path.length - 1) {
+                        edge.classList.add('pruned');
+                    } else {
+                        edge.classList.add('active');
+                    }
+                }
+            }
+        }
+
+        this.updatePathDisplay(`剪枝: ${this.pathToString(path)}`);
+    }
+
+    pathToString(path) {
+        if (!path || path.length === 0) return '根節點';
+        
+        const pathStrings = path.map((decision, index) => {
+            const element = this.elements[index];
+            return decision === 'select' ? `選${element}` : `不選${element}`;
+        });
+        
+        return `[${pathStrings.join(', ')}]`;
+    }
+
+    updatePathDisplay(pathText) {
+        const pathDisplay = document.getElementById('current-path-display');
+        if (pathDisplay) {
+            pathDisplay.textContent = pathText;
+        }
+    }
+}
+
+// 當頁面載入完成時初始化
+document.addEventListener('DOMContentLoaded', () => {
+    new CombinationsEnumeration();
+});('根節點');
+            return;
+        }
+
+        // 高亮根節點
+        if (this.treeNodes['root']) {
+            this.treeNodes['root'].classList.add('completed');
+        }
+
+        // 構建路徑並高亮節點和邊
+        let currentPath = '';
+        for (let i = 0; i < path.length; i++) {
+            if (i > 0) currentPath += ',';
+            currentPath += path[i];
+            
+            const node = this.treeNodes[currentPath];
+            if (node) {
+                if (i === path.length - 1) {
+                    node.classList.add('current');
+                    node.style.backgroundColor = '#f39c12';
+                    node.style.borderColor = '#e67e22';
+                    node.style.color = 'white';
+                } else {
+                    node.classList.add('completed');
+                    node.style.backgroundColor = '#2ecc71';
+                    node.style.borderColor = '#27ae60';
+                    node.style.color = 'white';
+                }
+            }
+            
+            // 高亮邊
+            if (i === 0) {
+                const edge = document.getElementById(`edge-root-${path[0]}`);
+                if (edge) edge.classList.add('active');
+            } else {
+                const prevPath = path.slice(0, i).join(',');
+                const edge = document.getElementById(`edge-${prevPath}-${currentPath}`);
+                if (edge) edge.classList.add('active');
+            }
+        }
+
+        this.updatePathDisplay(this.pathToString(path));
+    }
+
+    highlightSolutionPath(path) {
+        // 重置所有高亮
+        this.resetTreeHighlights();
+        
+        // 高亮根節點
+        if (this.treeNodes['root']) {
+            this.treeNodes['root'].classList.add('completed');
+        }
+
+        // 高亮整個解路徑
+        let currentPath = '';
+        for (let i = 0; i < path.length; i++) {
+            if (i > 0) currentPath += ',';
+            currentPath += path[i];
+            
+            const node = this.treeNodes[currentPath];
+            if (node) {
+                node.classList.add('solution');
+                node.style.backgroundColor = '#2ecc71';
+                node.style.borderColor = '#27ae60';
+                node.style.color = 'white';
+            }
+            
+            // 高亮邊
+            if (i === 0) {
+                const edge = document.getElementById(`edge-root-${path[0]}`);
+                if (edge) edge.classList.add('completed');
+            } else {
+                const prevPath = path.slice(0, i).join(',');
+                const edge = document.getElementById(`edge-${prevPath}-${currentPath}`);
+                if (edge) edge.classList.add('completed');
+            }
+        }
+
+        this.updatePathDisplay(`解: ${this.pathToString(path)}`);
+    }
+
+    highlightPrunedPath(path) {
+        this.resetTreeHighlights();
+        
+        // 高亮根節點
+        if (this.treeNodes['root']) {
+            this.treeNodes['root'].classList.add('completed');
+        }
+
+        // 高亮剪枝路徑
+        let currentPath = '';
+        for (let i = 0; i < path.length; i++) {
+            if (i > 0) currentPath += ',';
+            currentPath += path[i];
+            
+            const node = this.treeNodes[currentPath];
+            if (node) {
+                if (i === path.length - 1) {
+                    node.classList.add('pruned');
+                    node.style.backgroundColor = '#95a5a6';
+                    node.style.borderColor = '#7f8c8d';
+                    node.style.color = 'white';
+                } else {
+                    node.classList.add('completed');
+                    node.style.backgroundColor = '#2ecc71';
+                    node.style.borderColor = '#27ae60';
+                    node.style.color = 'white';
+                }
+            }
+            
+            // 高亮邊
+            if (i === 0) {
+                const edge = document.getElementById(`edge-root-${path[0]}`);
+                if (edge) {
+                    if (i === path.length - 1) {
+                        edge.classList.add('pruned');
+                    } else {
+                        edge.classList.add('active');
+                    }
+                }
+            } else {
+                const prevPath = path.slice(0, i).join(',');
+                const edge = document.getElementById(`edge-${prevPath}-${currentPath}`);
+                if (edge) {
+                    if (i === path.length - 1) {
+                        edge.classList.add('pruned');
+                    } else {
+                        edge.classList.add('active');
+                    }
+                }
+            }
+        }
+
+        this.updatePathDisplay(`剪枝: ${this.pathToString(path)}`);
+    }
+
+    pathToString(path) {
+        if (!path || path.length === 0) return '根節點';
+        
+        const elements = path.map(index => this.elements[index]);
+        return `[${elements.join(', ')}]`;
+    }
+
+    updatePathDisplay(pathText) {
+        const pathDisplay = document.getElementById('current-path-display');
+        if (pathDisplay) {
+            pathDisplay.textContent = pathText;
+        }
+    }
+
+    // 創建完整的樹狀結構
+    createTreeStructure() {
+        this.combinationTree.innerHTML = '';
+        
+        // 計算節點位置
+        const nodePositions = this.calculateNodePositions();
+        
+        // 創建所有節點
+        this.createAllNodes(nodePositions);
+        
+        // 創建所有邊
+        this.createAllEdges(nodePositions);
+        
+        // 添加圖例和標籤
+        this.addLegend();
+    }
+
+    calculateNodePositions() {
+        const positions = {};
+        const levelHeight = 100;
+        const rootX = 350;
+        const rootY = 30;
+        
+        // 根節點
+        positions['root'] = { x: rootX, y: rootY };
+        
+        // 第一層 - 選擇第一個元素的位置
+        const level1Y = rootY + levelHeight;
+        const level1Spacing = 80;
+        for (let i = 0; i < this.elements.length; i++) {
+            positions[`${i}`] = { 
+                x: rootX - (this.elements.length - 1) * level1Spacing / 2 + i * level1Spacing, 
+                y: level1Y 
+            };
+        }
+        
+        // 第二層 - 選擇第二個元素的位置
+        const level2Y = level1Y + levelHeight;
+        const level2Spacing = 60;
+        let level2Index = 0;
+        for (let i = 0; i < this.elements.length; i++) {
+            for (let j = i + 1; j < this.elements.length; j++) {
+                positions[`${i},${j}`] = { 
+                    x: rootX - (9 * level2Spacing) / 2 + level2Index * level2Spacing, 
+                    y: level2Y 
+                };
+                level2Index++;
+            }
+        }
+        
+        // 第三層 - 解節點（選擇第三個元素）
+        const level3Y = level2Y + levelHeight;
+        const level3Spacing = 50;
+        let level3Index = 0;
+        for (let i = 0; i < this.elements.length; i++) {
+            for (let j = i + 1; j < this.elements.length; j++) {
+                for (let k = j + 1; k < this.elements.length; k++) {
+                    positions[`${i},${j},${k}`] = { 
+                        x: rootX - (9 * level3Spacing) / 2 + level3Index * level3Spacing, 
+                        y: level3Y 
+                    };
+                    level3Index++;
+                }
+            }
+        }
+        
+        return positions;
+    }
+
+    createAllNodes(positions) {
+        // 根節點
+        const rootNode = this.createNode('root', '[]', 0, positions['root'].x, positions['root'].y);
+        this.treeNodes['root'] = rootNode;
+        
+        // 第一層節點 - 選擇第一個元素
+        for (let i = 0; i < this.elements.length; i++) {
+            const nodeId = `${i}`;
+            const node = this.createNode(nodeId, this.elements[i].toString(), 1, positions[nodeId].x, positions[nodeId].y);
+            this.treeNodes[nodeId] = node;
+        }
+        
+        // 第二層節點 - 選擇第二個元素
+        for (let i = 0; i < this.elements.length; i++) {
+            for (let j = i + 1; j < this.elements.length; j++) {
+                const nodeId = `${i},${j}`;
+                const node = this.createNode(nodeId, this.elements[j].toString(), 2, positions[nodeId].x, positions[nodeId].y);
+                this.treeNodes[nodeId] = node;
+            }
+        }
+        
+        // 第三層節點 - 解節點
+        for (let i = 0; i < this.elements.length; i++) {
+            for (let j = i + 1; j < this.elements.length; j++) {
+                for (let k = j + 1; k < this.elements.length; k++) {
+                    const nodeId = `${i},${j},${k}`;
+                    const node = this.createNode(nodeId, this.elements[k].toString(), 3, positions[nodeId].x, positions[nodeId].y);
+                    this.treeNodes[nodeId] = node;
+                }
+            }
+        }
+    }
+
+    createNode(id, text, level, x, y) {
+        const node = document.createElement('div');
+        node.className = `tree-node level-${level}`;
+        if (level === 0) node.classList.add('root');
+        node.id = `node-${id}`;
+        node.textContent = text;
+        node.style.left = `${x - 17.5}px`;
+        node.style.top = `${y - 17.5}px`;
+        this.combinationTree.appendChild(node);
+        return node;
+    }
+
+    createAllEdges(positions) {
+        // 從根到第一層的邊
+        for (let i = 0; i < this.elements.length; i++) {
+            this.createEdge('root', `${i}`, positions);
+        }
+        
+        // 從第一層到第二層的邊
+        for (let i = 0; i < this.elements.length; i++) {
+            for (let j = i + 1; j < this.elements.length; j++) {
+                this.createEdge(`${i}`, `${i},${j}`, positions);
+            }
+        }
+        
+        // 從第二層到第三層的邊
+        for (let i = 0; i < this.elements.length; i++) {
+            for (let j = i + 1; j < this.elements.length; j++) {
+                for (let k = j + 1; k < this.elements.length; k++) {
+                    this.createEdge(`${i},${j}`, `${i},${j},${k}`, positions);
+                }
+            }
+        }
+    }
+
+    createEdge(fromId, toId, positions) {
+        const fromPos = positions[fromId];
+        const toPos = positions[toId];
+        
+        const dx = toPos.x - fromPos.x;
+        const dy = toPos.y - fromPos.y;
+        const length = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+        
+        const edge = document.createElement('div');
+        edge.className = 'tree-edge';
+        edge.id = `edge-${fromId}-${toId}`;
+        edge.style.left = `${fromPos.x}px`;
+        edge.style.top = `${fromPos.y}px`;
+        edge.style.width = `${length}px`;
+        edge.style.transform = `rotate(${angle}deg)`;
+        
+        this.combinationTree.appendChild(edge);
+        this.treeEdges.push(edge);
+        return edge;
+    }
+
+    addLegend() {
+        // 在樹的左側添加層級指示器
+        const levelLabels = [
+            { text: '根節點', y: 30 },
+            { text: '選第1個', y: 130 },
+            { text: '選第2個', y: 230 },
+            { text: '選第3個', y: 330 }
+        ];
+        
+        levelLabels.forEach(label => {
+            const labelElement = document.createElement('div');
+            labelElement.className = 'tree-level-indicator';
+            labelElement.style.left = '20px';
+            labelElement.style.top = `${label.y - 10}px`;
+            labelElement.textContent = label.text;
+            this.combinationTree.appendChild(labelElement);
+        });
+        
+        // 在樹的下方添加路徑信息
+        const pathInfo = document.createElement('div');
+        pathInfo.className = 'tree-path-info';
+        pathInfo.innerHTML = `
+            <strong>當前決策路徑：</strong>
+            <span id="current-path-display">尚未開始</span>
+        `;
+        this.combinationTree.appendChild(pathInfo);
+    }
+}
+
+// 當頁面載入完成時初始化
+document.addEventListener('DOMContentLoaded', () => {
+    new CombinationsEnumeration();
+});

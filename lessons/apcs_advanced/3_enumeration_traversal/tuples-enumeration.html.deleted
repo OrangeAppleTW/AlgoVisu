@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>元組枚舉演示 - L3 枚舉與遍歷</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <style>
+        .enumeration-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .algorithm-display {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .tree-visualization {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 600px;
+            border: 2px solid #e0e0e0;
+            overflow: auto;
+        }
+
+        .control-panel {
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .problem-setup {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .setup-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .values-display {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .value-item {
+            width: 40px;
+            height: 40px;
+            border: 2px solid white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            background: #3498db;
+            color: white;
+        }
+
+        .current-tuple {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #e0e0e0;
+        }
+
+        .tuple-display {
+            background: white;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 1.2em;
+            font-weight: bold;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tuple-slots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .slot {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            background: #f8f9fa;
+            color: #666;
+            position: relative;
+        }
+
+        .slot.filled {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .slot.current {
+            background: #f39c12;
+            color: white;
+            border-color: #e67e22;
+            animation: pulse-orange 1s infinite;
+        }
+
+        .slot-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7em;
+            color: #666;
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .cartesian-info {
+            background: #e8f5e8;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #2e7d32;
+            text-align: center;
+        }
+
+        .tree-display {
+            font-family: monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .tree-level {
+            margin: 15px 0;
+            padding: 10px;
+            border-left: 3px solid #3498db;
+            background: #f8f9fa;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .level-header {
+            background: #3498db;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .choice-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .choice-option {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .choice-option.current {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+
+        .choice-option.available {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .choice-option.used {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .solutions-display {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+        }
+
+        .solution-item {
+            background: white;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .solution-number {
+            background: #3498db;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-button.primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .control-button.primary:hover:not(:disabled) {
+            background: #2980b9;
+        }
+
+        .control-button.secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .control-button.secondary:hover:not(:disabled) {
+            background: #7f8c8d;
+        }
+
+        .control-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .status-display {
+            background: #e8f5e8;
+            border: 1px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        .algorithm-info {
+            background: #f0f8ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .algorithm-info h3 {
+            color: #2c5aa0;
+            margin-bottom: 15px;
+        }
+
+        .algorithm-info p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .code-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 1024px) {
+            .algorithm-display {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .control-panel {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>元組枚舉演示</h1>
+        <div class="lesson-info">
+            學習如何枚舉所有可能的元組：從值域 {1,2,3} 中選擇 3 次（可重複）
+        </div>
+
+        <div class="algorithm-info">
+            <h3>📚 演算法說明</h3>
+            <p><strong>問題：</strong>從值域 {1,2,3} 中選擇 3 次（允許重複），列出所有可能的元組。</p>
+            <p><strong>方法：</strong>對每個位置都可以選擇任意值，形成笛卡爾積的完全枚舉。</p>
+            <p><strong>解空間：</strong>總共有 3^3 = 27 種元組。</p>
+            <p><strong>特點：</strong>與排列不同的是可以重複選擇相同值，與組合不同的是位置有意義。</p>
+        </div>
+
+        <div class="enumeration-container">
+            <div class="algorithm-display">
+                <div class="tree-visualization">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🌳 元組生成樹</h3>
+                    <div id="tuple-tree"></div>
+                </div>
+
+                <div class="control-panel">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🎮 控制面板</h3>
+                    
+                    <div class="problem-setup">
+                        <div class="setup-row">
+                            <span>值域：</span>
+                            <div class="values-display">
+                                <div class="value-item">1</div>
+                                <div class="value-item">2</div>
+                                <div class="value-item">3</div>
+                            </div>
+                        </div>
+                        <div class="setup-row">
+                            <span>元組長度：3</span>
+                            <span>3^3 = 27</span>
+                        </div>
+                    </div>
+
+                    <div class="current-tuple">
+                        <h4>當前元組</h4>
+                        <div class="tuple-slots" id="tuple-slots">
+                            <div class="slot">
+                                ?
+                                <div class="slot-label">位置0</div>
+                            </div>
+                            <div class="slot">
+                                ?
+                                <div class="slot-label">位置1</div>
+                            </div>
+                            <div class="slot">
+                                ?
+                                <div class="slot-label">位置2</div>
+                            </div>
+                        </div>
+                        <div>當前填充位置：<span id="current-position">0</span></div>
+                    </div>
+
+                    <div class="cartesian-info">
+                        💡 笛卡爾積：每個位置都可以選擇任意值
+                    </div>
+
+                    <div class="status-display" id="status">
+                        準備開始元組枚舉
+                    </div>
+
+                    <div class="control-buttons">
+                        <button class="control-button primary" id="start-btn">開始枚舉</button>
+                        <button class="control-button secondary" id="reset-btn">重新開始</button>
+                        <button class="control-button primary" id="step-btn" disabled>下一步</button>
+                        <button class="control-button secondary" id="auto-btn" disabled>自動執行</button>
+                    </div>
+
+                    <div style="text-align: center; margin: 20px 0;">
+                        <strong>已找到元組：<span id="tuple-count">0</span> / 27</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="solutions-display">
+                <h3>✅ 找到的元組（顯示前20個）</h3>
+                <div id="tuples-list"></div>
+            </div>
+        </div>
+
+        <div class="code-display">
+            <div style="color: #81c784; margin-bottom: 10px;">// 元組枚舉演算法的Python實作</div>
+def enumerate_tuples(N, k):
+    solution = [None] * k 
+
+    def backtrack(pos):
+        if pos == k:  # 已填滿所有位置
+            print(*solution) 
+            return
+
+        # 依序嘗試可以放的所有值
+        for num in range(1, N+1):
+            solution[pos] = num  # 將第 pos 個位置賦值為 num
+            backtrack(pos+1)     # 遞迴填入下一個位置
+            # 回溯步驟：因為下一輪迴圈會覆蓋 solution[pos]，這裡不需特別復原
+
+    backtrack(0)  # 從位置0開始枚舉
+
+# 使用範例：3^3 元組
+enumerate_tuples(3, 3)
+        </div>
+
+        <div class="navigation">
+            <a href="combinations-enumeration.html" class="nav-button">← 上一個：組合枚舉</a>
+            <a href="permutations-enumeration.html" class="nav-button">下一個：排列枚舉 →</a>
+        </div>
+    </div>
+
+    <script src="tuples-enumeration.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

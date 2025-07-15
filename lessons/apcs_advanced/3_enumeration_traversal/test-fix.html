@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專注模式修復測試</title>
+</head>
+<body>
+    <div id="combination-slots"></div>
+    <div id="status">準備中</div>
+    <button id="start-btn">開始</button>
+    <div id="combination-tree"></div>
+    <div id="combination-count">0/0</div>
+    <div id="combinations-list"></div>
+
+    <script src="combinations-core.js"></script>
+    <script src="focus-combinations-init.js"></script>
+    <script>
+        console.log('開始測試專注模式修復...');
+        
+        // 測試是否可以成功創建 FocusCombinationsEnumeration 實例
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM已載入，開始測試...');
+            
+            try {
+                const testInstance = new FocusCombinationsEnumeration();
+                console.log('✅ 成功創建 FocusCombinationsEnumeration 實例');
+                
+                // 等待初始化完成
+                setTimeout(() => {
+                    if (testInstance.isReady && testInstance.isReady()) {
+                        console.log('✅ 實例已準備就緒');
+                    } else {
+                        console.log('⏳ 實例仍在初始化中...');
+                        
+                        // 再等待一下
+                        setTimeout(() => {
+                            if (testInstance.isReady && testInstance.isReady()) {
+                                console.log('✅ 實例初始化完成');
+                            } else {
+                                console.log('⚠️ 實例初始化可能有問題');
+                            }
+                        }, 1000);
+                    }
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ 創建實例失敗:', error);
+            }
+        });
+    </script>
+</body>
+</html>

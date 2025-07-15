@@ -1,0 +1,586 @@
+class ComprehensivePractice {
+    constructor() {
+        this.currentMethod = 'numbers';
+        this.isRunning = false;
+        this.isAutoMode = false;
+        this.autoInterval = null;
+        this.stepIndex = 0;
+        this.solutions = [];
+        this.maxDisplay = 30;
+        
+        // 各種枚舉方法的配置
+        this.methodConfigs = {
+            numbers: {
+                name: '數字枚舉',
+                description: '從1~10選擇5次',
+                space: '10^5 = 100,000',
+                feature: '可重複選擇',
+                structure: '位置遞迴',
+                scenario: '基本遞迴練習',
+                generator: () => this.generateNumbersSteps()
+            },
+            subsets: {
+                name: '子集枚舉',
+                description: '[1,2,3]的所有子集',
+                space: '2^3 = 8',
+                feature: '選擇/不選擇',
+                structure: '二元決策',
+                scenario: '集合問題、背包問題',
+                generator: () => this.generateSubsetsSteps()
+            },
+            combinations: {
+                name: '組合枚舉',
+                description: 'C(5,3)組合',
+                space: 'C(5,3) = 10',
+                feature: '不可重複、無序',
+                structure: '起始位置控制',
+                scenario: '組隊問題、選擇問題',
+                generator: () => this.generateCombinationsSteps()
+            },
+            tuples: {
+                name: '元組枚舉',
+                description: '3^3元組',
+                space: '3^3 = 27',
+                feature: '可重複、有序',
+                structure: '完全自由選擇',
+                scenario: '笛卡爾積、密碼生成',
+                generator: () => this.generateTuplesSteps()
+            },
+            permutations: {
+                name: '排列枚舉',
+                description: '[0,1,2,3,4]的排列',
+                space: '5! = 120',
+                feature: '不可重複、有序',
+                structure: '使用標記避免重複',
+                scenario: '排序問題、路徑規劃',
+                generator: () => this.generatePermutationsSteps()
+            }
+        };
+        
+        this.initializeElements();
+        this.bindEvents();
+        this.switchMethod('numbers');
+    }
+
+    initializeElements() {
+        this.methodButtons = document.querySelectorAll('.method-button');
+        this.methodInfo = document.getElementById('method-info');
+        this.visualizationArea = document.getElementById('visualization-area');
+        this.currentState = document.getElementById('current-state');
+        this.progress = document.getElementById('progress');
+        this.total = document.getElementById('total');
+        this.startBtn = document.getElementById('start-btn');
+        this.resetBtn = document.getElementById('reset-btn');
+        this.stepBtn = document.getElementById('step-btn');
+        this.autoBtn = document.getElementById('auto-btn');
+        this.speedSlider = document.getElementById('speed-slider');
+        this.solutionsList = document.getElementById('solutions-list');
+    }
+
+    bindEvents() {
+        // 方法選擇按鈕
+        this.methodButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const method = button.dataset.method;
+                this.switchMethod(method);
+            });
+        });
+
+        // 控制按鈕
+        this.startBtn.addEventListener('click', () => this.start());
+        this.resetBtn.addEventListener('click', () => this.reset());
+        this.stepBtn.addEventListener('click', () => this.nextStep());
+        this.autoBtn.addEventListener('click', () => this.toggleAuto());
+    }
+
+    switchMethod(method) {
+        this.reset();
+        this.currentMethod = method;
+        
+        // 更新按鈕狀態
+        this.methodButtons.forEach(button => {
+            button.classList.toggle('active', button.dataset.method === method);
+        });
+        
+        // 更新方法資訊
+        this.updateMethodInfo();
+        
+        // 生成步驟
+        this.generateSteps();
+        
+        // 更新顯示
+        this.updateDisplay();
+    }
+
+    updateMethodInfo() {
+        const config = this.methodConfigs[this.currentMethod];
+        this.methodInfo.innerHTML = `
+            <h4>${config.name}</h4>
+            <div class="detail-row">
+                <span class="detail-label">問題描述：</span>
+                <span class="detail-value">${config.description}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">解空間：</span>
+                <span class="detail-value">${config.space}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">特點：</span>
+                <span class="detail-value">${config.feature}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">遞迴結構：</span>
+                <span class="detail-value">${config.structure}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">適用場景：</span>
+                <span class="detail-value">${config.scenario}</span>
+            </div>
+        `;
+    }
+
+    generateSteps() {
+        const config = this.methodConfigs[this.currentMethod];
+        this.steps = config.generator();
+        this.solutions = [];
+        this.stepIndex = 0;
+    }
+
+    // 數字枚舉步驟生成（簡化版）
+    generateNumbersSteps() {
+        const steps = [];
+        const solutions = [];
+        
+        const generate = (pos, current) => {
+            if (pos === 3) { // 簡化為3位數字
+                solutions.push([...current]);
+                steps.push({
+                    type: 'solution',
+                    data: [...current],
+                    description: `找到解: [${current.join(', ')}]`
+                });
+                return solutions.length >= 20; // 限制20個解
+            }
+            
+            for (let i = 1; i <= 3; i++) { // 簡化為1~3
+                current[pos] = i;
+                steps.push({
+                    type: 'try',
+                    data: [...current],
+                    description: `在位置${pos}嘗試數字${i}`
+                });
+                
+                if (generate(pos + 1, current)) return true;
+            }
+            return false;
+        };
+        
+        generate(0, [0, 0, 0]);
+        return steps;
+    }
+
+    // 子集枚舉步驟生成
+    generateSubsetsSteps() {
+        const steps = [];
+        const elements = [1, 2, 3];
+        const solutions = [];
+        
+        const generate = (index, subset) => {
+            if (index === elements.length) {
+                solutions.push([...subset]);
+                steps.push({
+                    type: 'solution',
+                    data: [...subset],
+                    description: `找到子集: {${subset.length > 0 ? subset.join(', ') : '空集合'}}`
+                });
+                return;
+            }
+            
+            // 選擇當前元素
+            subset.push(elements[index]);
+            steps.push({
+                type: 'select',
+                data: [...subset],
+                description: `選擇元素 ${elements[index]}`
+            });
+            generate(index + 1, subset);
+            
+            // 不選擇當前元素（回溯）
+            subset.pop();
+            steps.push({
+                type: 'skip',
+                data: [...subset],
+                description: `不選擇元素 ${elements[index]}`
+            });
+            generate(index + 1, subset);
+        };
+        
+        generate(0, []);
+        return steps;
+    }
+
+    // 組合枚舉步驟生成
+    generateCombinationsSteps() {
+        const steps = [];
+        const elements = [1, 2, 3, 4, 5];
+        const m = 3;
+        const solutions = [];
+        
+        const generate = (start, subset) => {
+            if (subset.length === m) {
+                solutions.push([...subset]);
+                steps.push({
+                    type: 'solution',
+                    data: [...subset],
+                    description: `找到組合: [${subset.join(', ')}]`
+                });
+                return;
+            }
+            
+            for (let i = start; i < elements.length; i++) {
+                subset.push(elements[i]);
+                steps.push({
+                    type: 'select',
+                    data: [...subset],
+                    description: `選擇元素 ${elements[i]}`
+                });
+                generate(i + 1, subset);
+                
+                subset.pop();
+                steps.push({
+                    type: 'backtrack',
+                    data: [...subset],
+                    description: `回溯：移除元素 ${elements[i]}`
+                });
+            }
+        };
+        
+        generate(0, []);
+        return steps;
+    }
+
+    // 元組枚舉步驟生成
+    generateTuplesSteps() {
+        const steps = [];
+        const solutions = [];
+        
+        const generate = (pos, tuple) => {
+            if (pos === 3) {
+                solutions.push([...tuple]);
+                steps.push({
+                    type: 'solution',
+                    data: [...tuple],
+                    description: `找到元組: (${tuple.join(', ')})`
+                });
+                return;
+            }
+            
+            for (let val = 1; val <= 3; val++) {
+                tuple[pos] = val;
+                steps.push({
+                    type: 'set',
+                    data: [...tuple],
+                    description: `設置位置${pos}為${val}`
+                });
+                generate(pos + 1, tuple);
+            }
+        };
+        
+        generate(0, [0, 0, 0]);
+        return steps;
+    }
+
+    // 排列枚舉步驟生成（簡化版）
+    generatePermutationsSteps() {
+        const steps = [];
+        const elements = [0, 1, 2];
+        const solutions = [];
+        
+        const generate = (pos, perm, used) => {
+            if (pos === elements.length) {
+                solutions.push([...perm]);
+                steps.push({
+                    type: 'solution',
+                    data: [...perm],
+                    description: `找到排列: [${perm.join(', ')}]`
+                });
+                return;
+            }
+            
+            for (let i = 0; i < elements.length; i++) {
+                if (!used[i]) {
+                    used[i] = true;
+                    perm[pos] = elements[i];
+                    steps.push({
+                        type: 'select',
+                        data: [...perm],
+                        description: `在位置${pos}選擇元素${elements[i]}`
+                    });
+                    generate(pos + 1, perm, used);
+                    
+                    used[i] = false;
+                    steps.push({
+                        type: 'backtrack',
+                        data: [...perm],
+                        description: `回溯：釋放元素${elements[i]}`
+                    });
+                }
+            }
+        };
+        
+        generate(0, [null, null, null], [false, false, false]);
+        return steps;
+    }
+
+    start() {
+        this.isRunning = true;
+        this.startBtn.disabled = true;
+        this.stepBtn.disabled = false;
+        this.autoBtn.disabled = false;
+        this.updateDisplay();
+    }
+
+    nextStep() {
+        if (this.stepIndex >= this.steps.length) {
+            this.currentState.textContent = '枚舉完成！';
+            this.stepBtn.disabled = true;
+            this.autoBtn.disabled = true;
+            return;
+        }
+
+        const step = this.steps[this.stepIndex];
+        this.currentStep = step;
+        this.stepIndex++;
+        
+        if (step.type === 'solution') {
+            this.addSolutionToDisplay(step.data);
+        }
+        
+        this.updateDisplay();
+    }
+
+    addSolutionToDisplay(solution) {
+        if (this.solutions.length < this.maxDisplay) {
+            this.solutions.push(solution);
+            const solutionElement = document.createElement('div');
+            solutionElement.className = 'solution-item';
+            
+            let displayText = '';
+            switch (this.currentMethod) {
+                case 'subsets':
+                    displayText = `{${solution.length > 0 ? solution.join(', ') : '空集合'}}`;
+                    break;
+                case 'tuples':
+                    displayText = `(${solution.join(', ')})`;
+                    break;
+                default:
+                    displayText = `[${solution.join(', ')}]`;
+            }
+            
+            solutionElement.innerHTML = `
+                <span class="solution-number">${this.solutions.length}</span>
+                <span>${displayText}</span>
+            `;
+            this.solutionsList.appendChild(solutionElement);
+        }
+    }
+
+    toggleAuto() {
+        if (this.isAutoMode) {
+            this.stopAuto();
+        } else {
+            this.startAuto();
+        }
+    }
+
+    startAuto() {
+        this.isAutoMode = true;
+        this.autoBtn.textContent = '暫停';
+        this.stepBtn.disabled = true;
+        
+        const speed = parseInt(this.speedSlider.value);
+        this.autoInterval = setInterval(() => {
+            this.nextStep();
+            if (this.stepIndex >= this.steps.length) {
+                this.stopAuto();
+            }
+        }, 2000 - speed + 100);
+    }
+
+    stopAuto() {
+        this.isAutoMode = false;
+        this.autoBtn.textContent = '自動';
+        this.stepBtn.disabled = false;
+        
+        if (this.autoInterval) {
+            clearInterval(this.autoInterval);
+            this.autoInterval = null;
+        }
+    }
+
+    reset() {
+        this.stopAuto();
+        this.isRunning = false;
+        this.stepIndex = 0;
+        this.solutions = [];
+        this.currentStep = null;
+        
+        this.startBtn.disabled = false;
+        this.stepBtn.disabled = true;
+        this.autoBtn.disabled = true;
+        this.autoBtn.textContent = '自動';
+        
+        this.solutionsList.innerHTML = '';
+        this.updateDisplay();
+    }
+
+    updateDisplay() {
+        // 更新當前狀態
+        if (this.currentStep) {
+            this.currentState.textContent = this.currentStep.description;
+        } else {
+            this.currentState.textContent = '準備開始...';
+        }
+        
+        // 更新進度
+        this.progress.textContent = this.solutions.length;
+        this.total.textContent = this.steps.filter(step => step.type === 'solution').length;
+        
+        // 更新視覺化區域
+        this.updateVisualization();
+    }
+
+    updateVisualization() {
+        if (!this.currentStep) {
+            this.visualizationArea.innerHTML = `
+                <div style="text-align: center; color: #666; padding: 40px;">
+                    <h4>${this.methodConfigs[this.currentMethod].name}</h4>
+                    <p>點擊「開始」以查看枚舉過程</p>
+                </div>
+            `;
+            return;
+        }
+
+        let visualization = '';
+        
+        switch (this.currentMethod) {
+            case 'numbers':
+                visualization = this.visualizeNumbers();
+                break;
+            case 'subsets':
+                visualization = this.visualizeSubsets();
+                break;
+            case 'combinations':
+                visualization = this.visualizeCombinations();
+                break;
+            case 'tuples':
+                visualization = this.visualizeTuples();
+                break;
+            case 'permutations':
+                visualization = this.visualizePermutations();
+                break;
+        }
+        
+        this.visualizationArea.innerHTML = visualization;
+    }
+
+    visualizeNumbers() {
+        const data = this.currentStep.data;
+        return `
+            <div style="text-align: center;">
+                <h4>數字枚舉 - 當前狀態</h4>
+                <div style="margin: 20px 0;">
+                    <strong>當前組合：</strong> [${data.join(', ')}]
+                </div>
+                <div style="color: #666;">
+                    ${this.currentStep.description}
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                    <strong>說明：</strong>每個位置都可以選擇1~3的任意數字，
+                    形成所有可能的3位數字組合。
+                </div>
+            </div>
+        `;
+    }
+
+    visualizeSubsets() {
+        const data = this.currentStep.data;
+        return `
+            <div style="text-align: center;">
+                <h4>子集枚舉 - 當前狀態</h4>
+                <div style="margin: 20px 0;">
+                    <strong>當前子集：</strong> {${data.length > 0 ? data.join(', ') : '空集合'}}
+                </div>
+                <div style="color: #666;">
+                    ${this.currentStep.description}
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                    <strong>說明：</strong>對每個元素做二元選擇：「選擇」或「不選擇」，
+                    最終得到所有可能的子集。
+                </div>
+            </div>
+        `;
+    }
+
+    visualizeCombinations() {
+        const data = this.currentStep.data;
+        return `
+            <div style="text-align: center;">
+                <h4>組合枚舉 - 當前狀態</h4>
+                <div style="margin: 20px 0;">
+                    <strong>當前組合：</strong> [${data.join(', ')}]
+                </div>
+                <div style="color: #666;">
+                    ${this.currentStep.description}
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                    <strong>說明：</strong>從5個元素中選出3個，確保選出的元素
+                    按遞增順序且不重複。
+                </div>
+            </div>
+        `;
+    }
+
+    visualizeTuples() {
+        const data = this.currentStep.data;
+        return `
+            <div style="text-align: center;">
+                <h4>元組枚舉 - 當前狀態</h4>
+                <div style="margin: 20px 0;">
+                    <strong>當前元組：</strong> (${data.join(', ')})
+                </div>
+                <div style="color: #666;">
+                    ${this.currentStep.description}
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                    <strong>說明：</strong>每個位置都可以選擇1~3的任意值，
+                    形成笛卡爾積的所有可能組合。
+                </div>
+            </div>
+        `;
+    }
+
+    visualizePermutations() {
+        const data = this.currentStep.data.filter(x => x !== null);
+        return `
+            <div style="text-align: center;">
+                <h4>排列枚舉 - 當前狀態</h4>
+                <div style="margin: 20px 0;">
+                    <strong>當前排列：</strong> [${data.join(', ')}]
+                </div>
+                <div style="color: #666;">
+                    ${this.currentStep.description}
+                </div>
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                    <strong>說明：</strong>每個元素只能使用一次，通過「已使用」
+                    標記確保不重複選擇。
+                </div>
+            </div>
+        `;
+    }
+}
+
+// 當頁面載入完成時初始化
+document.addEventListener('DOMContentLoaded', () => {
+    new ComprehensivePractice();
+});

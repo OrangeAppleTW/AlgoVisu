@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排列枚舉演示 - L3 枚舉與遍歷</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <style>
+        .enumeration-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .algorithm-display {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .control-panel {
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            padding: 30px;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .main-display {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .problem-setup {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1em;
+        }
+
+        .elements-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .element-item {
+            width: 50px;
+            height: 45px;
+            border: 2px solid white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+            background: #3498db;
+            color: white;
+            position: relative;
+        }
+
+        .element-item.used {
+            background: #e74c3c;
+            opacity: 0.6;
+        }
+
+        .element-item.available {
+            background: #2ecc71;
+        }
+
+        .element-item.current {
+            background: #f39c12;
+            animation: pulse-orange 1s infinite;
+        }
+
+        .used-indicator {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7em;
+            background: #e74c3c;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .current-permutation {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #e0e0e0;
+        }
+
+        .current-permutation h4 {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .permutation-slots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .slot {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            background: #f8f9fa;
+            color: #666;
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .slot.filled {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .slot.current {
+            background: #f39c12;
+            color: white;
+            border-color: #e67e22;
+            animation: pulse-orange 1s infinite;
+        }
+
+        .slot-label {
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6em;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .used-array {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #e0e0e0;
+        }
+
+        .used-array h4 {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        .used-status {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .used-cell {
+            width: 45px;
+            height: 40px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1em;
+            background: white;
+            color: #666;
+        }
+
+        .used-cell.true {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+
+        .used-cell.false {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+
+
+
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .control-button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-button.primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .control-button.primary:hover:not(:disabled) {
+            background: #2980b9;
+        }
+
+        .control-button.secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .control-button.secondary:hover:not(:disabled) {
+            background: #7f8c8d;
+        }
+
+        .control-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        .status-display {
+            background: #e8f5e8;
+            border: 2px solid #c8e6c9;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #2e7d32;
+        }
+
+        .progress-display {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .progress-display .main-count {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .progress-display .sub-count {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .solutions-display-sidebar {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .solutions-display-sidebar h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+
+        .solutions-display-sidebar .solution-item {
+            background: white;
+            padding: 4px 8px;
+            margin: 3px 0;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-family: monospace;
+            font-size: 0.7em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .solutions-display-sidebar .solution-number {
+            background: #3498db;
+            color: white;
+            padding: 1px 4px;
+            border-radius: 8px;
+            font-size: 0.7em;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .algorithm-info {
+            background: #f0f8ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .algorithm-info h3 {
+            color: #2c5aa0;
+            margin-bottom: 15px;
+        }
+
+        .algorithm-info p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+
+        .code-display {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        @media (max-width: 900px) {
+            .control-panel {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .control-sidebar {
+                order: -1;
+            }
+            
+            .solutions-display-sidebar {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .element-item {
+                width: 50px;
+                height: 45px;
+                font-size: 1.1em;
+            }
+            
+            .slot {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2em;
+            }
+            
+            .used-cell {
+                width: 45px;
+                height: 40px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>排列枚舉演示</h1>
+        <div class="lesson-info">
+            學習如何枚舉集合 [0,1,2,3,4] 的所有排列，理解「已使用」標記的重要性
+        </div>
+
+        <div class="algorithm-info">
+            <h3>📚 演算法說明</h3>
+            <p><strong>問題：</strong>給定集合 [0,1,2,3,4]，列出所有可能的排列。</p>
+            <p><strong>方法：</strong>使用「已使用」標記陣列，確保每個元素只被使用一次，順序重要。</p>
+            <p><strong>解空間：</strong>總共有 5! = 120 種排列。</p>
+            <p><strong>關鍵技巧：</strong>回溯時要復原「已使用」標記，確保狀態正確恢復。</p>
+        </div>
+
+        <div class="enumeration-container">
+            <div class="algorithm-display">
+                <div class="control-panel">
+                    <div class="main-display">
+                        <div class="problem-setup">
+                            <div style="margin-bottom: 10px;"><strong>集合元素</strong></div>
+                            <div class="elements-row" id="elements-row">
+                                <div class="element-item">0</div>
+                                <div class="element-item">1</div>
+                                <div class="element-item">2</div>
+                                <div class="element-item">3</div>
+                                <div class="element-item">4</div>
+                            </div>
+                            <div style="margin-top: 10px;"><strong>5! = 120 種排列</strong></div>
+                        </div>
+
+                        <div class="current-permutation">
+                            <h4>當前排列</h4>
+                            <div class="permutation-slots" id="permutation-slots">
+                                <div class="slot">
+                                    ?
+                                    <div class="slot-label">位置0</div>
+                                </div>
+                                <div class="slot">
+                                    ?
+                                    <div class="slot-label">位置1</div>
+                                </div>
+                                <div class="slot">
+                                    ?
+                                    <div class="slot-label">位置2</div>
+                                </div>
+                                <div class="slot">
+                                    ?
+                                    <div class="slot-label">位置3</div>
+                                </div>
+                                <div class="slot">
+                                    ?
+                                    <div class="slot-label">位置4</div>
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin-top: 10px; padding: 8px; background: #fff3e0; border-radius: 6px; border: 1px solid #ffcc02;">
+                                <strong style="color: #e65100; font-size: 0.9em;">當前填充位置：<span id="current-position" style="color: #d84315; font-size: 1.1em;">0</span></strong>
+                            </div>
+                        </div>
+
+                        <div class="used-array">
+                            <h4>已使用標記陣列</h4>
+                            <div class="used-status" id="used-status">
+                                <div class="used-cell false">F</div>
+                                <div class="used-cell false">F</div>
+                                <div class="used-cell false">F</div>
+                                <div class="used-cell false">F</div>
+                                <div class="used-cell false">F</div>
+                            </div>
+                            <div style="text-align: center; font-size: 0.8em; color: #666; margin-top: 5px;">
+                                F=可用, T=已使用
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-sidebar">
+                        <div class="status-display" id="status">
+                            準備開始排列枚舉
+                        </div>
+
+                        <div class="control-buttons">
+                            <button class="control-button primary" id="start-btn">開始枚舉</button>
+                            <button class="control-button secondary" id="reset-btn">重新開始</button>
+                            <button class="control-button primary" id="step-btn" disabled>下一步</button>
+                            <button class="control-button secondary" id="auto-btn" disabled>自動執行</button>
+                        </div>
+
+                        <div class="progress-display">
+                            <div class="main-count">已找到排列：<span id="permutation-count" style="color: #d32f2f;">0</span> / 120</div>
+                            <div class="sub-count">步驟進度：<span id="step-progress">0</span> / <span id="total-steps">0</span></div>
+                        </div>
+
+                        <div class="solutions-display-sidebar">
+                            <h4>✅ 找到的排列（顯示前20個）</h4>
+                            <div id="permutations-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="code-display">
+            <div style="color: #81c784; margin-bottom: 10px;">// 排列枚舉演算法的Python實作</div>
+def enumerate_permutations(elements):
+    n = len(elements)
+    used = [False] * n  # 記錄元素是否被使用過
+    perm = [None] * n   # 一個解（排列）存放此串列中
+
+    def backtrack(pos):
+        if pos == n:  # 已填滿所有位置
+            print(*perm)
+            return
+
+        # 嘗試放入每一個尚未使用的元素
+        for i in range(n):
+            if not used[i]:  # 如果元素 elements[i] 尚未被使用
+                used[i] = True  # 標記為已使用
+                perm[pos] = elements[i]  # 將該元素放入當前排列位置
+                backtrack(pos + 1)  # 遞迴決定下一個位置
+                used[i] = False  # 回溯：復原標記
+
+    backtrack(0)
+
+# 使用範例
+enumerate_permutations([0, 1, 2, 3, 4])
+        </div>
+
+        <div class="navigation">
+            <a href="combinations-enumeration.html" class="nav-button">← 上一個：組合枚舉</a>
+            <a href="../index.html" class="nav-button">下一個：返回章節列表 →</a>
+        </div>
+    </div>
+
+    <script src="permutations-enumeration.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

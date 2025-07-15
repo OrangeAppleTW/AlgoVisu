@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L6: 圖形搜尋方法 - BFS 與 DFS 測試</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/graph-search.css">
+    <style>
+        .test-info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+        }
+        .test-info h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 L6: 圖形搜尋方法測試</h1>
+        
+        <div class="test-info">
+            <h4>✨ 新功能測試</h4>
+            <ul>
+                <li><strong>動態標籤：</strong>節點標籤只在加入Queue時顯示</li>
+                <li><strong>Queue簡化：</strong>只顯示字母（A、B、C...），無node_前綴</li>
+                <li><strong>當前節點：</strong>Queue下方顯示正在處理的節點</li>
+                <li><strong>黑白風格：</strong>簡約教學外觀</li>
+            </ul>
+        </div>
+
+        <!-- 分頁導航 -->
+        <div class="tabs">
+            <div class="tab active" data-tab="bfs">廣度優先搜尋 (BFS)</div>
+            <div class="tab" data-tab="dfs">深度優先搜尋 (DFS)</div>
+        </div>
+
+        <!-- BFS 頁面 -->
+        <div id="bfs" class="tab-content active">
+            <div class="algorithm-container">
+                <h2>廣度優先搜尋 (Breadth-First Search)</h2>
+                
+                <!-- BFS 視覺化區域 -->
+                <div class="visualization-section">
+                    <div class="visualization-container">
+                        <div class="graph-area">
+                            <h4>圖形結構</h4>
+                            <svg id="bfs-graph" class="graph-svg"></svg>
+                        </div>
+                        <div class="queue-area">
+                            <h4>Queue (佇列) 狀態</h4>
+                            <div id="bfs-queue" class="queue-container">
+                                <div class="queue-label">Queue:</div>
+                                <div class="queue-items"></div>
+                                <div class="current-node-display">
+                                    <div class="current-node-label">當前取出節點:</div>
+                                    <div id="bfs-current-node" class="current-node-item">無</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 控制面板 -->
+                <div class="controls-section">
+                    <button class="btn" id="bfs-start">開始 BFS</button>
+                    <button class="btn btn-secondary" id="bfs-step">單步執行</button>
+                    <button class="btn btn-secondary" id="bfs-reset">重置</button>
+                    <button class="btn btn-secondary" id="bfs-random">隨機圖形</button>
+                </div>
+
+                <!-- 速度控制 -->
+                <div class="speed-control">
+                    <label for="bfs-speed">執行速度：</label>
+                    <input type="range" id="bfs-speed" class="speed-slider" min="1" max="10" value="5">
+                    <span>快</span>
+                </div>
+
+                <!-- 狀態顯示 -->
+                <div class="status-display" id="bfs-status">
+                    點擊「開始 BFS」開始搜尋演算法演示
+                </div>
+
+                <!-- 訪問順序顯示 -->
+                <div class="visit-order">
+                    <h4>訪問順序：</h4>
+                    <div id="bfs-visit-order" class="visit-sequence"></div>
+                </div>
+
+                <!-- 圖例說明 -->
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-color default"></div>
+                        <span>未訪問</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color in-queue"></div>
+                        <span>在佇列中</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color current"></div>
+                        <span>當前處理</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color visited"></div>
+                        <span>已訪問</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DFS 頁面 -->
+        <div id="dfs" class="tab-content">
+            <div class="algorithm-container">
+                <h2>深度優先搜尋 (Depth-First Search)</h2>
+                
+                <!-- DFS 視覺化區域 -->
+                <div class="visualization-section">
+                    <div class="visualization-container">
+                        <div class="graph-area">
+                            <h4>圖形結構</h4>
+                            <svg id="dfs-graph" class="graph-svg"></svg>
+                        </div>
+                        <div class="stack-area">
+                            <h4>Stack (堆疊) 狀態</h4>
+                            <div id="dfs-stack" class="stack-container">
+                                <div class="stack-label">Stack:</div>
+                                <div class="stack-items"></div>
+                                <div class="current-node-display">
+                                    <div class="current-node-label">當前取出節點:</div>
+                                    <div id="dfs-current-node" class="current-node-item">無</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 控制面板 -->
+                <div class="controls-section">
+                    <button class="btn" id="dfs-start">開始 DFS</button>
+                    <button class="btn btn-secondary" id="dfs-step">單步執行</button>
+                    <button class="btn btn-secondary" id="dfs-reset">重置</button>
+                    <button class="btn btn-secondary" id="dfs-random">隨機圖形</button>
+                </div>
+
+                <!-- 速度控制 -->
+                <div class="speed-control">
+                    <label for="dfs-speed">執行速度：</label>
+                    <input type="range" id="dfs-speed" class="speed-slider" min="1" max="10" value="5">
+                    <span>快</span>
+                </div>
+
+                <!-- 狀態顯示 -->
+                <div class="status-display" id="dfs-status">
+                    點擊「開始 DFS」開始搜尋演算法演示
+                </div>
+
+                <!-- 訪問順序顯示 -->
+                <div class="visit-order">
+                    <h4>訪問順序：</h4>
+                    <div id="dfs-visit-order" class="visit-sequence"></div>
+                </div>
+
+                <!-- 圖例說明 -->
+                <div class="legend-container">
+                    <div class="legend-item">
+                        <div class="legend-color default"></div>
+                        <span>未訪問</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color in-stack"></div>
+                        <span>在堆疊中</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color current"></div>
+                        <span>當前處理</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color visited"></div>
+                        <span>已訪問</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 檔案 - 正確的載入順序 -->
+    <script>
+        console.log('開始載入JavaScript檔案...');
+    </script>
+    <script src="scripts/graph-structure.js"></script>
+    <script>
+        console.log('GraphStructure 載入完成:', typeof GraphStructure);
+    </script>
+    <script src="scripts/bfs-algorithm.js"></script>
+    <script>
+        console.log('BFSAlgorithm 載入完成:', typeof BFSAlgorithm);
+    </script>
+    <script src="scripts/dfs-algorithm.js"></script>
+    <script>
+        console.log('DFSAlgorithm 載入完成:', typeof DFSAlgorithm);
+    </script>
+    <script src="scripts/graph-search-ui.js"></script>
+    <script>
+        console.log('所有檔案載入完成');
+        
+        // 確保在DOM載入完成後初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+        
+        function initializeApp() {
+            console.log('DOM已準備就緒，開始初始化應用程式...');
+            try {
+                window.graphSearchUI = new GraphSearchUI();
+                console.log('✅ 應用程式初始化成功');
+            } catch (error) {
+                console.error('❌ 應用程式初始化失敗:', error);
+            }
+        }
+    </script>
+</body>
+</html>

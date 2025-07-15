@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>L4 二維串列應用 - APCS進階班</title>
     <link rel="stylesheet" href="../../../styles/styles.css">
-    <link rel="stylesheet" href="styles/index_minimal.css">
 </head>
 <body>
     <div class="container">
@@ -24,7 +23,7 @@
             <p>
                 透過視覺化演示，你將學會如何在二維陣列中進行網格搜尋，
                 包括<strong>4-neighbors</strong>和<strong>8-neighbors</strong>的搜尋方式，
-                並實作經典的<strong>Flood Fill 演算法</strong>。
+                並實作經典的<strong>Flood Fill 演算法</strong>，理解座標系統和邊界檢查的重要性。
             </p>
         </div>
         
@@ -36,12 +35,13 @@
                 <div class="card-body">
                     <p>理解二維陣列中行列座標系統的基本概念，學會正確使用 (i, j) 索引。</p>
                     <ul class="card-features">
-                        <li>互動式座標顯示</li>
-                        <li>視覺化索引說明</li>
-                        <li>實際例子演示</li>
-                        <li>常見錯誤提醒</li>
+                        <li>互動式座標顯示系統</li>
+                        <li>視覺化索引說明圖解</li>
+                        <li>實際例子動態演示</li>
+                        <li>常見錯誤警示提醒</li>
+                        <li>座標轉換練習</li>
                     </ul>
-                    <a href="row_column_concept.html" class="demo-button">開始學習</a>
+                    <a href="row_column_concept.html" class="demo-button">學習座標概念</a>
                 </div>
             </div>
 
@@ -54,28 +54,71 @@
                     <ul class="card-features">
                         <li>4-鄰居搜尋演示</li>
                         <li>8-鄰居搜尋演示</li>
-                        <li>Flood Fill 動畫</li>
-                        <li>邊界檢查機制</li>
-                        <li>回溯過程展示</li>
+                        <li>Flood Fill 動畫效果</li>
+                        <li>邊界檢查機制展示</li>
+                        <li>回溯過程視覺化</li>
                     </ul>
-                    <a href="grid_traversal.html" class="demo-button">開始演示</a>
+                    <a href="grid_traversal.html" class="demo-button">開始網格搜尋</a>
                 </div>
             </div>
         </div>
 
-        <div class="learning-objectives">
-            <h2>學習目標</h2>
-            <ul>
-                <li>清楚理解二維陣列的索引方式和座標系統</li>
-                <li>掌握網格搜尋的基本概念和實作方法</li>
-                <li>學會實作連通區域搜尋演算法</li>
-                <li>理解邊界檢查和回溯機制的重要性</li>
-                <li>能夠應用於實際問題解決和程式設計</li>
-            </ul>
+        <div class="comparison-section">
+            <h2>網格搜尋方法比較</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>4-Neighbors 搜尋</h4>
+                    <p><strong>方向:</strong> 上、下、左、右</p>
+                    <p><strong>鄰居數:</strong> 最多4個</p>
+                    <p><strong>應用:</strong> 迷宮路徑、連通區域</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>8-Neighbors 搜尋</h4>
+                    <p><strong>方向:</strong> 包含對角線方向</p>
+                    <p><strong>鄰居數:</strong> 最多8個</p>
+                    <p><strong>應用:</strong> 圖像處理、遊戲AI</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>Flood Fill 演算法</h4>
+                    <p><strong>原理:</strong> 遞迴或佇列實作</p>
+                    <p><strong>特色:</strong> 連通區域填充</p>
+                    <p><strong>應用:</strong> 小畫家油漆桶、島嶼計數</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="extension-topics">
+            <div class="topic-card">
+                <h4>🎯 座標系統重點</h4>
+                <p>二維陣列的索引方式與數學座標系統有所不同，需要特別注意行列的定義。</p>
+                <div class="practice-hints">
+                    <strong>重要概念：</strong>
+                    <ul>
+                        <li>array[i][j] 中 i 代表列(row)，j 代表行(column)</li>
+                        <li>二維陣列的原點通常在左上角 (0,0)</li>
+                        <li>邊界檢查防止陣列越界錯誤</li>
+                        <li>理解記憶體中的儲存方式</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic-card">
+                <h4>💡 實際應用場景</h4>
+                <p>二維陣列廣泛應用於遊戲開發、圖像處理、地圖系統等領域。</p>
+                <div class="practice-hints">
+                    <strong>應用實例：</strong>
+                    <ul>
+                        <li>遊戲地圖的格子系統</li>
+                        <li>圖像的像素處理</li>
+                        <li>迷宮自動生成與求解</li>
+                        <li>棋盤遊戲的邏輯實作</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <div class="navigation">
-            <a href="../2_time_space_complexity/index.html" class="nav-button">← 上一課：時間與空間複雜度</a>
+            <a href="../2_time_space_complexity/index.html" class="nav-button">← 上一課：複雜度</a>
             <a href="row_column_concept.html" class="nav-button">開始學習 →</a>
         </div>
     </div>

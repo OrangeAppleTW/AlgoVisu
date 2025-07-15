@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L7 貪心演算法 - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>貪心演算法</h1>
+        <div class="lesson-info">
+            學習貪心演算法的基本概念，並透過 Dijkstra's Algorithm 和合併排序法來理解不同演算法策略
+        </div>
+        
+        <div class="intro-section">
+            <h2>什麼是貪心演算法？</h2>
+            <p>
+                <strong>貪心演算法（Greedy Algorithm）</strong>是一種演算法設計技巧，在每一步都選擇當前看起來最好的選擇，
+                希望最終能得到全域最佳解。貪心演算法的特點是每次都做局部最優的決定，不會回頭修改之前的選擇。
+            </p>
+            <p>
+                在本課程中，我們將透過<strong>Dijkstra's Algorithm</strong>來學習貪心策略的實際應用，
+                並與<strong>分治法（Divide and Conquer）</strong>形成有趣的對比。
+            </p>
+        </div>
+        
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>Dijkstra's Algorithm</h3>
+                </div>
+                <div class="card-body">
+                    <p>學習經典的最短路徑演算法，了解貪心策略在圖論中的應用。</p>
+                    <ul class="card-features">
+                        <li>🗺️ <strong>最短路徑</strong>：找出兩點間最短距離</li>
+                        <li>🎯 <strong>貪心選擇</strong>：每次選擇距離最小的節點</li>
+                        <li>📊 <strong>逐步視覺化</strong>：觀察演算法執行過程</li>
+                        <li>📋 <strong>距離表格</strong>：追蹤每個節點的狀態</li>
+                        <li>🔍 <strong>路徑追蹤</strong>：顯示完整最短路徑</li>
+                    </ul>
+                    <a href="dijkstra.html" class="demo-button">學習 Dijkstra</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>合併排序法視覺化</h3>
+                </div>
+                <div class="card-body">
+                    <p>透過動畫演示理解分治法的三個核心步驟：切割、求解、合併。</p>
+                    <ul class="card-features">
+                        <li>🔪 <strong>切割</strong>：將大問題分解成小問題</li>
+                        <li>🔄 <strong>遞迴求解</strong>：解決較小規模的相同問題</li>
+                        <li>🔗 <strong>合併</strong>：將子問題的解組合成原問題的解</li>
+                        <li>📊 逐步動畫演示分割過程</li>
+                        <li>🎯 視覺化合併過程</li>
+                    </ul>
+                    <a href="merge_sort.html" class="demo-button">學習合併排序</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>貪心 vs 分治</h3>
+                </div>
+                <div class="card-body">
+                    <p>了解兩種不同演算法設計策略的差異和應用場景。</p>
+                    <ul class="card-features">
+                        <li>💡 貪心：局部最優選擇</li>
+                        <li>🌳 分治：問題分解與合併</li>
+                        <li>⚖️ 時間複雜度比較</li>
+                        <li>🎯 適用問題類型</li>
+                        <li>📈 效能分析</li>
+                    </ul>
+                    <a href="comparison.html" class="demo-button">策略比較</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="learning-objectives">
+            <h2>學習目標</h2>
+            <div class="objectives-grid">
+                <div class="objective-item">
+                    <h4>🧠 理解貪心演算法</h4>
+                    <p>掌握貪心策略的核心思想：每步都做局部最優選擇</p>
+                </div>
+                <div class="objective-item">
+                    <h4>👁️ 視覺化學習</h4>
+                    <p>透過 Dijkstra 演算法觀察貪心策略的實際應用</p>
+                </div>
+                <div class="objective-item">
+                    <h4>⚡ 演算法分析</h4>
+                    <p>理解最短路徑問題與時間複雜度分析</p>
+                </div>
+                <div class="objective-item">
+                    <h4>🔄 策略對比</h4>
+                    <p>比較貪心演算法與分治法的設計思想差異</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="algorithm-intro">
+            <h2>貪心演算法核心概念</h2>
+            <div class="concept-explanation">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>局部最優選擇</h4>
+                        <p>在每一步都選擇當前狀態下的最佳選項，不考慮全局影響。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>不可撤銷性</h4>
+                        <p>一旦做出選擇就不再改變，演算法不會回頭修正之前的決定。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>最優子結構</h4>
+                        <p>問題的最優解包含其子問題的最優解，這是貪心策略有效的關鍵。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="../6_graph_search/index.html" class="nav-button">← 上一課：圖形搜尋方法</a>
+            <a href="dijkstra.html" class="nav-button">開始學習 →</a>
+        </div>
+    </div>
+    
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L3 枚舉與遍歷 - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>枚舉與遍歷</h1>
+        <div class="lesson-info">
+            透過視覺化演示學習如何用遞迴方式枚舉所有可能的解，掌握解題的重要基礎技巧
+        </div>
+        
+        <div class="intro-section">
+            <h2>什麼是枚舉？</h2>
+            <p>
+                <strong>枚舉（Enumeration）</strong>是程式設計中解決問題的重要基礎技巧，簡單來說就是<strong>「列出所有可能的情況」</strong>。
+                想像你要找出所有可能的密碼組合，或是列出一個集合的所有子集，這些都需要用到枚舉的概念。
+            </p>
+            <p>
+                透過遞迴的方式進行枚舉，我們可以系統性地探索所有可能的解空間。
+                這節課將學習五種重要的枚舉模式：<strong>數字枚舉</strong>、<strong>子集枚舉</strong>、<strong>組合枚舉</strong>、<strong>元組枚舉</strong>和<strong>排列枚舉</strong>。
+                每種模式都有其特定的應用場景和遞迴結構。
+            </p>
+        </div>
+        
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>🔢 數字枚舉演示</h3>
+                </div>
+                <div class="card-body">
+                    <p>演示如何枚舉數字1~10選擇五次的所有可能情況，理解基本的遞迴枚舉結構。</p>
+                    <ul class="card-features">
+                        <li>學習最基本的遞迴枚舉模式</li>
+                        <li>觀察遞迴樹的展開過程</li>
+                        <li>理解解空間的大小計算</li>
+                        <li>掌握遞迴的終止條件設定</li>
+                    </ul>
+                    <a href="numbers-enumeration.html" class="demo-button">開始學習數字枚舉</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>📦 子集枚舉演示</h3>
+                </div>
+                <div class="card-body">
+                    <p>學習如何枚舉集合的所有子集，包含空集合在內的所有可能組合。</p>
+                    <ul class="card-features">
+                        <li>理解「選擇」與「不選擇」的二分概念</li>
+                        <li>觀察 2^n 個子集的生成過程</li>
+                        <li>學習回溯技巧的應用</li>
+                        <li>掌握子集問題的遞迴結構</li>
+                    </ul>
+                    <a href="subsets-enumeration.html" class="demo-button">開始學習子集枚舉</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>🎯 組合枚舉演示</h3>
+                </div>
+                <div class="card-body">
+                    <p>學習 C(n,m) 組合的枚舉，理解如何從 n 個元素中選出 m 個的所有方法。</p>
+                    <ul class="card-features">
+                        <li>理解組合與子集的差異</li>
+                        <li>學習剪枝優化技巧</li>
+                        <li>觀察組合數的實際計算過程</li>
+                        <li>掌握有限制條件的枚舉</li>
+                    </ul>
+                    <a href="combinations-enumeration.html" class="demo-button">開始學習組合枚舉</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>🔄 排列枚舉演示</h3>
+                </div>
+                <div class="card-body">
+                    <p>學習如何枚舉所有可能的排列，每個元素只能使用一次且順序重要。</p>
+                    <ul class="card-features">
+                        <li>理解排列與組合的重要差異</li>
+                        <li>學習使用標記陣列避免重複</li>
+                        <li>觀察 n! 種排列的生成過程</li>
+                        <li>掌握狀態回溯的精髓</li>
+                    </ul>
+                    <a href="permutations-enumeration.html" class="demo-button">開始學習排列枚舉</a>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="comparison-section">
+            <h2>三種枚舉方法比較</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>數字枚舉</h4>
+                    <p><strong>特點:</strong> 每個位置可選1~N</p>
+                    <p><strong>解空間:</strong> N^k 種可能</p>
+                    <p><strong>應用:</strong> 基本的遞迴練習</p>
+                    <p><strong>關鍵:</strong> 位置遞迴填充</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>子集枚舉</h4>
+                    <p><strong>特點:</strong> 每個元素選或不選</p>
+                    <p><strong>解空間:</strong> 2^n 種可能</p>
+                    <p><strong>應用:</strong> 集合問題、背包問題</p>
+                    <p><strong>關鍵:</strong> 二元選擇遞迴</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>組合枚舉</h4>
+                    <p><strong>特點:</strong> 從n個中選m個</p>
+                    <p><strong>解空間:</strong> C(n,m) 種可能</p>
+                    <p><strong>應用:</strong> 組隊問題、選擇問題</p>
+                    <p><strong>關鍵:</strong> 起始位置控制</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>排列枚舉</h4>
+                    <p><strong>特點:</strong> 順序重要、不可重複</p>
+                    <p><strong>解空間:</strong> n! 種可能</p>
+                    <p><strong>應用:</strong> 排序問題、路徑規劃</p>
+                    <p><strong>關鍵:</strong> 使用標記避免重複</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="extension-topics">
+            <div class="topic-card">
+                <h4>🎯 教學流程建議</h4>
+                <p>從最簡單的數字枚舉開始，逐步引入子集、組合、元組和排列的概念，每種都要強調其遞迴結構的差異。</p>
+                <div class="practice-hints">
+                    <strong>教學重點：</strong>
+                    <ul>
+                        <li>強調每種枚舉的遞迴終止條件</li>
+                        <li>比較不同枚舉的解空間大小</li>
+                        <li>示範回溯過程的狀態恢復</li>
+                        <li>解釋選擇與不選擇的邏輯差異</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic-card">
+                <h4>💡 學習要點</h4>
+                <p>枚舉是解決組合數學問題的基礎，理解不同枚舉模式有助於解決更複雜的演算法問題。</p>
+                <div class="practice-hints">
+                    <strong>練習方向：</strong>
+                    <ul>
+                        <li>手動追蹤每種枚舉的遞迴樹</li>
+                        <li>計算並驗證解空間的大小</li>
+                        <li>識別實際問題適用的枚舉模式</li>
+                        <li>練習設計不同的剪枝策略</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="../index.html" class="nav-button">← 回到課程大綱</a>
+            <a href="numbers-enumeration.html" class="nav-button">開始學習 →</a>
+        </div>
+    </div>
+    
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

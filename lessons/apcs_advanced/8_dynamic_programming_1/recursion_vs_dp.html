@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>遞迴 vs 動態規劃 - 效率比較分析</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="comparison_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>遞迴 vs 動態規劃 - 效率比較分析</h1>
+        
+        <div class="intro-section">
+            <p>
+                本頁面詳細比較純遞迴方法與動態規劃方法在解決爬樓梯問題時的效率差異。
+                透過視覺化的方式展示為什麼動態規劃能夠大幅提升演算法效率。
+            </p>
+        </div>
+
+        <div class="controls-section">
+            <div class="input-group">
+                <label for="comparison-n">測試樓梯階數:</label>
+                <input type="number" id="comparison-n" min="1" max="12" value="6">
+                <button id="run-comparison">執行比較</button>
+                <button id="reset-comparison">重置</button>
+            </div>
+            
+            <div class="method-selector">
+                <label>
+                    <input type="radio" name="method" value="both" checked>
+                    同時比較
+                </label>
+                <label>
+                    <input type="radio" name="method" value="recursive">
+                    只顯示遞迴
+                </label>
+                <label>
+                    <input type="radio" name="method" value="dp">
+                    只顯示動態規劃
+                </label>
+            </div>
+        </div>
+
+        <div class="comparison-container">
+            <!-- 效能統計 -->
+            <div class="performance-stats">
+                <h3>效能統計</h3>
+                <div class="stats-grid">
+                    <div class="stat-card recursive-stats">
+                        <h4>純遞迴方法</h4>
+                        <div class="stat-item">
+                            <span class="stat-label">函數調用次數:</span>
+                            <span class="stat-value" id="recursive-calls">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">時間複雜度:</span>
+                            <span class="stat-value" id="recursive-complexity">O(2ⁿ)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">執行時間:</span>
+                            <span class="stat-value" id="recursive-time">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card dp-stats">
+                        <h4>動態規劃方法</h4>
+                        <div class="stat-item">
+                            <span class="stat-label">計算次數:</span>
+                            <span class="stat-value" id="dp-calls">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">時間複雜度:</span>
+                            <span class="stat-value" id="dp-complexity">O(n)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">執行時間:</span>
+                            <span class="stat-value" id="dp-time">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card improvement-stats">
+                        <h4>效率提升</h4>
+                        <div class="stat-item">
+                            <span class="stat-label">速度提升:</span>
+                            <span class="stat-value" id="speed-improvement">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">調用減少:</span>
+                            <span class="stat-value" id="call-reduction">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 視覺化比較 -->
+            <div class="visualization-comparison">
+                <div class="method-visualization" id="recursive-visualization">
+                    <h3>純遞迴方法執行過程</h3>
+                    <div class="execution-info">
+                        <p>觀察遞迴調用如何重複計算相同的子問題</p>
+                        <div class="legend">
+                            <span class="legend-item first-call">首次調用</span>
+                            <span class="legend-item repeated-call">重複調用</span>
+                            <span class="legend-item base-case">基礎情況</span>
+                        </div>
+                    </div>
+                    <div class="recursive-tree" id="recursive-tree"></div>
+                    <div class="call-sequence" id="call-sequence">
+                        <h4>函數調用序列</h4>
+                        <div class="sequence-container"></div>
+                    </div>
+                </div>
+
+                <div class="method-visualization" id="dp-visualization">
+                    <h3>動態規劃方法執行過程</h3>
+                    <div class="execution-info">
+                        <p>觀察DP如何避免重複計算，直接從表格中取值</p>
+                        <div class="legend">
+                            <span class="legend-item computed">已計算</span>
+                            <span class="legend-item computing">計算中</span>
+                            <span class="legend-item lookup">表格查詢</span>
+                        </div>
+                    </div>
+                    <div class="dp-execution" id="dp-execution">
+                        <div class="dp-table-container">
+                            <table class="comparison-dp-table" id="comparison-dp-table"></table>
+                        </div>
+                        <div class="execution-steps" id="execution-steps"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 重複計算分析 -->
+            <div class="duplication-analysis">
+                <h3>重複計算分析</h3>
+                <div class="analysis-content">
+                    <div class="duplication-chart" id="duplication-chart">
+                        <!-- 重複計算的視覺化圖表 -->
+                    </div>
+                    <div class="duplication-details" id="duplication-details">
+                        <!-- 詳細的重複計算統計 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 時間複雜度成長圖 -->
+            <div class="complexity-growth">
+                <h3>時間複雜度成長比較</h3>
+                <div class="growth-chart" id="growth-chart">
+                    <!-- 使用簡單的HTML/CSS繪製成長圖 -->
+                </div>
+                <div class="growth-explanation">
+                    <p>
+                        當n增加時，純遞迴的調用次數呈指數級增長，而動態規劃保持線性增長。
+                        這就是為什麼動態規劃在處理較大問題時效率顯著提升的原因。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="key-concepts">
+            <h3>關鍵概念總結</h3>
+            <div class="concepts-grid">
+                <div class="concept-card">
+                    <h4>🔄 重疊子問題</h4>
+                    <p>純遞迴會多次計算相同的f(n)值，例如計算f(5)時，f(3)會被計算多次。動態規劃將結果存儲避免重複。</p>
+                </div>
+                <div class="concept-card">
+                    <h4>💾 記憶化存儲</h4>
+                    <p>DP表格就像一個記憶體，一旦計算出f(i)的值就存儲起來，需要時直接查表，不需要重新計算。</p>
+                </div>
+                <div class="concept-card">
+                    <h4>⚡ 時間複雜度</h4>
+                    <p>純遞迴：O(2ⁿ)，每次分裂成兩個子問題。動態規劃：O(n)，每個問題只計算一次。</p>
+                </div>
+                <div class="concept-card">
+                    <h4>🎯 最優子結構</h4>
+                    <p>f(n)的最優解由f(n-1)和f(n-2)的最優解構成，這個性質讓動態規劃方法有效。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="code-comparison">
+            <h3>程式碼比較</h3>
+            <div class="code-blocks">
+                <div class="code-block">
+                    <h4>純遞迴實作</h4>
+                    <pre><code>function climbStairsRecursive(n) {
+    // 基礎情況
+    if (n <= 2) {
+        return n;
+    }
+    
+    // 遞迴調用
+    return climbStairsRecursive(n - 1) + 
+           climbStairsRecursive(n - 2);
+}
+
+// 時間複雜度: O(2^n)
+// 空間複雜度: O(n) - 遞迴調用棧</code></pre>
+                </div>
+                
+                <div class="code-block">
+                    <h4>動態規劃實作</h4>
+                    <pre><code>function climbStairsDP(n) {
+    // 建立DP表格
+    const dp = new Array(n + 1);
+    
+    // 初始條件
+    dp[1] = 1;
+    dp[2] = 2;
+    
+    // 填充表格
+    for (let i = 3; i <= n; i++) {
+        dp[i] = dp[i - 1] + dp[i - 2];
+    }
+    
+    return dp[n];
+}
+
+// 時間複雜度: O(n)
+// 空間複雜度: O(n) - DP表格</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="stair_climbing.html" class="nav-button">← 回到爬樓梯視覺化</a>
+            <a href="state_tree.html" class="nav-button">狀態轉移樹 →</a>
+        </div>
+    </div>
+
+    <script src="comparison_data.js"></script>
+    <script src="comparison_renderer.js"></script>
+    <script src="comparison_controller.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

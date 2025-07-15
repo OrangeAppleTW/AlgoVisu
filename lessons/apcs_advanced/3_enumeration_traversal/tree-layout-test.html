@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專注模式樹狀圖調整測試</title>
+    <link rel="stylesheet" href="focus-mode-styles.css">
+</head>
+<body>
+    <div class="focus-container">
+        <!-- 左側：樹狀圖視覺化區域 -->
+        <div class="tree-section">
+            <h2 class="section-title">🌳 組合搜尋樹視覺化</h2>
+            <div class="tree-visualization">
+                <div id="combination-tree" class="tree-container">
+                    <!-- 樹狀圖節點會在這裡動態生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：控制面板 -->
+        <div class="control-section">
+            <h2 class="section-title">🎮 控制面板</h2>
+            
+            <!-- 問題設置 -->
+            <div class="problem-setup">
+                <div class="setup-row">
+                    <span>從集合選擇：</span>
+                    <div class="elements-display">
+                        <div class="element-item">1</div>
+                        <div class="element-item">2</div>
+                        <div class="element-item">3</div>
+                    </div>
+                </div>
+                <div class="setup-row">
+                    <span>選擇數量：</span>
+                    <select id="m-selector" class="m-selector">
+                        <option value="2" selected>2</option>
+                        <option value="1">1</option>
+                        <option value="3">3</option>
+                    </select>
+                    <span id="combination-formula">C(3,2) = 3</span>
+                </div>
+            </div>
+
+            <!-- 當前組合 -->
+            <div class="current-combination">
+                <h3>當前組合</h3>
+                <div id="combination-slots" class="combination-slots">
+                    <div class="slot">?</div>
+                    <div class="slot">?</div>
+                </div>
+                <div style="margin-top: 10px;">起始位置：<span id="start-position">0</span></div>
+            </div>
+
+            <!-- 狀態顯示 -->
+            <div id="status" class="status-display">
+                準備開始 C(3,2) 組合枚舉
+            </div>
+
+            <!-- 剪枝資訊 -->
+            <div id="pruning-info" class="pruning-info">
+                剪枝：剩餘元素不足以形成有效組合
+            </div>
+
+            <!-- 控制按鈕 -->
+            <div class="control-buttons">
+                <button id="start-btn" class="control-button primary">開始枚舉</button>
+                <button id="reset-btn" class="control-button secondary">重新開始</button>
+                <button id="step-btn" class="control-button secondary" disabled>下一步</button>
+                <button id="auto-btn" class="control-button secondary" disabled>自動執行</button>
+            </div>
+
+            <!-- 組合計數 -->
+            <div class="combination-counter">
+                已找到組合：<span id="combination-count">0 / 3</span>
+            </div>
+
+            <!-- 找到的組合列表 -->
+            <div style="background: white; border-radius: 8px; padding: 15px; margin-top: 15px; max-height: 200px; overflow-y: auto;">
+                <h4 style="margin: 0 0 10px 0; color: #2c3e50;">找到的組合</h4>
+                <div id="combinations-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入相關腳本 -->
+    <script src="combinations-core.js"></script>
+    <script src="combinations-tree.js"></script>
+    <script src="focus-combinations-init.js"></script>
+    
+    <script>
+        console.log('專注模式樹狀圖調整測試開始...');
+        
+        // 測試樹狀圖顯示
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM已載入，初始化測試...');
+            
+            try {
+                // 直接測試樹狀圖視覺化器
+                const mockParent = {
+                    combinationTree: document.getElementById('combination-tree'),
+                    elements: [1, 2, 3],
+                    m: 2,
+                    treeNodes: {},
+                    treeEdges: []
+                };
+                
+                const treeVisualizer = new CombinationTreeVisualizer(mockParent);
+                console.log('樹狀圖視覺化器創建成功');
+                
+                // 創建樹狀結構來測試新的布局
+                treeVisualizer.createTreeStructure();
+                console.log('✅ 樹狀圖結構創建成功');
+                
+                // 測試高亮功能
+                setTimeout(() => {
+                    console.log('測試路徑高亮...');
+                    treeVisualizer.highlightCurrentPath(['select']);
+                }, 1000);
+                
+                setTimeout(() => {
+                    treeVisualizer.highlightCurrentPath(['select', 'select']);
+                }, 2000);
+                
+                setTimeout(() => {
+                    treeVisualizer.highlightCurrentPath(['select', 'skip']);
+                }, 3000);
+                
+            } catch (error) {
+                console.error('❌ 樹狀圖測試失敗:', error);
+            }
+        });
+        
+        // 視窗大小改變時的測試
+        window.addEventListener('resize', function() {
+            console.log('視窗大小改變，檢查響應式效果');
+        });
+    </script>
+</body>
+</html>

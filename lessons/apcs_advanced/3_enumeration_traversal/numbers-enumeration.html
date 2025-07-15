@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>數字枚舉演示 - L3 枚舉與遍歷</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <style>
+        .enumeration-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .algorithm-display {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .tree-visualization {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 600px;
+            border: 2px solid #e0e0e0;
+            overflow: auto;
+            position: relative;
+        }
+
+        .control-panel {
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .current-solution {
+            background: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.1em;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #555;
+        }
+
+        .solution-array {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .array-cell {
+            width: 50px;
+            height: 50px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            background: #f0f0f0;
+            color: #333;
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .array-cell.active {
+            background: #999;
+            color: white;
+            border-color: #333;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(153, 153, 153, 0.5);
+        }
+
+        .array-cell.filled {
+            background: #666;
+            color: white;
+            border-color: #333;
+        }
+
+        @keyframes pulse-orange {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .recursion-stack {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #333;
+        }
+
+        .stack-level {
+            background: #f0f0f0;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .stack-level.current {
+            background: #666;
+            color: white;
+            border-color: #333;
+            font-weight: 600;
+        }
+
+        .solutions-display {
+            background: #f8f9fa;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #333;
+        }
+
+        .solution-item {
+            background: #f0f0f0;
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #333;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #333;
+        }
+
+        .solution-number {
+            background: #333;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            min-width: 30px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* 樹狀圖相關樣式 - 黑白簡約風格 */
+        .tree-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: auto;
+            min-height: 600px;
+            background-color: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .tree-node {
+            position: absolute;
+            background: #f0f0f0;
+            border: 2px solid #333;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+            font-family: 'Courier New', monospace;
+            color: #333;
+        }
+
+        .tree-node.root {
+            background: #333;
+            color: white;
+            border-color: #000;
+            width: 40px;
+            height: 40px;
+            font-size: 1em;
+        }
+
+        .tree-node.current {
+            background: #333;
+            color: white;
+            border-color: #000;
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(51, 51, 51, 0.5);
+        }
+
+        .tree-node.completed {
+            background: #666;
+            color: white;
+            border-color: #333;
+        }
+
+        .tree-node.exploring {
+            background: #999;
+            color: white;
+            border-color: #333;
+        }
+
+        .tree-node.level-0 {
+            background: #333;
+            color: white;
+            border-color: #000;
+        }
+
+        .tree-node.level-1 {
+            background: #f0f0f0;
+            color: #333;
+            border-color: #333;
+        }
+
+        .tree-node.level-2 {
+            background: #f0f0f0;
+            color: #333;
+            border-color: #333;
+        }
+
+        .tree-node.level-3 {
+            background: #f0f0f0;
+            color: #333;
+            border-color: #333;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { transform: scale(1.2); }
+            50% { transform: scale(1.3); }
+        }
+
+        .tree-edge {
+            position: absolute;
+            background: #999;
+            transform-origin: left center;
+            z-index: 5;
+            height: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .tree-edge.active {
+            background: #333;
+            height: 3px;
+            box-shadow: 0 0 5px rgba(51, 51, 51, 0.5);
+        }
+
+        .tree-edge.completed {
+            background: #666;
+            height: 3px;
+        }
+
+        .tree-edge.black {
+            background: #999;
+        }
+
+        .tree-level-indicator {
+            position: absolute;
+            left: 15px;
+            background: #333;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #555;
+        }
+
+        .tree-path-info {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 4px;
+            border: 2px solid #333;
+            font-size: 0.9em;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .tree-legend {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px;
+            border-radius: 4px;
+            border: 2px solid #333;
+            font-size: 0.8em;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 4px 0;
+        }
+
+        .legend-color {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            margin-right: 8px;
+            border: 2px solid #333;
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .control-buttons #start-btn {
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .control-buttons #reset-btn {
+            grid-column: 3;
+            grid-row: 1;
+        }
+
+        .control-buttons #prev-btn {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .control-buttons #step-btn {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        .control-buttons #auto-btn {
+            grid-column: 3;
+            grid-row: 2;
+        }
+
+        .control-button {
+            padding: 12px 20px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .control-button:hover:not(:disabled) {
+            background: #e0e0e0;
+            border-color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-button.primary {
+            background: #333;
+            color: white;
+            border-color: #000;
+        }
+
+        .control-button.primary:hover:not(:disabled) {
+            background: #000;
+            border-color: #333;
+        }
+
+        .control-button.secondary {
+            background: #f0f0f0;
+            color: #333;
+            border-color: #333;
+        }
+
+        .control-button.secondary:hover:not(:disabled) {
+            background: #e0e0e0;
+            border-color: #000;
+        }
+
+        .control-button:disabled {
+            background: #ccc;
+            color: #888;
+            border-color: #aaa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-display {
+            background: #f8f9fa;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .algorithm-info {
+            background: #f8f9fa;
+            border: 2px solid #333;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .algorithm-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .algorithm-info p {
+            margin: 8px 0;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .code-display {
+            background: #333;
+            color: #f0f0f0;
+            padding: 20px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin: 20px 0;
+            overflow-x: auto;
+            border: 2px solid #555;
+        }
+
+        .code-highlight {
+            background: #555;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        @media (max-width: 1024px) {
+            .algorithm-display {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .control-panel {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>數字枚舉演示</h1>
+        <div class="lesson-info">
+            學習如何用遞迴枚舉數字1~3選擇三次的所有可能情況
+        </div>
+
+        <div class="algorithm-info">
+            <h3>📚 演算法說明</h3>
+            <p><strong>問題：</strong>從數字1到3中，選擇3次（可重複），列出所有可能的組合。</p>
+            <p><strong>方法：</strong>使用遞迴函式，每次選擇一個位置要填入的數字，當填滿3個位置時輸出結果。</p>
+            <p><strong>解空間：</strong>總共有 3^3 = 27 種可能的組合。</p>
+            <p><strong>遞迴結構：</strong>backtrack(位置) → 嘗試每個數字 → backtrack(下一個位置)</p>
+        </div>
+
+        <div class="enumeration-container">
+            <div class="algorithm-display">
+                <div class="tree-visualization">
+                <h3 style="text-align: center; margin-bottom: 20px;">🌳 遞迴樹視覺化</h3>
+                <div class="tree-container" id="recursion-tree">
+                        <!-- 樹狀圖將在這裡動態生成 -->
+                        <div class="tree-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #333; border-color: #000;"></div>
+                                <span>根節點</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f0f0f0; border-color: #333;"></div>
+                                <span>第1層</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f0f0f0; border-color: #333;"></div>
+                                <span>第2層</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #f0f0f0; border-color: #333;"></div>
+                                <span>第3層</span>
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+                <div class="control-panel">
+                    <h3 style="text-align: center; margin-bottom: 20px;">🎮 控制面板</h3>
+                    
+                    <div class="current-solution">
+                        <div>當前解陣列</div>
+                        <div class="solution-array" id="solution-array">
+                            <div class="array-cell">?</div>
+                            <div class="array-cell">?</div>
+                            <div class="array-cell">?</div>
+                        </div>
+                    </div>
+
+                    <div class="status-display" id="status">
+                        準備開始枚舉
+                    </div>
+
+                    <div class="control-buttons">
+                        <button class="control-button primary" id="start-btn">開始枚舉</button>
+                        <button class="control-button secondary" id="reset-btn">重新開始</button>
+                        <button class="control-button primary" id="prev-btn" disabled>上一步</button>
+                        <button class="control-button primary" id="step-btn" disabled>下一步</button>
+                        <button class="control-button secondary" id="auto-btn" disabled>自動執行</button>
+                    </div>
+
+                    <div class="recursion-stack">
+                        <h4>📚 遞迴堆疊</h4>
+                        <div id="stack-display"></div>
+                    </div>
+
+                    <div style="text-align: center; margin: 20px 0;">
+                        <strong>已找到解的數量：<span id="solution-count">0</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="solutions-display">
+                <h3>✅ 找到的解（全部27個解）</h3>
+                <div id="solutions-list"></div>
+            </div>
+        </div>
+
+        <div class="code-display">
+            <div style="color: #81c784; margin-bottom: 10px;">// 數字枚舉演算法的Python實作</div>
+def backtrack(n):
+    if n == 3:  # 終止條件：已填滿3個位置
+        print(*solution)  # 輸出當前解
+        return
+    
+    for i in range(3):  # 嘗試數字1到3
+        solution[n] = i + 1  # 在位置n填入數字i+1
+        backtrack(n + 1)     # 遞迴處理下一個位置
+
+# 初始化
+solution = [0 for _ in range(3)]
+backtrack(0)  # 從位置0開始
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="nav-button">← 回到課程目錄</a>
+            <a href="subsets-enumeration.html" class="nav-button">下一個：子集枚舉 →</a>
+        </div>
+    </div>
+
+    <script src="numbers-enumeration.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

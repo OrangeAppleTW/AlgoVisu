@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BFS演算法測試</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="styles/graph-search.css">
+    <style>
+        /* 簡單的測試樣式 */
+        body { 
+            padding: 20px; 
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 BFS 演算法測試頁面</h1>
+        
+        <div class="test-section">
+            <h2>圖形與佇列視覺化</h2>
+            
+            <div class="visualization-container">
+                <div class="graph-area">
+                    <h4>圖形結構</h4>
+                    <svg id="bfs-graph" class="graph-svg"></svg>
+                </div>
+                <div class="queue-area">
+                    <h4>Queue (佇列) 狀態</h4>
+                    <div id="bfs-queue" class="queue-container">
+                        <div class="queue-label">Queue:</div>
+                        <div class="queue-items"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <button class="btn" id="bfs-start">開始 BFS</button>
+                <button class="btn btn-secondary" id="bfs-step">單步執行</button>
+                <button class="btn btn-secondary" id="bfs-reset">重置</button>
+                <button class="btn btn-secondary" id="bfs-random">隨機圖形</button>
+            </div>
+
+            <div class="speed-control">
+                <label for="bfs-speed">執行速度：</label>
+                <input type="range" id="bfs-speed" class="speed-slider" min="1" max="10" value="5">
+                <span>快</span>
+            </div>
+
+            <div class="status-display" id="bfs-status">
+                點擊「開始 BFS」開始搜尋演算法演示
+            </div>
+
+            <div class="visit-order">
+                <h4>訪問順序：</h4>
+                <div id="bfs-visit-order" class="visit-sequence"></div>
+            </div>
+
+            <div class="legend-container">
+                <div class="legend-item">
+                    <div class="legend-color default"></div>
+                    <span>未訪問</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color in-queue"></div>
+                    <span>在佇列中</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color current"></div>
+                    <span>當前處理</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color visited"></div>
+                    <span>已訪問</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>系統測試記錄</h2>
+            <div id="test-log" style="background: #f5f5f5; padding: 15px; border-radius: 4px; font-family: monospace; white-space: pre-line; max-height: 200px; overflow-y: auto;">
+                正在初始化測試環境...
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 檔案 -->
+    <script src="scripts/graph-structure.js"></script>
+    <script src="scripts/bfs-algorithm.js"></script>
+    <script>
+        // 測試日誌函數
+        function log(message) {
+            const logElement = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // 簡化的 UI 控制器用於測試
+        class TestUI {
+            constructor() {
+                log('開始初始化測試 UI...');
+                this.initializeComponents();
+                this.setupEventListeners();
+                log('測試 UI 初始化完成');
+            }
+
+            initializeComponents() {
+                try {
+                    // 圖形結構
+                    this.graph = new GraphStructure();
+                    this.graph.initializeGraph();
+                    log('✓ 圖形結構初始化成功');
+
+                    // BFS 元件
+                    this.bfsSvgRenderer = new TestSVGRenderer('bfs-graph', this.graph);
+                    this.bfsQueueRenderer = new TestQueueRenderer('bfs-queue');
+                    this.bfsAlgorithm = new BFSAlgorithm(this.graph, this.bfsSvgRenderer, this.bfsQueueRenderer);
+                    log('✓ BFS 演算法組件初始化成功');
+
+                    // 初始渲染
+                    this.bfsSvgRenderer.render();
+                    log('✓ 初始圖形渲染完成');
+                } catch (error) {
+                    log(`✗ 初始化錯誤: ${error.message}`);
+                    console.error('初始化錯誤:', error);
+                }
+            }
+
+            setupEventListeners() {
+                try {
+                    document.getElementById('bfs-start')?.addEventListener('click', () => {
+                        log('開始執行 BFS 演算法');
+                        this.bfsAlgorithm.start();
+                    });
+
+                    document.getElementById('bfs-step')?.addEventListener('click', () => {
+                        log('執行 BFS 單步');
+                        this.bfsAlgorithm.step();
+                    });
+
+                    document.getElementById('bfs-reset')?.addEventListener('click', () => {
+                        log('重置 BFS 演算法');
+                        this.bfsAlgorithm.reset();
+                    });
+
+                    document.getElementById('bfs-random')?.addEventListener('click', () => {
+                        log('生成隨機圖形');
+                        this.graph.generateRandomGraph();
+                        this.bfsSvgRenderer.render();
+                        this.bfsAlgorithm.reset();
+                    });
+
+                    document.getElementById('bfs-speed')?.addEventListener('input', (e) => {
+                        const speed = parseInt(e.target.value);
+                        log(`調整執行速度: ${speed}`);
+                        this.bfsAlgorithm.setSpeed(speed);
+                    });
+
+                    log('✓ 事件監聽器設置完成');
+                } catch (error) {
+                    log(`✗ 事件監聽器設置錯誤: ${error.message}`);
+                    console.error('事件監聽器錯誤:', error);
+                }
+            }
+        }
+
+        // 測試用的簡化渲染器
+        class TestSVGRenderer {
+            constructor(svgId, graph) {
+                this.svg = document.getElementById(svgId);
+                this.graph = graph;
+                this.setupSVG();
+            }
+
+            setupSVG() {
+                if (!this.svg) return;
+                this.svg.innerHTML = '';
+                this.svg.setAttribute('viewBox', '0 0 360 220');
+                this.svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+            }
+
+            render() {
+                if (!this.svg) return;
+                this.svg.innerHTML = '';
+                this.renderEdges();
+                this.renderNodes();
+            }
+
+            renderEdges() {
+                const edges = this.graph.getEdges();
+                const nodes = this.graph.getNodes();
+                const nodeMap = new Map(nodes.map(node => [node.id, node]));
+
+                edges.forEach(edge => {
+                    const fromNode = nodeMap.get(edge.from);
+                    const toNode = nodeMap.get(edge.to);
+                    
+                    if (fromNode && toNode) {
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', fromNode.x);
+                        line.setAttribute('y1', fromNode.y);
+                        line.setAttribute('x2', toNode.x);
+                        line.setAttribute('y2', toNode.y);
+                        line.setAttribute('class', 'graph-edge');
+                        this.svg.appendChild(line);
+                    }
+                });
+            }
+
+            renderNodes() {
+                const nodes = this.graph.getNodes();
+
+                nodes.forEach(node => {
+                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.setAttribute('class', 'graph-node');
+
+                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    circle.setAttribute('cx', node.x);
+                    circle.setAttribute('cy', node.y);
+                    circle.setAttribute('r', '20');
+                    circle.setAttribute('class', 'node-circle');
+
+                    if (node.current) circle.classList.add('current');
+                    else if (node.visited) circle.classList.add('visited');
+                    else if (node.inQueue) circle.classList.add('in-queue');
+
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', node.x);
+                    text.setAttribute('y', node.y);
+                    text.setAttribute('class', 'node-text');
+                    text.textContent = node.label;
+
+                    if (node.current) text.classList.add('current');
+                    else if (node.visited) text.classList.add('visited');
+                    else if (node.inQueue) text.classList.add('in-queue');
+
+                    group.appendChild(circle);
+                    group.appendChild(text);
+                    this.svg.appendChild(group);
+                });
+            }
+        }
+
+        class TestQueueRenderer {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.itemsContainer = this.container?.querySelector('.queue-items');
+            }
+
+            updateQueue(queue) {
+                if (!this.itemsContainer) return;
+                this.itemsContainer.innerHTML = '';
+
+                queue.forEach((item, index) => {
+                    const queueItem = document.createElement('div');
+                    queueItem.className = 'queue-item';
+                    queueItem.textContent = item;
+                    if (index === 0) queueItem.classList.add('front');
+                    this.itemsContainer.appendChild(queueItem);
+                });
+
+                if (queue.length === 0) {
+                    const emptyMsg = document.createElement('div');
+                    emptyMsg.textContent = '佇列為空';
+                    emptyMsg.style.color = '#999';
+                    emptyMsg.style.fontStyle = 'italic';
+                    this.itemsContainer.appendChild(emptyMsg);
+                }
+            }
+
+            clear() {
+                this.updateQueue([]);
+            }
+        }
+
+        // 當頁面載入完成後初始化測試
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                log('DOM 載入完成，開始初始化...');
+                window.testUI = new TestUI();
+                log('🎉 測試環境初始化成功！可以開始測試 BFS 演算法');
+            } catch (error) {
+                log(`💥 初始化失敗: ${error.message}`);
+                console.error('初始化失敗:', error);
+            }
+        });
+    </script>
+</body>
+</html>
