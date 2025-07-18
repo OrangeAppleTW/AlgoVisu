@@ -707,6 +707,13 @@
     color: #86efac;
 }
 
+/* 確保所有標點符號和未標記的文字都是亮色 */
+.code-view,
+.code-view code,
+.code-view pre {
+    color: #e2e8f0;
+}
+
 /* C++ 語法高亮樣式 */
 .code-view .preprocessor {
     color: #c084fc;

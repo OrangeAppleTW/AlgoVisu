@@ -51,12 +51,12 @@
             
             <div class="code-section">
                 <h4>遞迴程式碼</h4>
-                <pre><code>function fibonacci(n) {
-    if (n <= 2) return 1;
-    return fibonacci(n-1) + fibonacci(n-2);
-}
+                <pre><code><span class="keyword">def</span> <span class="function">fibonacci</span>(<span class="parameter">n</span>):
+    <span class="keyword">if</span> <span class="parameter">n</span> <span class="operator"><=</span> <span class="number">2</span>:
+        <span class="keyword">return</span> <span class="number">1</span>
+    <span class="keyword">return</span> <span class="function">fibonacci</span>(<span class="parameter">n</span><span class="operator">-</span><span class="number">1</span>) <span class="operator">+</span> <span class="function">fibonacci</span>(<span class="parameter">n</span><span class="operator">-</span><span class="number">2</span>)
 
-// 呼叫 fibonacci(8) 會產生大量重複計算</code></pre>
+<span class="comment"># 呼叫 fibonacci(8) 會產生大量重複計算</span></code></pre>
             </div>
         </div>
 
@@ -128,15 +128,13 @@
             
             <div class="code-section">
                 <h4>動態規劃程式碼</h4>
-                <pre><code>function fibonacciDP(n) {
-    let dp = [0, 1, 1];
-    for (let i = 3; i <= n; i++) {
-        dp[i] = dp[i-1] + dp[i-2];
-    }
-    return dp[n];
-}
+                <pre><code><span class="keyword">def</span> <span class="function">fibonacci_dp</span>(<span class="parameter">n</span>):
+    <span class="variable">dp</span> <span class="operator">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>]
+    <span class="keyword">for</span> <span class="parameter">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="number">3</span>, <span class="parameter">n</span> <span class="operator">+</span> <span class="number">1</span>):
+        <span class="variable">dp</span>.<span class="function">append</span>(<span class="variable">dp</span>[<span class="parameter">i</span><span class="operator">-</span><span class="number">1</span>] <span class="operator">+</span> <span class="variable">dp</span>[<span class="parameter">i</span><span class="operator">-</span><span class="number">2</span>])
+    <span class="keyword">return</span> <span class="variable">dp</span>[<span class="parameter">n</span>]
 
-// 每個 f(i) 只計算一次</code></pre>
+<span class="comment"># 每個 f(i) 只計算一次</span></code></pre>
             </div>
         </div>
 

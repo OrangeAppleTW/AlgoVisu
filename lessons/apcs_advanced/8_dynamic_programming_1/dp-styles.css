@@ -282,6 +282,60 @@
     color: #333;
 }
 
+/* Python 語法高亮樣式 */
+.code-section pre {
+    margin: 0;
+    background: #2d3748;
+    border-radius: 6px;
+    padding: 15px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.6;
+    border: 1px solid #e9ecef;
+    color: #e2e8f0; /* 預設文字顏色，包含標點符號 */
+}
+
+.code-section .keyword {
+    color: #ff7edb;
+    font-weight: bold;
+}
+
+.code-section .function {
+    color: #7dd3fc;
+    font-weight: bold;
+}
+
+.code-section .parameter {
+    color: #fbbf24;
+}
+
+.code-section .variable {
+    color: #a7f3d0;
+}
+
+.code-section .operator {
+    color: #f472b6;
+}
+
+.code-section .number {
+    color: #fde047;
+}
+
+.code-section .comment {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.code-section .string {
+    color: #86efac;
+}
+
+/* 確保程式碼區域內的所有文字都是亮色 */
+.code-section code {
+    color: #e2e8f0;
+}
+
 /* 樹狀圖節點樣式 */
 .tree-node {
     position: absolute;
