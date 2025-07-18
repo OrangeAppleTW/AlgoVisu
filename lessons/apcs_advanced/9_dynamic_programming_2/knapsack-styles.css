@@ -126,7 +126,6 @@
 
 .dp-table td.current {
     background: #ffeb3b !important;
-    border: 2px solid #f57f17;
     box-shadow: 0 0 8px rgba(245, 127, 23, 0.3);
 }
 
@@ -715,9 +714,10 @@
     100% { transform: scale(1); }
 }
 
-.dp-table td.current {
+/* 移除目標格的閃爍效果 */
+/* .dp-table td.current {
     animation: pulse 2s infinite;
-}
+} */
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
