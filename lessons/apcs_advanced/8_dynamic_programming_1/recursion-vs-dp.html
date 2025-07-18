@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動態規劃 - 爬樓梯問題</title>
+    
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="dp-styles.css">
+    
+    
+</head>
+<body>
+    <div class="container">
+        <h1>動態規劃 - 爬樓梯問題 (n=8)</h1>
+        
+        <div class="method-selector" style="display: none;">
+            <button id="show-dp" class="selector-btn active">動態規劃解法</button>
+            <button id="show-recursion" class="selector-btn">遞迴解法</button>
+        </div>
+
+        <!-- 遞迴解法區域 -->
+        <div id="recursion-section" class="method-display" style="display: none;">
+            <div class="method-header">
+                <h2>遞迴解法</h2>
+                <p class="method-description">
+                    從 f(8) 開始，每次都重新計算所有子問題，導致大量重複計算。
+                    觀察紅色節點代表重複計算的部分。
+                </p>
+                <div class="stats">
+                    <span>計算次數: <span id="recursion-count">0</span></span>
+                    <span>時間複雜度: O(2^n)</span>
+                    <span>空間複雜度: O(n)</span>
+                </div>
+            </div>
+            
+            <div class="method-controls">
+                <button id="recursion-prevBtn" disabled>上一步</button>
+                <button id="recursion-nextBtn">下一步</button>
+                <button id="recursion-autoBtn">自動播放</button>
+                <button id="recursion-pauseBtn" disabled>暫停</button>
+                <button id="recursion-resetBtn">重置</button>
+            </div>
+            
+            <div class="large-tree-container" id="recursion-tree"></div>
+            
+            <div class="step-info">
+                <h4>當前步驟</h4>
+                <p id="recursion-step-text">點擊「下一步」開始遞迴演示</p>
+            </div>
+            
+            <div class="code-section">
+                <h4>遞迴程式碼</h4>
+                <pre><code>function fibonacci(n) {
+    if (n <= 2) return 1;
+    return fibonacci(n-1) + fibonacci(n-2);
+}
+
+// 呼叫 fibonacci(8) 會產生大量重複計算</code></pre>
+            </div>
+        </div>
+
+        <!-- 動態規劃解法區域 -->
+        <div id="dp-section" class="method-display active">
+            <div class="method-header">
+                <h2>動態規劃解法</h2>
+                <p class="method-description">
+                    從 f(1), f(2) 開始由下而上建構，每個子問題只計算一次。
+                    觀察如何重複使用已計算的結果。
+                </p>
+                <div class="stats">
+                    <span>計算次數: <span id="dp-count">0</span></span>
+                    <span>時間複雜度: O(n)</span>
+                    <span>空間複雜度: O(n)</span>
+                </div>
+            </div>
+            
+            <div class="method-controls">
+                <button id="dp-prevBtn" disabled>上一步</button>
+                <button id="dp-nextBtn">下一步</button>
+                <button id="dp-autoBtn">自動播放</button>
+                <button id="dp-pauseBtn" disabled>暫停</button>
+                <button id="dp-resetBtn">重置</button>
+            </div>
+            
+            <div class="dp-visualization">
+                <div class="dp-table-section">
+                    <h4>DP表格</h4>
+                    <table class="dp-table" id="dp-table">
+                        <thead>
+                            <tr>
+                                <th>f(n)</th>
+                                <th>f(1)</th>
+                                <th>f(2)</th>
+                                <th>f(3)</th>
+                                <th>f(4)</th>
+                                <th>f(5)</th>
+                                <th>f(6)</th>
+                                <th>f(7)</th>
+                                <th>f(8)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th>值</th>
+                                <td id="dp-val-1">?</td>
+                                <td id="dp-val-2">?</td>
+                                <td id="dp-val-3">?</td>
+                                <td id="dp-val-4">?</td>
+                                <td id="dp-val-5">?</td>
+                                <td id="dp-val-6">?</td>
+                                <td id="dp-val-7">?</td>
+                                <td id="dp-val-8">?</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tree-section">
+                    <div class="large-tree-container" id="dp-tree"></div>
+                </div>
+            </div>
+            
+            <div class="step-info">
+                <h4>當前步驟</h4>
+                <p id="dp-step-text">點擊「下一步」開始動態規劃演示</p>
+            </div>
+            
+            <div class="code-section">
+                <h4>動態規劃程式碼</h4>
+                <pre><code>function fibonacciDP(n) {
+    let dp = [0, 1, 1];
+    for (let i = 3; i <= n; i++) {
+        dp[i] = dp[i-1] + dp[i-2];
+    }
+    return dp[n];
+}
+
+// 每個 f(i) 只計算一次</code></pre>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="nav-button">← 回到課程首頁</a>
+        </div>
+    </div>
+
+    <script src="tree-visualization.js"></script>
+    <script src="recursion-logic.js"></script>
+    <script src="dp-logic.js"></script>
+    <script src="toggle-comparison-controller.js"></script>
+    
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

@@ -464,6 +464,42 @@
             overflow-x: auto;
         }
 
+        /* Python 語法高亮 */
+        .code-display .keyword {
+            color: #ff7edb;
+            font-weight: bold;
+        }
+
+        .code-display .function {
+            color: #7dd3fc;
+            font-weight: bold;
+        }
+
+        .code-display .parameter {
+            color: #fbbf24;
+        }
+
+        .code-display .variable {
+            color: #a7f3d0;
+        }
+
+        .code-display .operator {
+            color: #f472b6;
+        }
+
+        .code-display .number {
+            color: #fde047;
+        }
+
+        .code-display .comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .code-display .string {
+            color: #86efac;
+        }
+
         .focus-mode-button {
             background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
@@ -610,30 +646,29 @@
         </div>
 
         <div class="code-display">
-            <div style="color: #81c784; margin-bottom: 10px;">// 組合枚舉演算法的Python實作</div>
-def enumerate_combinations(elements, m):
-    n = len(elements)
-    subset = []
+            <pre><code class="language-python"><span class="keyword">def</span> <span class="function">enumerate_combinations</span>(<span class="parameter">elements</span>, <span class="parameter">m</span>):
+    <span class="parameter">n</span> <span class="operator">=</span> <span class="function">len</span>(<span class="parameter">elements</span>)
+    <span class="variable">subset</span> <span class="operator">=</span> []
 
-    def backtrack(start):
-        if len(subset) == m:  # 已選滿 m 個元素
-            print(subset)
-            return
+    <span class="keyword">def</span> <span class="function">backtrack</span>(<span class="parameter">start</span>):
+        <span class="keyword">if</span> <span class="function">len</span>(<span class="variable">subset</span>) <span class="operator">==</span> <span class="parameter">m</span>:  <span class="comment"># 已選滿 m 個元素</span>
+            <span class="function">print</span>(<span class="variable">subset</span>)
+            <span class="keyword">return</span>
 
-        # 剪枝：如果剩餘元素全部選取也無法湊滿 m
-        if start >= n:
-            return
+        <span class="comment"># 剪枝：如果剩餘元素全部選取也無法湊滿 m</span>
+        <span class="keyword">if</span> <span class="parameter">start</span> <span class="operator">>=</span> <span class="parameter">n</span>:
+            <span class="keyword">return</span>
 
-        # 遍歷從 start 開始的每個候選元素
-        for i in range(start, n):
-            subset.append(elements[i])  # 選取元素 i
-            backtrack(i + 1)  # 遞迴選取下一個之後的元素
-            subset.pop()  # 回溯：移除剛選取的元素
+        <span class="comment"># 遍歷從 start 開始的每個候選元素</span>
+        <span class="keyword">for</span> <span class="parameter">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="parameter">start</span>, <span class="parameter">n</span>):
+            <span class="variable">subset</span>.<span class="function">append</span>(<span class="parameter">elements</span>[<span class="parameter">i</span>])  <span class="comment"># 選取元素 i</span>
+            <span class="function">backtrack</span>(<span class="parameter">i</span> <span class="operator">+</span> <span class="number">1</span>)  <span class="comment"># 遞迴選取下一個之後的元素</span>
+            <span class="variable">subset</span>.<span class="function">pop</span>()  <span class="comment"># 回溯：移除剛選取的元素</span>
 
-    backtrack(0)
+    <span class="function">backtrack</span>(<span class="number">0</span>)
 
-# 使用範例：C(3,2)
-enumerate_combinations([1, 2, 3], 2)
+<span class="comment"># 使用範例：C(3,2)</span>
+<span class="function">enumerate_combinations</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], <span class="number">2</span>)</code></pre>
         </div>
 
         <div class="navigation">

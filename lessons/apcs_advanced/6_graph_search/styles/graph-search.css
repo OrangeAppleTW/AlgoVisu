@@ -658,3 +658,67 @@
     background-color: #777;
     border: 2px solid #333;
 }
+
+/* Python 語法高亮樣式 */
+.code-view {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+}
+
+.code-view .keyword {
+    color: #ff7edb;
+    font-weight: bold;
+}
+
+.code-view .function {
+    color: #7dd3fc;
+    font-weight: bold;
+}
+
+.code-view .parameter {
+    color: #fbbf24;
+}
+
+.code-view .variable {
+    color: #a7f3d0;
+}
+
+.code-view .operator {
+    color: #f472b6;
+}
+
+.code-view .number {
+    color: #fde047;
+}
+
+.code-view .comment {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+.code-view .string {
+    color: #86efac;
+}
+
+/* C++ 語法高亮樣式 */
+.code-view .preprocessor {
+    color: #c084fc;
+    font-weight: bold;
+}
+
+.code-view .type {
+    color: #60a5fa;
+    font-weight: bold;
+}
+
+.code-view .namespace {
+    color: #a78bfa;
+    font-weight: bold;
+}

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背包問題解題分析 - 動態規劃(2)</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="knapsack-styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📊 背包問題解題分析</h1>
+        <div class="lesson-info">
+            深入了解 0/1 背包問題的完整解題流程，從狀態定義到最佳解回溯
+        </div>
+
+        <div class="analysis-section">
+            <h2>🎯 問題定義</h2>
+            <div class="problem-definition">
+                <p><strong>給定：</strong></p>
+                <ul>
+                    <li>n 個物品，每個物品有重量 w[i] 和價值 v[i]</li>
+                    <li>背包容量為 W</li>
+                    <li>每個物品只能選擇一次（0/1 背包）</li>
+                </ul>
+                <p><strong>目標：</strong>在不超過背包容量的前提下，選擇物品使總價值最大化</p>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h2>🧠 動態規劃設計</h2>
+            <div class="dp-design">
+                <div class="step-card">
+                    <h3>步驟 1：狀態定義</h3>
+                    <p><code>dp[i][w]</code> = 考慮前 i 個物品，背包容量為 w 時的最大價值</p>
+                    <ul>
+                        <li>i 的範圍：0 ≤ i ≤ n</li>
+                        <li>w 的範圍：0 ≤ w ≤ W</li>
+                        <li>答案就是 dp[n][W]</li>
+                    </ul>
+                </div>
+
+                <div class="step-card">
+                    <h3>步驟 2：狀態轉移</h3>
+                    <div class="formula-box">
+                        <p><strong>當 w < weight[i] 時：</strong></p>
+                        <code>dp[i][w] = dp[i-1][w]</code>
+                        <p><small>（容量不足，無法放入第 i 個物品）</small></p>
+                        
+                        <p><strong>當 w ≥ weight[i] 時：</strong></p>
+                        <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight[i]] + value[i])</code>
+                        <p><small>（不拿 vs 拿第 i 個物品，取較大值）</small></p>
+                    </div>
+                </div>
+
+                <div class="step-card">
+                    <h3>步驟 3：初始條件</h3>
+                    <ul>
+                        <li><code>dp[0][w] = 0</code> for all w（不考慮任何物品，價值為 0）</li>
+                        <li><code>dp[i][0] = 0</code> for all i（容量為 0，價值為 0）</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h2>📈 填表過程示例</h2>
+            <div class="example-section">
+                <h3>範例數據</h3>
+                <div class="example-data">
+                    <table class="example-table">
+                        <tr>
+                            <th>物品</th>
+                            <th>重量</th>
+                            <th>價值</th>
+                            <th>價值密度</th>
+                        </tr>
+                        <tr>
+                            <td>書本A</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>1.5</td>
+                        </tr>
+                        <tr>
+                            <td>書本B</td>
+                            <td>3</td>
+                            <td>3</td>
+                            <td>1.0</td>
+                        </tr>
+                        <tr>
+                            <td>書本C</td>
+                            <td>8</td>
+                            <td>1</td>
+                            <td>0.125</td>
+                        </tr>
+                        <tr>
+                            <td>書本D</td>
+                            <td>5</td>
+                            <td>3</td>
+                            <td>0.6</td>
+                        </tr>
+                    </table>
+                    <p><strong>背包容量：</strong>6</p>
+                </div>
+
+                <h3>DP 表格填寫邏輯</h3>
+                <div class="filling-logic">
+                    <div class="logic-step">
+                        <h4>考慮書本A (w=2, v=3)</h4>
+                        <p>對於容量 w ≥ 2 的情況，可以選擇放入書本A，價值變為 3</p>
+                    </div>
+                    <div class="logic-step">
+                        <h4>考慮書本B (w=3, v=3)</h4>
+                        <p>容量 5 時：不拿B = 3，拿B = dp[1][2] + 3 = 3 + 3 = 6</p>
+                        <p>容量 6 時：不拿B = 3，拿B = dp[1][3] + 3 = 3 + 3 = 6</p>
+                    </div>
+                    <div class="logic-step">
+                        <h4>考慮書本C (w=8, v=1)</h4>
+                        <p>由於重量 8 > 背包容量 6，所以無法選擇，值保持不變</p>
+                    </div>
+                    <div class="logic-step">
+                        <h4>考慮書本D (w=5, v=3)</h4>
+                        <p>雖然重量 5 ≤ 6，但選擇後總價值不會增加，所以不選</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h2>🔍 最佳解回溯</h2>
+            <div class="backtrack-section">
+                <p>完成 DP 表格後，我們需要回溯找出具體選擇了哪些物品：</p>
+                <div class="backtrack-algorithm">
+                    <h3>回溯演算法</h3>
+                    <pre><code>function backtrack(dp, items, n, W):
+    result = []
+    i = n, w = W
+    
+    while i > 0 and w > 0:
+        if dp[i][w] != dp[i-1][w]:
+            // 選擇了第 i 個物品
+            result.add(items[i-1])
+            w = w - items[i-1].weight
+        i = i - 1
+    
+    return result</code></pre>
+                </div>
+                
+                <div class="backtrack-example">
+                    <h3>本題回溯過程</h3>
+                    <ol>
+                        <li>從 dp[4][6] = 6 開始</li>
+                        <li>dp[4][6] = dp[3][6] = 6，所以不選書本D</li>
+                        <li>dp[3][6] = dp[2][6] = 6，所以不選書本C</li>
+                        <li>dp[2][6] ≠ dp[1][6]，dp[2][6] = 6，dp[1][6] = 3，所以選書本B</li>
+                        <li>剩餘容量 = 6 - 3 = 3</li>
+                        <li>dp[1][3] ≠ dp[0][3]，dp[1][3] = 3，dp[0][3] = 0，所以選書本A</li>
+                        <li>剩餘容量 = 3 - 2 = 1，結束</li>
+                    </ol>
+                    <p><strong>結果：</strong>選擇書本A和書本B，總重量 5，總價值 6</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h2>⚡ 複雜度分析</h2>
+            <div class="complexity-analysis">
+                <div class="complexity-item">
+                    <h3>時間複雜度</h3>
+                    <p><strong>O(n × W)</strong></p>
+                    <ul>
+                        <li>需要填入 n × W 個狀態</li>
+                        <li>每個狀態的計算是 O(1)</li>
+                        <li>回溯過程是 O(n)</li>
+                    </ul>
+                </div>
+                <div class="complexity-item">
+                    <h3>空間複雜度</h3>
+                    <p><strong>O(n × W)</strong></p>
+                    <ul>
+                        <li>需要 (n+1) × (W+1) 的二維陣列</li>
+                        <li>可以用滾動陣列優化到 O(W)</li>
+                        <li>但會失去回溯能力</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h2>🚀 優化技巧</h2>
+            <div class="optimization-section">
+                <div class="optimization-item">
+                    <h3>空間優化</h3>
+                    <p>使用一維陣列，從後往前更新：</p>
+                    <pre><code>for i in range(1, n+1):
+    for w in range(W, weight[i]-1, -1):
+        dp[w] = max(dp[w], dp[w-weight[i]] + value[i])</code></pre>
+                </div>
+                <div class="optimization-item">
+                    <h3>剪枝優化</h3>
+                    <ul>
+                        <li>如果剩餘物品的總重量小於剩餘容量，直接全選</li>
+                        <li>按價值密度排序，優先考慮高價值密度的物品</li>
+                        <li>使用分支界定法進一步優化</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h2>🎯 應用場景</h2>
+            <div class="applications">
+                <div class="app-item">
+                    <h3>資源分配</h3>
+                    <p>有限預算下選擇投資項目，使收益最大化</p>
+                </div>
+                <div class="app-item">
+                    <h3>任務調度</h3>
+                    <p>在有限時間內選擇任務，使完成的價值最大</p>
+                </div>
+                <div class="app-item">
+                    <h3>貨物裝載</h3>
+                    <p>運輸工具容量限制下，選擇貨物使價值最大</p>
+                </div>
+                <div class="app-item">
+                    <h3>記憶體分配</h3>
+                    <p>有限記憶體下選擇程序，使系統效能最佳</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="practice-section">
+            <h2>💡 學習建議</h2>
+            <div class="learning-tips">
+                <div class="tip-item">
+                    <h3>理解重點</h3>
+                    <ul>
+                        <li>狀態定義要清晰，包含所有必要信息</li>
+                        <li>狀態轉移要考慮所有可能的選擇</li>
+                        <li>邊界條件的處理很重要</li>
+                        <li>回溯過程幫助理解解的構成</li>
+                    </ul>
+                </div>
+                <div class="tip-item">
+                    <h3>常見錯誤</h3>
+                    <ul>
+                        <li>忘記檢查容量是否足夠</li>
+                        <li>狀態轉移方程寫錯</li>
+                        <li>索引範圍計算錯誤</li>
+                        <li>初始化條件設置不當</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="knapsack-game.html" class="nav-button">← 回到遊戲</a>
+            <a href="index.html" class="nav-button">回到課程介紹</a>
+            <a href="../index.html" class="nav-button">課程大綱 →</a>
+        </div>
+    </div>
+
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>
+
+<style>
+.analysis-section {
+    margin: 40px 0;
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.problem-definition {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.dp-design .step-card {
+    margin: 20px 0;
+    padding: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.step-card h3 {
+    color: #333;
+    margin-top: 0;
+}
+
+.example-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+
+.example-table th,
+.example-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.example-table th {
+    background: #667eea;
+    color: white;
+}
+
+.filling-logic .logic-step {
+    margin: 15px 0;
+    padding: 15px;
+    background: #e3f2fd;
+    border-radius: 6px;
+    border-left: 4px solid #2196f3;
+}
+
+.backtrack-algorithm pre {
+    background: #2d2d2d;
+    color: #f8f8f2;
+    padding: 20px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.backtrack-example ol {
+    line-height: 1.8;
+}
+
+.complexity-analysis,
+.applications {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.complexity-item,
+.app-item {
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.optimization-section .optimization-item {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fff3e0;
+    border-radius: 8px;
+    border-left: 4px solid #ff9800;
+}
+
+.learning-tips {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.tip-item {
+    padding: 20px;
+    background: #e8f5e8;
+    border-radius: 8px;
+    border-left: 4px solid #4caf50;
+}
+
+.tip-item h3 {
+    color: #2e7d32;
+    margin-top: 0;
+}
+
+@media (max-width: 768px) {
+    .complexity-analysis,
+    .applications,
+    .learning-tips {
+        grid-template-columns: 1fr;
+    }
+    
+    .analysis-section {
+        padding: 20px;
+    }
+}
+</style>

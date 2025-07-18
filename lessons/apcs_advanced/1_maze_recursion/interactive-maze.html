@@ -422,23 +422,30 @@
                 以下是對應的程式碼結構，可供進階學習時參考：
             </p>
             <div style="background-color: #f8f8f8; border-left: 4px solid #4169e1; padding: 15px; border-radius: 4px; font-family: monospace; font-size: 13px;">
-                <strong>function findPath(x, y) {</strong><br>
-                &nbsp;&nbsp;// ① 先判斷是否找到起司<br>
-                &nbsp;&nbsp;<strong style="color: #228b22;">if (x == 起司位置) return true;</strong><br><br>
-                &nbsp;&nbsp;// 檢查位置是否有效<br>
-                &nbsp;&nbsp;<strong style="color: #dc143c;">if (無效位置 || 已訪問) return false;</strong><br>
-                &nbsp;&nbsp;visited[x][y] = true; // 標記已訪問<br><br>
-                &nbsp;&nbsp;// ② 嘗試向上移動，如果找到路就回傳 true<br>
-                &nbsp;&nbsp;<strong style="color: #4169e1;">if (findPath(x, y-1)) return true;</strong><br>
-                &nbsp;&nbsp;// ③ 嘗試向右移動，如果找到路就回傳 true<br>
-                &nbsp;&nbsp;<strong style="color: #4169e1;">if (findPath(x+1, y)) return true;</strong><br>
-                &nbsp;&nbsp;// ④ 嘗試向下移動，如果找到路就回傳 true<br>
-                &nbsp;&nbsp;<strong style="color: #4169e1;">if (findPath(x, y+1)) return true;</strong><br>
-                &nbsp;&nbsp;// ⑤ 嘗試向左移動，如果找到路就回傳 true<br>
-                &nbsp;&nbsp;<strong style="color: #4169e1;">if (findPath(x-1, y)) return true;</strong><br><br>
-                &nbsp;&nbsp;// ⑥ 所有方向都沒路 - 回溯<br>
-                &nbsp;&nbsp;<strong style="color: #dc143c;">return false;</strong><br>
-                <strong>}</strong>
+                <strong>def find_path(x, y):</strong><br>
+                &nbsp;&nbsp;# ① 先判斷是否找到起司<br>
+                &nbsp;&nbsp;<strong style="color: #228b22;">if x == cheese_x and y == cheese_y:</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: #228b22;">return True</strong><br><br>
+                &nbsp;&nbsp;# 檢查位置是否有效<br>
+                &nbsp;&nbsp;<strong style="color: #dc143c;">if (x < 0 or x >= width or y < 0 or y >= height or</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: #dc143c;">maze[y][x] == 1 or visited[y][x]):</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: #dc143c;">return False</strong><br><br>
+                &nbsp;&nbsp;visited[y][x] = True  # 標記已訪問<br><br>
+                &nbsp;&nbsp;# ② 嘗試向上移動，如果找到路就回傳 True<br>
+                &nbsp;&nbsp;<strong style="color: #4169e1;">if find_path(x, y-1):</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: #4169e1;">return True</strong><br>
+                &nbsp;&nbsp;# ③ 嘗試向右移動，如果找到路就回傳 True<br>
+                &nbsp;&nbsp;<strong style="color: #4169e1;">if find_path(x+1, y):</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: #4169e1;">return True</strong><br>
+                &nbsp;&nbsp;# ④ 嘗試向下移動，如果找到路就回傳 True<br>
+                &nbsp;&nbsp;<strong style="color: #4169e1;">if find_path(x, y+1):</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: #4169e1;">return True</strong><br>
+                &nbsp;&nbsp;# ⑤ 嘗試向左移動，如果找到路就回傳 True<br>
+                &nbsp;&nbsp;<strong style="color: #4169e1;">if find_path(x-1, y):</strong><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong style="color: #4169e1;">return True</strong><br><br>
+                &nbsp;&nbsp;# ⑥ 所有方向都沒路 - 回溯<br>
+                &nbsp;&nbsp;<strong style="color: #dc143c;">visited[y][x] = False  # 取消標記</strong><br>
+                &nbsp;&nbsp;<strong style="color: #dc143c;">return False</strong>
             </div>
         </div>
     </div>

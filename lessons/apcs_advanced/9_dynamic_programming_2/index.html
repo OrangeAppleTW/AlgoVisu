@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L9 動態規劃 (2) - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>動態規劃（二）- 背包問題</h1>
+        <div class="lesson-info">
+            透過經典的 0/1 背包問題，深入學習二維動態規劃的應用與最佳化策略
+        </div>
+        
+        <div class="intro-section">
+            <h2>什麼是背包問題？</h2>
+            <p>
+                <strong>背包問題（Knapsack Problem）</strong>是動態規劃的經典應用。給定一個固定容量的背包和一組物品（每個物品有重量和價值），
+                目標是在不超過背包容量的前提下，選擇物品使總價值最大化。
+            </p>
+            <p>
+                <strong>0/1 背包問題</strong>是指每個物品只能選擇一次（要嘛拿，要嘛不拿），這需要用到<strong>二維動態規劃</strong>：
+                <code>dp[i][w] = 考慮前 i 個物品，背包容量為 w 時的最大價值</code>
+            </p>
+            <div class="formula-box">
+                <strong>狀態轉移方程：</strong><br>
+                <code>dp[i][w] = max(dp[i-1][w], dp[i-1][w-weight[i]] + value[i])</code><br>
+                <small>意思是：不拿第 i 個物品 vs 拿第 i 個物品，取較大值</small>
+            </div>
+        </div>
+        
+        <div class="concept-grid">
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>🎮 互動式背包遊戲</h3>
+                </div>
+                <div class="card-body">
+                    <p>透過逐步填入 DP 表格，理解背包問題的解題過程。只有填入正確答案才能進入下一步！</p>
+                    <ul class="card-features">
+                        <li>逐步引導的 DP 表格填入</li>
+                        <li>即時答案驗證機制</li>
+                        <li>背包視覺化展示</li>
+                        <li>物品選擇狀態追蹤</li>
+                        <li>最佳解路徑回溯</li>
+                        <li>學習進度追蹤</li>
+                    </ul>
+                    <a href="knapsack-game.html" class="demo-button">開始遊戲</a>
+                </div>
+            </div>
+
+            <div class="concept-card">
+                <div class="card-header">
+                    <h3>📊 狀態轉移方程解析</h3>
+                </div>
+                <div class="card-body">
+                    <p>深入理解動態規劃的核心：狀態轉移方程的每一個步驟和決策過程。</p>
+                    <ul class="card-features">
+                        <li>逐步分解狀態轉移方程</li>
+                        <li>視覺化決策過程</li>
+                        <li>常見錯誤與除錯技巧</li>
+                        <li>實際計算示例演示</li>
+                        <li>重量分配邏輯說明</li>
+                        <li>練習建議與技巧</li>
+                    </ul>
+                    <a href="equation-analysis.html" class="demo-button">深入理解</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section">
+            <h2>背包問題的關鍵概念</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>狀態定義</h4>
+                    <p><strong>dp[i][w]:</strong> 前 i 個物品，容量 w</p>
+                    <p><strong>意義:</strong> 在給定條件下的最大價值</p>
+                    <p><strong>範圍:</strong> i: 0~n, w: 0~W</p>
+                    <p><strong>目標:</strong> 求 dp[n][W]</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>狀態轉移</h4>
+                    <p><strong>不選:</strong> dp[i-1][w]</p>
+                    <p><strong>選擇:</strong> dp[i-1][w-wi] + vi</p>
+                    <p><strong>條件:</strong> w >= wi 才能選擇</p>
+                    <p><strong>決策:</strong> 取兩者較大值</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>複雜度分析</h4>
+                    <p><strong>時間:</strong> O(n × W)</p>
+                    <p><strong>空間:</strong> O(n × W)</p>
+                    <p><strong>優化:</strong> 可用滾動陣列優化至 O(W)</p>
+                    <p><strong>應用:</strong> 資源分配、投資組合等</p>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="extension-topics">
+            <div class="topic-card">
+                <h4>🎯 教學建議</h4>
+                <p>建議先讓學生理解一維 DP（如爬樓梯），再進入二維 DP 的背包問題，循序漸進。</p>
+                <div class="practice-hints">
+                    <strong>教學流程：</strong>
+                    <ul>
+                        <li>複習一維動態規劃概念</li>
+                        <li>介紹二維狀態的定義</li>
+                        <li>推導狀態轉移方程</li>
+                        <li>實際操作填表過程</li>
+                        <li>學習最佳解回溯</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="topic-card">
+                <h4>💡 實作要點</h4>
+                <p>背包問題是很多實際應用的基礎，掌握好這個經典問題對理解其他 DP 問題很有幫助。</p>
+                <div class="practice-hints">
+                    <strong>延伸應用：</strong>
+                    <ul>
+                        <li>完全背包問題（物品可重複選擇）</li>
+                        <li>多重背包問題（每種物品有數量限制）</li>
+                        <li>二維背包問題（重量和體積雙重限制）</li>
+                        <li>分組背包問題（物品分組，每組最多選一個）</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="../index.html" class="nav-button">← 回到課程大綱</a>
+            <a href="knapsack-game.html" class="nav-button">開始遊戲 →</a>
+        </div>
+    </div>
+    
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

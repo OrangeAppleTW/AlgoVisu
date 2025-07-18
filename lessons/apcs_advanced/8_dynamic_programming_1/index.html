@@ -3,154 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>L8 動態規劃 (1) - APCS進階班</title>
+    <title>L8 動態規劃 - APCS進階班</title>
     <link rel="stylesheet" href="../../../styles/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>動態規劃 (1)</h1>
+        <h1>動態規劃（一）</h1>
         <div class="lesson-info">
-            學習動態規劃的基本概念，透過爬樓梯問題理解一維表格建立與狀態轉移過程
+            透過爬樓梯問題的視覺化演示，比較遞迴與動態規劃的效率差異，學習動態規劃的核心概念
         </div>
         
         <div class="intro-section">
             <h2>什麼是動態規劃？</h2>
             <p>
-                <strong>動態規劃（Dynamic Programming, DP）</strong>是一種重要的演算法設計技巧，
-                主要用於解決具有重疊子問題和最優子結構性質的問題。
-                動態規劃的核心思想是將複雜問題分解為較小的子問題，並將子問題的解儲存起來，避免重複計算。
+                <strong>動態規劃（Dynamic Programming）</strong>是一種演算法設計技巧，核心思想是<strong>「避免重複計算」</strong>。
+                當我們用遞迴解決問題時，常常會重複計算相同的子問題，動態規劃透過<strong>記憶化（Memoization）</strong>
+                或<strong>表格法（Tabulation）</strong>來儲存已計算的結果，大幅提升效率。
             </p>
             <p>
-                在本課程中，我們將透過經典的<strong>爬樓梯問題</strong>來學習動態規劃的三個基本步驟：
-                狀態定義、轉移公式、初始條件。
+                以爬樓梯問題為例：到達第 n 階的方法數等於到達第 (n-1) 階和第 (n-2) 階的方法數總和。
+                遞迴解法會重複計算許多子問題，而動態規劃只計算一次，<strong>時間複雜度從 O(2^n) 降為 O(n)</strong>。
             </p>
         </div>
         
         <div class="concept-grid">
             <div class="concept-card">
                 <div class="card-header">
-                    <h3>爬樓梯問題</h3>
+                    <h3>🌟 遞迴 vs 動態規劃比較</h3>
                 </div>
                 <div class="card-body">
-                    <p>透過經典的爬樓梯問題，學習動態規劃的基本概念和實作方法。</p>
+                    <p>透過樹狀結構視覺化展示兩種解法的差異，直觀理解動態規劃的優勢。</p>
                     <ul class="card-features">
-                        <li>🪜 <strong>問題描述</strong>：如何計算爬n階樓梯的方法數</li>
-                        <li>📊 <strong>狀態定義</strong>：dp[i] 表示爬到第 i 階的方法數</li>
-                        <li>🔄 <strong>轉移公式</strong>：f(n) = f(n-1) + f(n-2)</li>
-                        <li>🎯 <strong>表格視覺化</strong>：觀察DP表格的建立過程</li>
-                        <li>🌳 <strong>樹狀圖解釋</strong>：理解轉移關係</li>
+                        <li>並排樹狀圖比較展示</li>
+                        <li>步驟式動畫演示</li>
+                        <li>重複計算的節點標記</li>
+                        <li>計算次數統計</li>
+                        <li>時間複雜度對比</li>
+                        <li>互動式控制面板</li>
                     </ul>
-                    <a href="stair_climbing.html" class="demo-button">學習爬樓梯DP</a>
-                </div>
-            </div>
-
-            <div class="concept-card">
-                <div class="card-header">
-                    <h3>遞迴 vs 動態規劃</h3>
-                </div>
-                <div class="card-body">
-                    <p>比較純遞迴與動態規劃的差異，理解為什麼需要動態規劃。</p>
-                    <ul class="card-features">
-                        <li>🔄 <strong>遞迴方法</strong>：直觀但效率低下</li>
-                        <li>💾 <strong>記憶化</strong>：儲存已計算的結果</li>
-                        <li>⚡ <strong>效率比較</strong>：時間複雜度分析</li>
-                        <li>📈 <strong>重疊子問題</strong>：避免重複計算</li>
-                        <li>🎯 <strong>最優子結構</strong>：問題的核心性質</li>
-                    </ul>
-                    <a href="recursion_vs_dp.html" class="demo-button">比較分析</a>
-                </div>
-            </div>
-
-            <div class="concept-card">
-                <div class="card-header">
-                    <h3>狀態轉移樹</h3>
-                </div>
-                <div class="card-body">
-                    <p>透過樹狀圖視覺化狀態轉移過程，理解DP的記憶化原理。</p>
-                    <ul class="card-features">
-                        <li>🌳 <strong>轉移樹</strong>：視覺化遞迴結構</li>
-                        <li>🔴 <strong>重複計算</strong>：標示重複的子問題</li>
-                        <li>💚 <strong>記憶化效果</strong>：顯示已儲存的結果</li>
-                        <li>📊 <strong>計算次數</strong>：比較優化前後</li>
-                        <li>⏱️ <strong>執行時間</strong>：實際效能差異</li>
-                    </ul>
-                    <a href="state_tree.html" class="demo-button">狀態轉移樹</a>
+                    <a href="recursion-vs-dp.html" class="demo-button">觀看比較演示</a>
                 </div>
             </div>
         </div>
 
-        <div class="learning-objectives">
-            <h2>學習目標</h2>
-            <div class="objectives-grid">
-                <div class="objective-item">
-                    <h4>🧠 理解動態規劃</h4>
-                    <p>掌握動態規劃的三個基本要素：狀態定義、轉移公式、初始條件</p>
+        <div class="comparison-section">
+            <h2>兩種方法的關鍵差異</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>遞迴解法</h4>
+                    <p><strong>思路:</strong> 由上而下分解問題</p>
+                    <p><strong>複雜度:</strong> O(2^n) 指數時間</p>
+                    <p><strong>問題:</strong> 大量重複計算</p>
+                    <p><strong>空間:</strong> O(n) 遞迴堆疊深度</p>
                 </div>
-                <div class="objective-item">
-                    <h4>👁️ 視覺化學習</h4>
-                    <p>透過表格和樹狀圖觀察DP的執行過程</p>
+                <div class="comparison-item">
+                    <h4>動態規劃</h4>
+                    <p><strong>思路:</strong> 由下而上建構解答</p>
+                    <p><strong>複雜度:</strong> O(n) 線性時間</p>
+                    <p><strong>優勢:</strong> 每個子問題只算一次</p>
+                    <p><strong>空間:</strong> O(n) 儲存中間結果</p>
                 </div>
-                <div class="objective-item">
-                    <h4>⚡ 效率分析</h4>
-                    <p>理解動態規劃如何避免重複計算，提升演算法效率</p>
-                </div>
-                <div class="objective-item">
-                    <h4>🎯 問題建模</h4>
-                    <p>學會將實際問題轉化為動態規劃模型</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="algorithm-intro">
-            <h2>動態規劃三步驟</h2>
-            <div class="concept-explanation">
-                <div class="step-item">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>狀態定義</h4>
-                        <p><strong>dp[i]</strong> 表示爬到第 i 階樓梯的方法數。清楚定義每個狀態的含義是DP的第一步。</p>
-                    </div>
-                </div>
-                <div class="step-item">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>轉移公式</h4>
-                        <p><strong>f(n) = f(n-1) + f(n-2)</strong><br>
-                        要到達第n階，可以從第(n-1)階走1步，或從第(n-2)階走2步。</p>
-                    </div>
-                </div>
-                <div class="step-item">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>初始條件</h4>
-                        <p><strong>dp[1] = 1, dp[2] = 2</strong><br>
-                        設定邊界條件，為遞推提供起始值。</p>
-                    </div>
+                <div class="comparison-item">
+                    <h4>效率對比</h4>
+                    <p><strong>f(10):</strong> 遞迴 177 次 vs DP 10 次</p>
+                    <p><strong>f(20):</strong> 遞迴 21891 次 vs DP 20 次</p>
+                    <p><strong>f(30):</strong> 遞迴 2.7M 次 vs DP 30 次</p>
+                    <p><strong>實際應用:</strong> DP 可解更大規模問題</p>
                 </div>
             </div>
         </div>
 
-        <div class="algorithm-intro">
-            <h2>為什麼需要動態規劃？</h2>
-            <div class="dp-benefits">
-                <div class="benefit-card">
-                    <h4>🔄 避免重複計算</h4>
-                    <p>純遞迴會重複計算相同的子問題，例如計算 f(5) 時，f(3) 會被計算多次。</p>
+        <div class="extension-topics">
+            <div class="topic-card">
+                <h4>🎯 教學流程建議</h4>
+                <p>先用遞迴解法讓學生理解問題結構，再引入動態規劃優化，強調記憶化的重要性。</p>
+                <div class="practice-hints">
+                    <strong>教學重點：</strong>
+                    <ul>
+                        <li>對比兩種解法的計算過程</li>
+                        <li>強調重複子問題的識別</li>
+                        <li>展示記憶化的實際效果</li>
+                        <li>分析時間複雜度的差異</li>
+                    </ul>
                 </div>
-                <div class="benefit-card">
-                    <h4>💾 記憶化存儲</h4>
-                    <p>將已計算的結果存在表格中，需要時直接查表，大幅提升效率。</p>
-                </div>
-                <div class="benefit-card">
-                    <h4>⚡ 時間複雜度優化</h4>
-                    <p>從指數時間 O(2ⁿ) 優化到線性時間 O(n)，效率提升顯著。</p>
+            </div>
+            
+            <div class="topic-card">
+                <h4>💡 學習要點</h4>
+                <p>動態規劃適用於具有重複子問題和最佳子結構的問題，是演算法優化的重要技巧。</p>
+                <div class="practice-hints">
+                    <strong>核心概念：</strong>
+                    <ul>
+                        <li>重複子問題（Overlapping Subproblems）</li>
+                        <li>最佳子結構（Optimal Substructure）</li>
+                        <li>記憶化技巧（Memoization）</li>
+                        <li>狀態轉移方程（State Transition）</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
         <div class="navigation">
-            <a href="../7_greedy_algorithm/index.html" class="nav-button">← 上一課：貪心演算法</a>
-            <a href="stair_climbing.html" class="nav-button">開始學習 →</a>
+            <a href="../index.html" class="nav-button">← 回到課程大綱</a>
+            <a href="recursion-vs-dp.html" class="nav-button">開始學習 →</a>
         </div>
     </div>
     

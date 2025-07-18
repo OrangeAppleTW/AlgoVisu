@@ -437,16 +437,52 @@
         }
 
         .code-display {
-            background: #333;
-            color: #f0f0f0;
+            background: #2d3748;
+            color: #e2e8f0;
             padding: 20px;
-            border-radius: 4px;
+            border-radius: 8px;
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
             line-height: 1.4;
             margin: 20px 0;
             overflow-x: auto;
             border: 2px solid #555;
+        }
+
+        /* Python 語法高亮 */
+        .code-display .keyword {
+            color: #ff7edb;
+            font-weight: bold;
+        }
+
+        .code-display .function {
+            color: #7dd3fc;
+            font-weight: bold;
+        }
+
+        .code-display .parameter {
+            color: #fbbf24;
+        }
+
+        .code-display .variable {
+            color: #a7f3d0;
+        }
+
+        .code-display .operator {
+            color: #f472b6;
+        }
+
+        .code-display .number {
+            color: #fde047;
+        }
+
+        .code-display .comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .code-display .string {
+            color: #86efac;
         }
 
         .code-highlight {
@@ -551,19 +587,18 @@
         </div>
 
         <div class="code-display">
-            <div style="color: #81c784; margin-bottom: 10px;">// 數字枚舉演算法的Python實作</div>
-def backtrack(n):
-    if n == 3:  # 終止條件：已填滿3個位置
-        print(*solution)  # 輸出當前解
-        return
+            <pre><code class="language-python"><span class="keyword">def</span> <span class="function">backtrack</span>(<span class="parameter">n</span>):
+    <span class="keyword">if</span> <span class="parameter">n</span> <span class="operator">==</span> <span class="number">3</span>:  <span class="comment"># 終止條件：已填滿3個位置</span>
+        <span class="function">print</span>(<span class="operator">*</span><span class="variable">solution</span>)  <span class="comment"># 輸出當前解</span>
+        <span class="keyword">return</span>
     
-    for i in range(3):  # 嘗試數字1到3
-        solution[n] = i + 1  # 在位置n填入數字i+1
-        backtrack(n + 1)     # 遞迴處理下一個位置
+    <span class="keyword">for</span> <span class="parameter">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="number">3</span>):  <span class="comment"># 嘗試數字1到3</span>
+        <span class="variable">solution</span>[<span class="parameter">n</span>] <span class="operator">=</span> <span class="parameter">i</span> <span class="operator">+</span> <span class="number">1</span>  <span class="comment"># 在位置n填入數字i+1</span>
+        <span class="function">backtrack</span>(<span class="parameter">n</span> <span class="operator">+</span> <span class="number">1</span>)     <span class="comment"># 遞迴處理下一個位置</span>
 
-# 初始化
-solution = [0 for _ in range(3)]
-backtrack(0)  # 從位置0開始
+<span class="comment"># 初始化</span>
+<span class="variable">solution</span> <span class="operator">=</span> [<span class="number">0</span> <span class="keyword">for</span> <span class="parameter">_</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="number">3</span>)]
+<span class="function">backtrack</span>(<span class="number">0</span>)  <span class="comment"># 從位置0開始</span></code></pre>
         </div>
 
         <div class="navigation">

@@ -360,6 +360,42 @@
             overflow-x: auto;
         }
 
+        /* Python 語法高亮 */
+        .code-display .keyword {
+            color: #ff7edb;
+            font-weight: bold;
+        }
+
+        .code-display .function {
+            color: #7dd3fc;
+            font-weight: bold;
+        }
+
+        .code-display .parameter {
+            color: #fbbf24;
+        }
+
+        .code-display .variable {
+            color: #a7f3d0;
+        }
+
+        .code-display .operator {
+            color: #f472b6;
+        }
+
+        .code-display .number {
+            color: #fde047;
+        }
+
+        .code-display .comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .code-display .string {
+            color: #86efac;
+        }
+
         @media (max-width: 900px) {
             .control-panel {
                 grid-template-columns: 1fr;
@@ -501,29 +537,28 @@
         </div>
 
         <div class="code-display">
-            <div style="color: #81c784; margin-bottom: 10px;">// 排列枚舉演算法的Python實作</div>
-def enumerate_permutations(elements):
-    n = len(elements)
-    used = [False] * n  # 記錄元素是否被使用過
-    perm = [None] * n   # 一個解（排列）存放此串列中
+            <pre><code class="language-python"><span class="keyword">def</span> <span class="function">enumerate_permutations</span>(<span class="parameter">elements</span>):
+    <span class="parameter">n</span> <span class="operator">=</span> <span class="function">len</span>(<span class="parameter">elements</span>)
+    <span class="variable">used</span> <span class="operator">=</span> [<span class="keyword">False</span>] <span class="operator">*</span> <span class="parameter">n</span>  <span class="comment"># 記錄元素是否被使用過</span>
+    <span class="variable">perm</span> <span class="operator">=</span> [<span class="keyword">None</span>] <span class="operator">*</span> <span class="parameter">n</span>   <span class="comment"># 一個解（排列）存放此串列中</span>
 
-    def backtrack(pos):
-        if pos == n:  # 已填滿所有位置
-            print(*perm)
-            return
+    <span class="keyword">def</span> <span class="function">backtrack</span>(<span class="parameter">pos</span>):
+        <span class="keyword">if</span> <span class="parameter">pos</span> <span class="operator">==</span> <span class="parameter">n</span>:  <span class="comment"># 已填滿所有位置</span>
+            <span class="function">print</span>(<span class="operator">*</span><span class="variable">perm</span>)
+            <span class="keyword">return</span>
 
-        # 嘗試放入每一個尚未使用的元素
-        for i in range(n):
-            if not used[i]:  # 如果元素 elements[i] 尚未被使用
-                used[i] = True  # 標記為已使用
-                perm[pos] = elements[i]  # 將該元素放入當前排列位置
-                backtrack(pos + 1)  # 遞迴決定下一個位置
-                used[i] = False  # 回溯：復原標記
+        <span class="comment"># 嘗試放入每一個尚未使用的元素</span>
+        <span class="keyword">for</span> <span class="parameter">i</span> <span class="keyword">in</span> <span class="function">range</span>(<span class="parameter">n</span>):
+            <span class="keyword">if</span> <span class="keyword">not</span> <span class="variable">used</span>[<span class="parameter">i</span>]:  <span class="comment"># 如果元素 elements[i] 尚未被使用</span>
+                <span class="variable">used</span>[<span class="parameter">i</span>] <span class="operator">=</span> <span class="keyword">True</span>  <span class="comment"># 標記為已使用</span>
+                <span class="variable">perm</span>[<span class="parameter">pos</span>] <span class="operator">=</span> <span class="parameter">elements</span>[<span class="parameter">i</span>]  <span class="comment"># 將該元素放入當前排列位置</span>
+                <span class="function">backtrack</span>(<span class="parameter">pos</span> <span class="operator">+</span> <span class="number">1</span>)  <span class="comment"># 遞迴決定下一個位置</span>
+                <span class="variable">used</span>[<span class="parameter">i</span>] <span class="operator">=</span> <span class="keyword">False</span>  <span class="comment"># 回溯：復原標記</span>
 
-    backtrack(0)
+    <span class="function">backtrack</span>(<span class="number">0</span>)
 
-# 使用範例
-enumerate_permutations([0, 1, 2, 3, 4])
+<span class="comment"># 使用範例</span>
+<span class="function">enumerate_permutations</span>([<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</code></pre>
         </div>
 
         <div class="navigation">

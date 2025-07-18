@@ -232,6 +232,9 @@ class NavbarLoader {
                                 <a href="${this.rootPath}lessons/apcs_advanced/4_2d_array_applications/index.html" class="dropdown-link">L4 二維串列應用</a>
                                 <a href="${this.rootPath}lessons/apcs_advanced/5_binary_tree/index.html" class="dropdown-link">L5 二元樹與樹走訪</a>
                                 <a href="${this.rootPath}lessons/apcs_advanced/6_graph_search/index.html" class="dropdown-link">L6 圖形搜索方法</a>
+                                <a href="${this.rootPath}lessons/apcs_advanced/7_greedy_algorithm/index.html" class="dropdown-link">L7 貪心演算法</a>
+                                <a href="${this.rootPath}lessons/apcs_advanced/8_dynamic_programming_1/index.html" class="dropdown-link">L8 動態規劃 (1)</a>
+                                <a href="${this.rootPath}lessons/apcs_advanced/9_dynamic_programming_2/index.html" class="dropdown-link">L9 動態規劃 (2)</a>
                             </div>
                         </div>
                         <div class="nav-dropdown">

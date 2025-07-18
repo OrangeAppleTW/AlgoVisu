@@ -1,0 +1,567 @@
+// 動態規劃建構過程的視覺化控制器
+class DPConstructionController {
+    constructor() {
+        this.tree = new TreeVisualization('dp-construction-tree', 'dp-construction');
+        this.currentN = 5;
+        this.steps = [];
+        this.currentStep = 0;
+        this.isAutoPlaying = false;
+        this.autoPlayInterval = null;
+        this.animationSpeed = 1200;
+        this.memoTable = new Map();
+        this.computedCount = 0;
+        
+        this.initializeControls();
+        this.initializeVisualization();
+    }
+
+    initializeControls() {
+        // 數值輸入控制
+        const nInput = document.getElementById('nValue');
+        nInput.addEventListener('change', (e) => {
+            const newN = parseInt(e.target.value);
+            if (newN >= 3 && newN <= 8) {
+                this.currentN = newN;
+                this.resetVisualization();
+            }
+        });
+
+        // 控制按鈕
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            this.resetVisualization();
+        });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            this.previousStep();
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            this.nextStep();
+        });
+
+        document.getElementById('autoBtn').addEventListener('click', () => {
+            this.startAutoPlay();
+        });
+
+        document.getElementById('pauseBtn').addEventListener('click', () => {
+            this.pauseAutoPlay();
+        });
+
+        // 速度控制
+        const speedSlider = document.getElementById('speedSlider');
+        const speedDisplay = document.getElementById('speedDisplay');
+        
+        speedSlider.addEventListener('input', (e) => {
+            this.animationSpeed = parseInt(e.target.value);
+            speedDisplay.textContent = `${(this.animationSpeed / 1000).toFixed(1)}s`;
+            
+            if (this.isAutoPlaying) {
+                this.pauseAutoPlay();
+                this.startAutoPlay();
+            }
+        });
+    }
+
+    initializeVisualization() {
+        this.resetVisualization();
+    }
+
+    resetVisualization() {
+        this.pauseAutoPlay();
+        this.tree.clear();
+        this.memoTable.clear();
+        this.computedCount = 0;
+        this.currentStep = 0;
+        
+        // 生成建構步驟
+        this.generateConstructionSteps();
+        
+        // 初始化DP表格
+        this.initializeDPTable();
+        
+        // 更新介面
+        this.updateInterface();
+    }
+
+    generateConstructionSteps() {
+        this.steps = [];
+        
+        // 步驟1: 初始化基礎情況
+        this.steps.push({
+            type: 'init_base',
+            values: [1, 2],
+            description: '初始化基礎情況：f(1) = 1, f(2) = 1'
+        });
+
+        // 為 f(3) 到 f(n) 生成建構步驟
+        for (let i = 3; i <= this.currentN; i++) {
+            this.generateStepsForValue(i);
+        }
+    }
+
+    generateStepsForValue(value) {
+        // f(3)的特殊建構過程
+        if (value === 3) {
+            // 步驟1: 顯示依賴關係
+            this.steps.push({
+                type: 'show_dependencies',
+                value: value,
+                dependencies: [2, 1],
+                description: `要計算 f(3)，需要依賴 f(2) 和 f(1)`
+            });
+
+            // 步驟2: 創建目標節點
+            this.steps.push({
+                type: 'create_target_node',
+                value: value,
+                description: `創建 f(3) 節點`
+            });
+
+            // 步驟3: 連接依賴（對於f(3)，直接連接到基礎節點）
+            this.steps.push({
+                type: 'connect_base_dependencies',
+                value: value,
+                dependencies: [2, 1],
+                description: `連接 f(3) 到基礎節點 f(2) 和 f(1)`
+            });
+        } else {
+            // 步驟1: 顯示依賴關係
+            this.steps.push({
+                type: 'show_dependencies',
+                value: value,
+                dependencies: [value - 1, value - 2],
+                description: `要計算 f(${value})，需要先有 f(${value-1}) 和 f(${value-2})`
+            });
+
+            // 步驟2: 創建新節點（右連線部分）
+            this.steps.push({
+                type: 'create_right_node', 
+                value: value,
+                rightDep: value - 2,
+                description: `在右邊創建新的 f(${value-2}) 節點來表示依賴關係`
+            });
+
+            // 步驟3: 創建目標節點
+            this.steps.push({
+                type: 'create_target_node',
+                value: value,
+                description: `創建 f(${value}) 節點`
+            });
+
+            // 步驟4: 連接依賴
+            this.steps.push({
+                type: 'connect_dependencies',
+                value: value,
+                dependencies: [value - 1, value - 2],
+                description: `連接 f(${value}) 到其依賴節點`
+            });
+        }
+
+        // 共通步驟：計算和儲存結果
+        this.steps.push({
+            type: 'compute',
+            value: value,
+            result: this.fibonacci(value),
+            description: `計算 f(${value}) = f(${value-1}) + f(${value-2}) = ${this.fibonacci(value)}`
+        });
+
+        this.steps.push({
+            type: 'store_result',
+            value: value,
+            result: this.fibonacci(value),
+            description: `將 f(${value}) = ${this.fibonacci(value)} 儲存到DP表格`
+        });
+    }
+
+    executeStep(stepIndex) {
+        if (stepIndex < 0 || stepIndex >= this.steps.length) return false;
+
+        const step = this.steps[stepIndex];
+        this.currentStep = stepIndex;
+
+        switch (step.type) {
+            case 'init_base':
+                this.initializeBaseNodes(step.values);
+                break;
+
+            case 'show_dependencies':
+                this.highlightDependencies(step.dependencies);
+                break;
+
+            case 'create_right_node':
+                this.createRightDependencyNode(step.value, step.rightDep);
+                break;
+
+            case 'create_target_node':
+                this.createTargetNode(step.value);
+                break;
+
+            case 'connect_dependencies':
+                this.connectDependencies(step.value, step.dependencies);
+                break;
+
+            case 'connect_base_dependencies':
+                this.connectBaseDependencies(step.value, step.dependencies);
+                break;
+
+            case 'compute':
+                this.computeValue(step.value, step.result);
+                break;
+
+            case 'store_result':
+                this.storeResult(step.value, step.result);
+                break;
+        }
+
+        this.updateInterface();
+        return true;
+    }
+
+    initializeBaseNodes(values) {
+        const positions = this.calculateNodePositions();
+        
+        values.forEach((value, index) => {
+            const pos = positions.get(value);
+            const nodeId = this.tree.createNode(value, pos.x, pos.y);
+            
+            // 立即標記為已計算
+            setTimeout(() => {
+                this.tree.markComputed(nodeId);
+                this.updateDPTableCell(value, 1, 'computed');
+                this.memoTable.set(value, 1);
+                this.computedCount++;
+            }, 200 * (index + 1));
+        });
+    }
+
+    highlightDependencies(dependencies) {
+        dependencies.forEach(dep => {
+            const nodeElement = this.findNodeByValue(dep, 'target');
+            if (nodeElement) {
+                nodeElement.classList.add('highlighted');
+                this.updateDPTableCell(dep, this.memoTable.get(dep), 'used');
+                
+                setTimeout(() => {
+                    nodeElement.classList.remove('highlighted');
+                    this.updateDPTableCell(dep, this.memoTable.get(dep), 'computed');
+                }, 1500);
+            }
+        });
+    }
+
+    createRightDependencyNode(targetValue, rightDepValue) {
+        const positions = this.calculateNodePositions();
+        const targetPos = positions.get(targetValue);
+        
+        // 在目標節點右下方創建依賴節點
+        const rightNodeX = targetPos.x + 100;
+        const rightNodeY = targetPos.y + 60;
+        
+        const nodeId = this.tree.createNode(rightDepValue, rightNodeX, rightNodeY);
+        
+        // 如果這個值已經在DP表格中，標記為重用
+        if (this.memoTable.has(rightDepValue)) {
+            setTimeout(() => {
+                this.tree.markReused(nodeId);
+                this.updateDPTableCell(rightDepValue, this.memoTable.get(rightDepValue), 'reused');
+            }, 500);
+        }
+    }
+
+    createTargetNode(value) {
+        const positions = this.calculateNodePositions();
+        const pos = positions.get(value);
+        const nodeId = this.tree.createNode(value, pos.x, pos.y);
+        
+        // 添加建構動畫
+        const nodeElement = this.tree.nodes.get(nodeId).element;
+        nodeElement.classList.add('construction-node', 'building');
+        nodeElement.setAttribute('data-step', value);
+        
+        // 更新DP表格
+        this.updateDPTableCell(value, '?', 'computing');
+    }
+
+    connectBaseDependencies(value, dependencies) {
+        const targetNode = this.findNodeByValue(value, 'target');
+        if (!targetNode) return;
+        
+        // 對於f(3)，直接連接到基礎節點
+        // 右連線：連接到 f(2)
+        const rightDep = dependencies[0]; // f(2)
+        const rightNode = this.findNodeByValue(rightDep, 'any');
+        if (rightNode) {
+            this.createDependencyConnection(rightNode, targetNode, 'right');
+        }
+        
+        // 左連線：連接到 f(1)
+        const leftDep = dependencies[1]; // f(1)
+        const leftNode = this.findNodeByValue(leftDep, 'any');
+        if (leftNode) {
+            this.createDependencyConnection(leftNode, targetNode, 'left');
+        }
+    }
+
+    connectDependencies(value, dependencies) {
+        const targetNode = this.findNodeByValue(value, 'target');
+        if (!targetNode) return;
+        
+        // 左連線：連接到上一次計算的目標節點
+        const leftDep = dependencies[0]; // f(n-1)
+        const leftNode = this.findNodeByValue(leftDep, 'target');
+        if (leftNode) {
+            this.createDependencyConnection(leftNode, targetNode, 'left');
+        }
+        
+        // 右連線：連接到新創建DP節點
+        const rightDep = dependencies[1]; // f(n-2)
+        const rightNode = this.findNodeByValue(rightDep, 'newest');
+        if (rightNode) {
+            this.createDependencyConnection(rightNode, targetNode, 'right');
+        }
+    }
+
+    computeValue(value, result) {
+        const nodeElement = this.findNodeByValue(value, 'target');
+        if (nodeElement) {
+            nodeElement.classList.add('computing');
+        }
+        
+        this.updateDPTableCell(value, result, 'computing');
+    }
+
+    storeResult(value, result) {
+        const nodeElement = this.findNodeByValue(value, 'target');
+        if (nodeElement) {
+            nodeElement.classList.remove('computing', 'building');
+            nodeElement.classList.add('computed');
+        }
+        
+        this.memoTable.set(value, result);
+        this.computedCount++;
+        this.updateDPTableCell(value, result, 'computed');
+    }
+
+    calculateNodePositions() {
+        const positions = new Map();
+        const containerWidth = 1000;  // 進一步增加寬度
+        const containerHeight = 550;
+        
+        // 動態規劃從左下角開始，向右上方建構
+        for (let i = 1; i <= this.currentN; i++) {
+            const level = i - 1;  // f(1)在level 0, f(2)在level 1, etc.
+            const x = 80 + (level * 140);  // 向右擴展，增加間距
+            const y = containerHeight - 100 - (level * 70);  // 向上擴展
+            
+            positions.set(i, { x, y });
+        }
+        
+        return positions;
+    }
+
+    // 移除舊的方法
+
+    findNodeByValue(value, type = 'any') {
+        const nodes = [];
+        for (const [nodeId, nodeData] of this.tree.nodes) {
+            if (nodeData.value === value) {
+                nodes.push(nodeData.element);
+            }
+        }
+        
+        if (nodes.length === 0) return null;
+        if (type === 'any') return nodes[0];
+        if (type === 'target') {
+            // 返回最近創建的目標節點（在主線上）
+            return nodes.find(node => node.classList.contains('construction-node')) || nodes[nodes.length - 1];
+        }
+        if (type === 'newest') {
+            // 返回最新創建的節點
+            return nodes[nodes.length - 1];
+        }
+        
+        return nodes[0];
+    }
+
+    createDependencyConnection(fromElement, toElement, connectionType) {
+        const fromRect = fromElement.getBoundingClientRect();
+        const toRect = toElement.getBoundingClientRect();
+        const containerRect = this.tree.container.getBoundingClientRect();
+        
+        const line = document.createElement('div');
+        line.className = `dependency-line ${connectionType}`;
+        
+        const startX = fromRect.left - containerRect.left + fromRect.width / 2;
+        const startY = fromRect.top - containerRect.top + fromRect.height / 2;
+        const endX = toRect.left - containerRect.left + toRect.width / 2;
+        const endY = toRect.top - containerRect.top + toRect.height / 2;
+        
+        const length = Math.sqrt((endX - startX) ** 2 + (endY - startY) ** 2);
+        const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+        
+        line.style.left = `${startX}px`;
+        line.style.top = `${startY}px`;
+        line.style.width = `${length}px`;
+        line.style.transform = `rotate(${angle}deg)`;
+        line.style.transformOrigin = '0 50%';
+        
+        this.tree.container.appendChild(line);
+        
+        // 動畫顯示
+        setTimeout(() => {
+            line.classList.add('active');
+        }, 100);
+    }
+
+
+
+    initializeDPTable() {
+        const dpTable = document.getElementById('dp-table');
+        
+        // 清除現有內容
+        dpTable.innerHTML = '';
+        
+        // 為每個值創建DP表格單元格
+        for (let i = 1; i <= this.currentN; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'dp-cell';
+            cell.setAttribute('data-value', i);
+            
+            cell.innerHTML = `
+                <span class="label">f(${i})</span>
+                <span class="value">?</span>
+            `;
+            
+            dpTable.appendChild(cell);
+        }
+    }
+
+    updateDPTableCell(value, result, status) {
+        const cell = document.querySelector(`[data-value="${value}"]`);
+        if (!cell) return;
+        
+        const valueSpan = cell.querySelector('.value');
+        if (result !== undefined) {
+            valueSpan.textContent = result;
+        }
+        
+        // 移除所有狀態類別
+        cell.classList.remove('computing', 'computed', 'used', 'reused');
+        
+        switch (status) {
+            case 'computing':
+                cell.classList.add('computing');
+                break;
+            case 'computed':
+                cell.classList.add('computed');
+                break;
+            case 'used':
+                cell.classList.add('used');
+                break;
+            case 'reused':
+                cell.classList.add('reused');
+                break;
+            default:
+                cell.className = 'dp-cell';
+        }
+    }
+
+    nextStep() {
+        if (this.currentStep < this.steps.length) {
+            this.executeStep(this.currentStep + 1);
+        }
+    }
+
+    previousStep() {
+        if (this.currentStep > 0) {
+            // 重新開始並執行到前一步
+            this.tree.clear();
+            this.memoTable.clear();
+            this.computedCount = 0;
+            this.initializeDPTable();
+            
+            for (let i = 0; i < this.currentStep; i++) {
+                this.executeStep(i);
+            }
+        }
+    }
+
+    startAutoPlay() {
+        if (this.isAutoPlaying) return;
+        
+        this.isAutoPlaying = true;
+        document.getElementById('autoBtn').disabled = true;
+        document.getElementById('pauseBtn').disabled = false;
+        
+        this.autoPlayInterval = setInterval(() => {
+            if (this.currentStep >= this.steps.length) {
+                this.pauseAutoPlay();
+                return;
+            }
+            this.nextStep();
+        }, this.animationSpeed);
+    }
+
+    pauseAutoPlay() {
+        this.isAutoPlaying = false;
+        document.getElementById('autoBtn').disabled = false;
+        document.getElementById('pauseBtn').disabled = true;
+        
+        if (this.autoPlayInterval) {
+            clearInterval(this.autoPlayInterval);
+            this.autoPlayInterval = null;
+        }
+    }
+
+    updateInterface() {
+        // 更新進度
+        document.getElementById('progress').textContent = this.currentStep;
+        document.getElementById('total-steps').textContent = this.steps.length;
+        document.getElementById('computed-count').textContent = this.computedCount;
+        
+        // 更新按鈕狀態
+        document.getElementById('prevBtn').disabled = this.currentStep <= 0;
+        document.getElementById('nextBtn').disabled = this.currentStep >= this.steps.length;
+        
+        // 更新步驟說明
+        this.updateStepDescription();
+        
+        // 如果演示結束，停止自動播放
+        if (this.currentStep >= this.steps.length && this.isAutoPlaying) {
+            this.pauseAutoPlay();
+        }
+    }
+
+    updateStepDescription() {
+        const stepText = document.getElementById('step-text');
+        
+        if (this.currentStep === 0) {
+            stepText.textContent = '點擊「下一步」開始觀察動態規劃的建構過程';
+        } else if (this.currentStep >= this.steps.length) {
+            stepText.innerHTML = `
+                建構完成！動態規劃成功計算出 f(${this.currentN}) = ${this.fibonacci(this.currentN)}<br>
+                總共只需要 ${this.currentN} 次計算，每個子問題只計算一次。
+            `;
+        } else if (this.currentStep > 0) {
+            const step = this.steps[this.currentStep - 1];
+            stepText.textContent = step.description || '執行步驟中...';
+        }
+    }
+
+    fibonacci(n) {
+        if (n <= 2) return 1;
+        let a = 1, b = 1;
+        for (let i = 3; i <= n; i++) {
+            [a, b] = [b, a + b];
+        }
+        return b;
+    }
+}
+
+// 頁面載入完成後初始化
+document.addEventListener('DOMContentLoaded', () => {
+    const controller = new DPConstructionController();
+    
+    // 導出到全域以便調試
+    window.dpConstructionController = controller;
+});

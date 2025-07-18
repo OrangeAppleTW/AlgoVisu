@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動態規劃建構過程 - 爬樓梯問題</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="dp-styles.css">
+    <link rel="stylesheet" href="dp-construction-styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>動態規劃建構過程</h1>
+        
+        <div class="intro-section">
+            <h2>觀察動態規劃如何由下而上建構解答</h2>
+            <p>
+                動態規劃採用<strong>「由下而上」</strong>的策略，從最小的子問題開始，
+                逐步建構更大問題的解答。與遞迴不同的是，每個子問題只計算一次，
+                並將結果儲存起來供後續使用。
+            </p>
+            <p>
+                這個視覺化展示了動態規劃樹狀結構的成長過程，
+                您可以清楚看到節點如何一層層向上建構，以及已計算節點的重複使用。
+            </p>
+        </div>
+        
+        <div class="control-panel">
+            <div class="input-section">
+                <label for="nValue">目標階數 (n):</label>
+                <input type="number" id="nValue" min="3" max="8" value="5">
+                <button id="resetBtn">重置</button>
+            </div>
+            
+            <div class="animation-controls">
+                <button id="prevBtn" disabled>上一步</button>
+                <button id="nextBtn">下一步</button>
+                <button id="autoBtn">自動播放</button>
+                <button id="pauseBtn" disabled>暫停</button>
+            </div>
+            
+            <div class="speed-control">
+                <label for="speedSlider">建構速度:</label>
+                <input type="range" id="speedSlider" min="800" max="3000" value="1200">
+                <span id="speedDisplay">1.2s</span>
+            </div>
+        </div>
+
+        <div class="dp-visualization">
+            <div class="tree-section">
+                <div class="section-header">
+                    <h2>動態規劃樹狀建構</h2>
+                </div>
+                
+                <div class="dp-table-section">
+                    <h3>DP表格</h3>
+                    <div class="dp-table" id="dp-table">
+                        <!-- 橫向DP表格將在這裡動態生成 -->
+                    </div>
+                    <div class="progress-info">
+                        <span>進度: <span id="progress">0</span> / <span id="total-steps">0</span></span>
+                        <span>已計算: <span id="computed-count">0</span> 個節點</span>
+                    </div>
+                </div>
+                
+                <div class="tree-container" id="dp-construction-tree"></div>
+            </div>
+        </div>
+
+        <div class="step-info">
+            <div class="step-description">
+                <h3>建構步驟說明</h3>
+                <p id="step-text">點擊「下一步」開始觀察動態規劃的建構過程</p>
+            </div>
+            
+            <div class="construction-principles">
+                <h4>動態規劃建構原則</h4>
+                <div class="principles-grid">
+                    <div class="principle-item">
+                        <strong>1. 基礎情況初始化</strong>
+                        <p>從 f(1) = 1, f(2) = 1 開始</p>
+                    </div>
+                    <div class="principle-item">
+                        <strong>2. 依序建構</strong>
+                        <p>按順序計算 f(3), f(4), ..., f(n)</p>
+                    </div>
+                    <div class="principle-item">
+                        <strong>3. 狀態轉移</strong>
+                        <p>f(i) = f(i-1) + f(i-2)</p>
+                    </div>
+                    <div class="principle-item">
+                        <strong>4. 結果重用</strong>
+                        <p>每個值只計算一次，多次使用</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="algorithm-comparison">
+            <h3>建構方式比較</h3>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>遞迴方式 (Top-Down)</h4>
+                    <p><strong>策略:</strong> 從目標問題開始分解</p>
+                    <p><strong>問題:</strong> 重複計算相同子問題</p>
+                    <p><strong>結構:</strong> 樹狀圖有大量重複節點</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>動態規劃 (Bottom-Up)</h4>
+                    <p><strong>策略:</strong> 從基礎情況開始建構</p>
+                    <p><strong>優勢:</strong> 每個子問題只計算一次</p>
+                    <p><strong>結構:</strong> 樹狀圖簡潔，節點重複利用</p>
+                </div>
+                <div class="comparison-item">
+                    <h4>效率對比</h4>
+                    <p><strong>時間複雜度:</strong> O(2^n) → O(n)</p>
+                    <p><strong>空間複雜度:</strong> O(n) → O(n)</p>
+                    <p><strong>實際效果:</strong> 指數級提升</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="recursion-vs-dp.html" class="nav-button">← 回到比較演示</a>
+            <a href="index.html" class="nav-button">回到課程首頁 →</a>
+        </div>
+    </div>
+
+    <script src="tree-visualization.js"></script>
+    <script src="dp-construction.js"></script>
+    
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

@@ -449,6 +449,42 @@
             overflow-x: auto;
         }
 
+        /* Python 語法高亮 */
+        .code-display .keyword {
+            color: #ff7edb;
+            font-weight: bold;
+        }
+
+        .code-display .function {
+            color: #7dd3fc;
+            font-weight: bold;
+        }
+
+        .code-display .parameter {
+            color: #fbbf24;
+        }
+
+        .code-display .variable {
+            color: #a7f3d0;
+        }
+
+        .code-display .operator {
+            color: #f472b6;
+        }
+
+        .code-display .number {
+            color: #fde047;
+        }
+
+        .code-display .comment {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .code-display .string {
+            color: #86efac;
+        }
+
         @media (max-width: 1024px) {
             .algorithm-display {
                 grid-template-columns: 1fr;
@@ -545,28 +581,27 @@
         </div>
 
         <div class="code-display">
-            <div style="color: #81c784; margin-bottom: 10px;">// 子集枚舉演算法的Python實作</div>
-def enumerate_subsets(elements):
-    n = len(elements)
-    subset = []  # 用於存放當前子集的元素
+            <pre><code class="language-python"><span class="keyword">def</span> <span class="function">enumerate_subsets</span>(<span class="parameter">elements</span>):
+    <span class="parameter">n</span> <span class="operator">=</span> <span class="function">len</span>(<span class="parameter">elements</span>)
+    <span class="variable">subset</span> <span class="operator">=</span> []  <span class="comment"># 用於存放當前子集的元素</span>
 
-    def backtrack(index):
-        if index == n:  # 終止條件：已決定對每個元素的取捨
-            print(subset)  # 輸出當前子集
-            return
+    <span class="keyword">def</span> <span class="function">backtrack</span>(<span class="parameter">index</span>):
+        <span class="keyword">if</span> <span class="parameter">index</span> <span class="operator">==</span> <span class="parameter">n</span>:  <span class="comment"># 終止條件：已決定對每個元素的取捨</span>
+            <span class="function">print</span>(<span class="variable">subset</span>)  <span class="comment"># 輸出當前子集</span>
+            <span class="keyword">return</span>
 
-        # 情況1：選取第 index 個元素
-        subset.append(elements[index])
-        backtrack(index + 1)
-        subset.pop()  # 回溯：將剛剛加入的元素移除
+        <span class="comment"># 情況1：選取第 index 個元素</span>
+        <span class="variable">subset</span>.<span class="function">append</span>(<span class="parameter">elements</span>[<span class="parameter">index</span>])
+        <span class="function">backtrack</span>(<span class="parameter">index</span> <span class="operator">+</span> <span class="number">1</span>)
+        <span class="variable">subset</span>.<span class="function">pop</span>()  <span class="comment"># 回溯：將剛剛加入的元素移除</span>
 
-        # 情況2：不選取第 index 個元素
-        backtrack(index + 1)
+        <span class="comment"># 情況2：不選取第 index 個元素</span>
+        <span class="function">backtrack</span>(<span class="parameter">index</span> <span class="operator">+</span> <span class="number">1</span>)
 
-    backtrack(0)
+    <span class="function">backtrack</span>(<span class="number">0</span>)
 
-# 使用範例
-enumerate_subsets([1, 2, 3])
+<span class="comment"># 使用範例</span>
+<span class="function">enumerate_subsets</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])</code></pre>
         </div>
 
         <div class="navigation">

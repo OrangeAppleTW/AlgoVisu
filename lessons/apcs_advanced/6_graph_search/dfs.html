@@ -109,55 +109,55 @@
                 </div>
                 
                 <div id="dfs-python" class="code-view active">
-def dfs(graph, start):
-    visited = set()
-    stack = [start]
-    result = []
+<span class="keyword">def</span> <span class="function">dfs</span>(<span class="parameter">graph</span>, <span class="parameter">start</span>):
+    <span class="variable">visited</span> <span class="operator">=</span> <span class="function">set</span>()
+    <span class="variable">stack</span> <span class="operator">=</span> [<span class="parameter">start</span>]
+    <span class="variable">result</span> <span class="operator">=</span> []
     
-    while stack:
-        node = stack.pop()  # 從後端取出
+    <span class="keyword">while</span> <span class="variable">stack</span>:
+        <span class="variable">node</span> <span class="operator">=</span> <span class="variable">stack</span>.<span class="function">pop</span>()  <span class="comment"># 從後端取出</span>
         
-        if node not in visited:
-            visited.add(node)
-            result.append(node)
+        <span class="keyword">if</span> <span class="variable">node</span> <span class="keyword">not in</span> <span class="variable">visited</span>:
+            <span class="variable">visited</span>.<span class="function">add</span>(<span class="variable">node</span>)
+            <span class="variable">result</span>.<span class="function">append</span>(<span class="variable">node</span>)
             
-            # 將鄰接節點加入 stack (反序)
-            for neighbor in reversed(graph[node]):
-                if neighbor not in visited:
-                    stack.append(neighbor)
+            <span class="comment"># 將鄰接節點加入 stack (反序)</span>
+            <span class="keyword">for</span> <span class="parameter">neighbor</span> <span class="keyword">in</span> <span class="function">reversed</span>(<span class="parameter">graph</span>[<span class="variable">node</span>]):
+                <span class="keyword">if</span> <span class="parameter">neighbor</span> <span class="keyword">not in</span> <span class="variable">visited</span>:
+                    <span class="variable">stack</span>.<span class="function">append</span>(<span class="parameter">neighbor</span>)
     
-    return result</div>
+    <span class="keyword">return</span> <span class="variable">result</span></div>
                 
                 <div id="dfs-cpp" class="code-view">
-#include &lt;stack&gt;
-#include &lt;vector&gt;
-#include &lt;unordered_set&gt;
-using namespace std;
+<span class="preprocessor">#include</span> <span class="string">&lt;stack&gt;</span>
+<span class="preprocessor">#include</span> <span class="string">&lt;vector&gt;</span>
+<span class="preprocessor">#include</span> <span class="string">&lt;unordered_set&gt;</span>
+<span class="keyword">using namespace</span> <span class="namespace">std</span>;
 
-vector&lt;int&gt; dfs(vector&lt;vector&lt;int&gt;&gt;& graph, int start) {
-    unordered_set&lt;int&gt; visited;
-    stack&lt;int&gt; st;
-    vector&lt;int&gt; result;
+<span class="type">vector</span>&lt;<span class="type">int</span>&gt; <span class="function">dfs</span>(<span class="type">vector</span>&lt;<span class="type">vector</span>&lt;<span class="type">int</span>&gt;&gt;&amp; <span class="parameter">graph</span>, <span class="type">int</span> <span class="parameter">start</span>) {
+    <span class="type">unordered_set</span>&lt;<span class="type">int</span>&gt; <span class="variable">visited</span>;
+    <span class="type">stack</span>&lt;<span class="type">int</span>&gt; <span class="variable">st</span>;
+    <span class="type">vector</span>&lt;<span class="type">int</span>&gt; <span class="variable">result</span>;
     
-    st.push(start);
+    <span class="variable">st</span>.<span class="function">push</span>(<span class="parameter">start</span>);
     
-    while (!st.empty()) {
-        int node = st.top();
-        st.pop();
+    <span class="keyword">while</span> (!<span class="variable">st</span>.<span class="function">empty</span>()) {
+        <span class="type">int</span> <span class="variable">node</span> = <span class="variable">st</span>.<span class="function">top</span>();
+        <span class="variable">st</span>.<span class="function">pop</span>();
         
-        if (visited.find(node) == visited.end()) {
-            visited.insert(node);
-            result.push_back(node);
+        <span class="keyword">if</span> (<span class="variable">visited</span>.<span class="function">find</span>(<span class="variable">node</span>) <span class="operator">==</span> <span class="variable">visited</span>.<span class="function">end</span>()) {
+            <span class="variable">visited</span>.<span class="function">insert</span>(<span class="variable">node</span>);
+            <span class="variable">result</span>.<span class="function">push_back</span>(<span class="variable">node</span>);
             
-            for (int neighbor : graph[node]) {
-                if (visited.find(neighbor) == visited.end()) {
-                    st.push(neighbor);
+            <span class="keyword">for</span> (<span class="type">int</span> <span class="parameter">neighbor</span> : <span class="parameter">graph</span>[<span class="variable">node</span>]) {
+                <span class="keyword">if</span> (<span class="variable">visited</span>.<span class="function">find</span>(<span class="parameter">neighbor</span>) <span class="operator">==</span> <span class="variable">visited</span>.<span class="function">end</span>()) {
+                    <span class="variable">st</span>.<span class="function">push</span>(<span class="parameter">neighbor</span>);
                 }
             }
         }
     }
     
-    return result;
+    <span class="keyword">return</span> <span class="variable">result</span>;
 }</div>
                 
                 <div id="dfs-pseudocode" class="code-view">

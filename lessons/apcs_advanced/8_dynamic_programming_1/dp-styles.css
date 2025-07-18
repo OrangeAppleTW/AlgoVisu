@@ -1,0 +1,752 @@
+/* 動態規劃課程專用樣式 */
+
+/* 方法選擇器 */
+.method-selector {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin: 30px 0;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.selector-btn {
+    padding: 12px 30px;
+    border: none;
+    background: transparent;
+    color: #666;
+    cursor: pointer;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-size: 1em;
+}
+
+.selector-btn.active {
+    background: #333;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.selector-btn:hover:not(.active) {
+    background: #e9ecef;
+    color: #333;
+}
+
+/* 方法顯示區域 */
+.method-display {
+    display: none !important;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.method-display.active {
+    display: block !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.method-header {
+    text-align: center;
+    margin-bottom: 25px;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.method-header h2 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1.8em;
+}
+
+.method-description {
+    color: #666;
+    line-height: 1.6;
+    margin: 15px 0;
+    font-size: 1.1em;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.stats span {
+    padding: 8px 16px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    font-weight: 500;
+    color: #555;
+}
+
+.method-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.method-controls button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    background: #333;
+    color: white;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 0.95em;
+}
+
+.method-controls button:hover:not(:disabled) {
+    background: #555;
+    transform: translateY(-1px);
+}
+
+.method-controls button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 大型樹狀圖容器 */
+.large-tree-container {
+    min-height: 420px; /* 減少高度以減少留白 */
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #e0e0e0;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    padding: 0;
+}
+
+/* 動態規劃視覺化區域 */
+.dp-visualization {
+    margin: 20px 0;
+}
+
+.tree-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
+    max-width: 900px; /* 減少寬度 */
+    margin: 0 auto; /* 置中 */
+}
+
+.tree-section .large-tree-container {
+    margin: 0;
+    min-height: 420px; /* 縮短高度大約1/3 */
+    width: 100%;
+    padding: 0;
+}
+
+.memo-table-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
+    height: fit-content;
+}
+
+.memo-table-section h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    text-align: center;
+    font-size: 1.1em;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.memo-table {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.table-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+    background: #333;
+    color: white;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.memo-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.memo-row.computing {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+    animation: pulse 1s infinite;
+}
+
+.memo-row.computed {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    font-weight: bold;
+}
+
+.memo-row.used {
+    background: #e2e3f3;
+    border-color: #b3b7e0;
+    animation: highlight 0.5s ease-in-out;
+}
+
+@keyframes highlight {
+    0%, 100% { background: #e2e3f3; }
+    50% { background: #c8cbf0; }
+}
+
+.step-info {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+}
+
+.step-info h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.step-info p {
+    margin: 0;
+    color: #666;
+    line-height: 1.5;
+}
+
+.code-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.code-section h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.code-section pre {
+    margin: 0;
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    line-height: 1.4;
+    border: 1px solid #e9ecef;
+}
+
+.code-section code {
+    color: #333;
+}
+
+/* 樹狀圖節點樣式 */
+.tree-node {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #00bcd4;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 11px;
+    border: 2px solid #00acc1;
+    cursor: default;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 5;
+    /* 移除transition效果避免影響位置 */
+}
+
+/* 移除hover效果避免影響位置 */
+/* .tree-node:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+} */
+
+/* 遞迴節點專用樣式 */
+.tree-node.recursion-node {
+    background: white;
+    border-color: #ddd;
+    color: #333;
+    width: 55px;
+    height: 55px;
+    font-size: 13px;
+}
+
+/* 遞迴節點狀態樣式 - 移除所有動畫，只改變顏色 */
+.tree-node.recursion-node.computing {
+    background: #ff9800 !important;
+    border-color: #f57c00 !important;
+    color: white !important;
+}
+
+.tree-node.recursion-node.computed {
+    background: #4caf50 !important;
+    border-color: #388e3c !important;
+    color: white !important;
+}
+
+.tree-node.recursion-node.repeated {
+    background: #f44336 !important;
+    border-color: #d32f2f !important;
+    color: white !important;
+}
+
+/* 深層遞迴節點自動縮小 */
+.tree-node.recursion-node.deep-node {
+    border-width: 1px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.tree-node.computing {
+    background: #ff9800;
+    border-color: #f57c00;
+}
+
+.tree-node.computed {
+    background: #4caf50;
+    border-color: #388e3c;
+}
+
+.tree-node.repeated {
+    background: #f44336 !important;
+    border-color: #d32f2f !important;
+    color: white !important;
+}
+
+/* 遞迴重複計算警告標記 */
+.tree-node.recursion-node.repeated::after {
+    /* 移除重複標記，避免位置偏移 */
+    display: none;
+}
+
+/* 移除highlighted的transform效果 */
+.tree-node.highlighted {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+.tree-node.reused {
+    background: #9c27b0;
+    border-color: #7b1fa2;
+}
+
+.tree-node.reused::before {
+    content: '重用';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #7b1fa2;
+    color: white;
+    font-size: 8px;
+    padding: 1px 4px;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+/* 遞迴專用動畫 */
+@keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+}
+
+/* 遞迴重複警告效果 */
+.repeat-warning {
+    animation: warningPulse 0.5s ease-in-out;
+}
+
+@keyframes warningPulse {
+    0% { transform: scale(0) rotate(-10deg); }
+    50% { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.computing-effect {
+    pointer-events: none;
+}
+
+.computed-checkmark {
+    animation: checkmarkAppear 0.5s ease-out;
+}
+
+@keyframes checkmarkAppear {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    50% { transform: scale(1.3) rotate(-90deg); opacity: 0.8; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* 樹狀圖連線樣式 */
+.tree-edge {
+    position: absolute;
+    background: #666;
+    height: 2px;
+    transform-origin: left center;
+    z-index: 1;
+}
+
+.tree-edge.active {
+    background: #ff9800;
+    box-shadow: 0 0 6px rgba(255, 152, 0, 0.5);
+}
+
+.tree-edge.completed {
+    background: #4caf50;
+}
+
+/* 動態規劃特殊樣式 */
+.dp-node {
+    background: #2196f3;
+    border-color: #1976d2;
+}
+
+.dp-node.reused {
+    background: #9c27b0;
+    border-color: #7b1fa2;
+    animation: glow 1s ease-in-out;
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+    50% { box-shadow: 0 4px 16px rgba(156, 39, 176, 0.6); }
+}
+
+/* DP表格樣式 - 覆蓋全域樣式，以此檔案為主 */
+.dp-table-section {
+    background: white !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    max-width: 800px !important; /* 減少表格區域寬度 */
+    margin: 0 auto 20px auto !important; /* 置中 */
+}
+
+.dp-table-section h4 {
+    margin: 0 0 15px 0 !important;
+    color: #333 !important;
+    text-align: center !important;
+    font-size: 1.2em !important;
+}
+
+.dp-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 0 auto !important;
+    min-width: auto !important;
+    font-size: 1.1em !important; /* 放大字體 */
+}
+
+.dp-table th,
+.dp-table td {
+    border: 1px solid #ddd !important;
+    padding: 8px !important; /* 減少內邊距 */
+    text-align: center !important;
+    font-size: 1.1em !important; /* 放大字體 */
+    min-width: 60px !important; /* 減少最小寬度 */
+    width: auto !important;
+}
+
+/* 確保表格標題行（f(n), f(1)~f(8)）為黑底白字，覆蓋全域樣式 */
+.dp-table th,
+.dp-table thead tr th,
+.dp-table thead th {
+    background: #333 !important;
+    background-color: #333 !important;
+    color: white !important;
+    font-weight: bold !important;
+}
+
+.dp-table td {
+    background: #f8f9fa !important;
+    background-color: #f8f9fa !important;
+    transition: all 0.3s ease !important;
+}
+
+/* 覆蓋全域樣式中的交替顏色 */
+.dp-table tbody tr:nth-child(odd) {
+    background-color: transparent !important;
+}
+
+.dp-table tbody tr:nth-child(odd) td {
+    background: #f8f9fa !important;
+    background-color: #f8f9fa !important;
+}
+
+.dp-table td.computing {
+    background: #fff3cd !important;
+    background-color: #fff3cd !important;
+    color: #856404 !important;
+    font-weight: bold !important;
+    animation: pulse 1s infinite !important;
+}
+
+.dp-table td.computed {
+    background: #d4edda !important;
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    font-weight: bold !important;
+}
+
+.dp-table td.used {
+    background: #e2e3f3 !important;
+    background-color: #e2e3f3 !important;
+    color: #383d41 !important;
+    animation: highlight 0.5s ease-in-out !important;
+}
+
+.dp-table td.target {
+    background: #ffc107 !important;
+    background-color: #ffc107 !important;
+    color: #856404 !important;
+    font-weight: bold !important;
+    animation: targetPulse 1s infinite !important;
+    position: relative !important;
+}
+
+.dp-table td.target::after {
+    content: '▲' !important;
+    position: absolute !important;
+    top: -15px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: #ffc107 !important;
+    color: #856404 !important;
+    font-size: 12px !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-weight: bold !important;
+    animation: targetArrow 1s infinite !important;
+    z-index: 1000 !important;
+}
+
+@keyframes targetPulse {
+    0%, 100% { background: #ffc107; }
+    50% { background: #ffeb3b; }
+}
+
+@keyframes targetArrow {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-2px); }
+}
+
+/* 比較總結區域 */
+.comparison-summary {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 40px 0;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.comparison-summary h3 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 1.4em;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.stat-item {
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.stat-item.highlight {
+    background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+    color: white;
+    border-color: #2e7d32;
+}
+
+.stat-label {
+    font-weight: 500;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.stat-item.highlight .stat-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.stat-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-item.highlight .stat-value {
+    color: white;
+}
+
+/* 計數器顏色 */
+#recursion-count {
+    color: #f44336;
+}
+
+#dp-count {
+    color: #4caf50;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .method-selector {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .selector-btn {
+        padding: 12px 20px;
+        border-radius: 0;
+    }
+    
+    .selector-btn:first-child {
+        border-radius: 6px 6px 0 0;
+    }
+    
+    .selector-btn:last-child {
+        border-radius: 0 0 6px 6px;
+    }
+    
+    .method-header {
+        padding: 20px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .method-controls {
+        gap: 8px;
+    }
+    
+    .method-controls button {
+        padding: 8px 16px;
+        font-size: 0.9em;
+    }
+    
+    .large-tree-container {
+        min-height: 400px;
+    }
+    
+    .tree-node {
+        width: 40px;
+        height: 40px;
+        font-size: 10px;
+    }
+    
+    .summary-stats {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .comparison-summary {
+        padding: 20px;
+    }
+    
+    /* 動態規劃表格響應式 */
+    .tree-section {
+        padding: 12px;
+    }
+    
+    /* 確保手機版表格標題行也是黑底白字 */
+    .dp-table th,
+    .dp-table thead tr th,
+    .dp-table thead th {
+        background: #333 !important;
+        background-color: #333 !important;
+        color: white !important;
+        font-weight: bold !important;
+    }
+    
+    .dp-table th,
+    .dp-table td {
+        padding: 6px !important; /* 手機版更小的內邊距 */
+        font-size: 1em !important; /* 手機版保持可讀性 */
+        min-width: 50px !important; /* 手機版更小的最小寬度 */
+    }
+    
+    .dp-table-section {
+        padding: 15px !important;
+        max-width: 100% !important; /* 手機版全寬 */
+    }
+    
+    .tree-section {
+        max-width: 100% !important; /* 手機版全寬 */
+    }
+    
+    .tree-section .large-tree-container {
+        min-height: 380px !important; /* 手機版高度適度減少 */
+        padding: 0 !important;
+    }
+}

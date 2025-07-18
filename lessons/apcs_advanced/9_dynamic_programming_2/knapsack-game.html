@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背包問題互動遊戲 - 動態規劃(2)</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="knapsack-styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="game-header">
+            <h1>背包問題互動學習</h1>
+            <div class="game-info">
+                <p>請逐步填入 DP 表格的正確數值。只有填入正確答案才能進入下一步！</p>
+                <div class="progress-info">
+                    <span id="current-step">步驟 1</span> / <span id="total-steps">總共 35 步</span>
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-content">
+            <!-- 左側：DP 表格 -->
+            <div class="dp-section">
+                <h3>📊 動態規劃表格</h3>
+                <div class="dp-explanation">
+                    <p>dp[i][w] = 考慮前 i 個物品，背包容量為 w 時的最大價值</p>
+                    <div class="current-hint" id="current-hint">
+                        點擊開始遊戲來開始填入表格！
+                    </div>
+                </div>
+                <div class="dp-table-container">
+                    <table class="dp-table" id="dp-table">
+                        <!-- 表格將由 JavaScript 動態生成 -->
+                    </table>
+                </div>
+                
+                <!-- 物品選擇區域 -->
+                <div class="item-selection-area">
+                    <h4>📦 選擇要放入背包的物品</h4>
+                    
+                    <!-- 決策按鈕區域 -->
+                    <div class="decision-area" id="decision-area">
+                        <h5> 是否要拿 <span id="current-item-name">物品</span>？</h5>
+                        <div class="decision-buttons">
+                            <button id="decision-not-take" class="decision-btn not-take">不拿</button>
+                            <button id="decision-take" class="decision-btn take">拿</button>
+                        </div>
+                        <div class="decision-explanation" id="decision-explanation">
+                            請先選擇是否要拿當前物品。
+                        </div>
+                    </div>
+                    
+                    <div class="selected-items-display">
+                        <div class="selected-items" id="selected-items-display">
+                            <p class="empty-selection">尚未選擇任何物品</p>
+                        </div>
+                        <div class="selection-summary">
+                            <span class="summary-weight">總重量: <span id="selection-weight">0</span> kg</span>
+                            <span class="summary-remaining" id="summary-remaining">剩餘重量: <span id="remaining-weight">6</span> kg</span>
+                            <span class="summary-value">總價值: <span id="selection-value">0</span></span>
+                            <button id="submit-selection" class="submit-btn" disabled>放入背包</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：背包視覺化和物品列表 -->
+            <div class="visualization-section">
+                <!-- 背包視覺化 -->
+                <div class="knapsack-visual">
+                    <h3>🎒 背包狀態</h3>
+                    <div class="knapsack-container">
+                        <div class="knapsack">
+                            <div class="knapsack-info">
+                                <div class="weight-info">
+                                    <span class="label">當前重量：</span>
+                                    <span id="current-weight">0</span> kg
+                                </div>
+                                <div class="capacity-info">
+                                    <span class="label">最大容量：</span>
+                                    <span id="max-capacity">6</span> kg
+                                </div>
+                                <div class="value-info">
+                                    <span class="label">當前價值：</span>
+                                    <span id="current-value">0</span> $
+                                </div>
+                            </div>
+                            <div class="knapsack-items" id="knapsack-items">
+                                <!-- 選中的物品將顯示在這裡 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 物品列表 -->
+                <div class="items-list">
+                    <h3>📦 可選物品</h3>
+                    <div class="items-container" id="items-container">
+                        <!-- 物品將由 JavaScript 動態生成 -->
+                    </div>
+                </div>
+
+                <!-- 控制面板 -->
+                <div class="control-panel">
+                    <button id="start-game" class="control-btn primary">開始遊戲</button>
+                    <button id="reset-game" class="control-btn secondary">重新開始</button>
+                    <button id="show-hint" class="control-btn hint">顯示提示</button>
+                    <button id="auto-solve" class="control-btn auto">自動解答</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 成功完成模態框 -->
+        <div id="success-modal" class="modal">
+            <div class="modal-content">
+                <h2>🎉 恭喜完成！</h2>
+                <p>你已經成功填完整個 DP 表格！</p>
+                <div class="final-result">
+                    <p><strong>最佳解：</strong>價值 <span id="final-value"></span>，重量 <span id="final-weight"></span></p>
+                    <div id="selected-items"></div>
+                </div>
+                <button id="close-modal" class="control-btn primary">再玩一次</button>
+            </div>
+        </div>
+
+        <!-- 錯誤提示模態框 -->
+        <div id="error-modal" class="modal">
+            <div class="modal-content error">
+                <h2>❌ 答案錯誤</h2>
+                <p id="error-message">請重新考慮這一步的答案。</p>
+                <div id="error-hint"></div>
+                <button id="close-error-modal" class="control-btn primary">我知道了</button>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="nav-button">← 回到課程介紹</a>
+            <a href="../index.html" class="nav-button">回到課程大綱</a>
+        </div>
+    </div>
+
+    <script src="knapsack-data.js"></script>
+    <script src="knapsack-game.js"></script>
+    <script src="knapsack-ui.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>
