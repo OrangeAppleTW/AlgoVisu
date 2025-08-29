@@ -105,10 +105,10 @@ class DijkstraRenderer {
 
         // 創建背景矩形讓文字更清楚
         const midX = (startX + endX) / 2;
-        const midY = (startY + endY) / 2;
+        const midY = (startY + endY) / 2 - 6; // 向上調整6像素
         const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
         rect.setAttribute('x', midX - 15);
-        rect.setAttribute('y', midY - 12);
+        rect.setAttribute('y', midY - 8);
         rect.setAttribute('width', 30);
         rect.setAttribute('height', 20);
         rect.setAttribute('fill', 'white');
@@ -119,7 +119,7 @@ class DijkstraRenderer {
         // 創建權重標籤
         const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         text.setAttribute('x', midX);
-        text.setAttribute('y', midY + 2);
+        text.setAttribute('y', midY + 2); // 對應調整文字位置
         text.textContent = edge.weight;
 
         g.appendChild(line);

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bellman-Ford Algorithm - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="bellman_ford_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Bellman-Ford Algorithm 負權重最短路徑演算法</h1>
+        
+        <div class="lesson-info">
+            學習 Bellman-Ford 演算法如何處理負權重邊並找到最短路徑（經典案例：C→F 負權重-10創造驚人的F:-2！）
+        </div>
+
+        <div class="algorithm-explanation">
+            <h2>演算法概念</h2>
+            <p>
+                <strong>Bellman-Ford Algorithm</strong> 是一種能夠處理負權重邊的單源最短路徑演算法。
+                與 Dijkstra 演算法不同，Bellman-Ford 能夠偵測圖中是否存在負權重環路，並在沒有負環的情況下找到正確的最短路徑。
+            </p>
+            <div class="algorithm-steps">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>初始化</h4>
+                        <p>設定起點距離為 0，其他所有節點距離為無限大</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>鬆弛操作</h4>
+                        <p>對所有邊進行 V-1 輪鬆弛操作，V 為節點數量</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>負環檢測</h4>
+                        <p>再進行一輪鬆弛，如果還能更新距離則存在負環</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>結果輸出</h4>
+                        <p>輸出最短距離或報告負環的存在</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="relax-explanation">
+            <h2>鬆弛 (Relax) 操作深度解析</h2>
+            <div class="relax-concept">
+                <p>
+                    <strong>鬆弛 (Relax)</strong> 是 Bellman-Ford 演算法的核心概念，它代表了一種<strong>「不急於做出最終決定」</strong>的靈活策略。
+                    與貪心演算法（如 Dijkstra）的「一次定終身」不同，鬆弛操作允許我們<strong>重新評估和改善</strong>之前的路徑選擇。
+                </p>
+            </div>
+            
+            <div class="relax-details">
+                <div class="relax-item">
+                    <h4>🔍 鬆弛的定義</h4>
+                    <div class="relax-formula">
+                        <code>如果 distance[u] + weight(u→v) < distance[v]</code><br>
+                        <code>那麼 distance[v] = distance[u] + weight(u→v)</code>
+                    </div>
+                    <p>對每條邊 u→v，檢查是否能透過 u 找到到達 v 的更短路徑</p>
+                </div>
+                
+                <div class="relax-item">
+                    <h4>🎯 為什麼叫「鬆弛」？</h4>
+                    <p>
+                        想像一條<strong>繃緊的橡皮筋</strong>：當我們找到更短的路徑時，距離就像橡皮筋一樣
+                        「放鬆」到更小的數值。這個過程是<strong>漸進式的改善</strong>，而非一次性的決定。
+                    </p>
+                </div>
+                
+                <div class="relax-item">
+                    <h4>⚡ 改善貪心策略的限制</h4>
+                    <div class="comparison-box">
+                        <div class="greedy-limitation">
+                            <h5>🚫 貪心演算法的問題：</h5>
+                            <ul>
+                                <li><strong>永不回頭</strong>：一旦選擇某個節點，就不會重新考慮</li>
+                                <li><strong>局部最優</strong>：只看當前步驟的最佳選擇</li>
+                                <li><strong>無法處理負權重</strong>：可能錯過更短路徑</li>
+                            </ul>
+                        </div>
+                        <div class="relax-solution">
+                            <h5>✅ 鬆弛操作的優勢：</h5>
+                            <ul>
+                                <li><strong>彈性調整</strong>：允許重新評估之前的決定</li>
+                                <li><strong>全域視野</strong>：透過多輪操作考慮所有可能路徑</li>
+                                <li><strong>負權重友善</strong>：能正確處理負權重邊</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relax-item">
+                    <h4>🔄 V-1 輪的智慧</h4>
+                    <p>
+                        透過 <strong>V-1 輪鬆弛</strong>，我們確保考慮了所有可能的路徑組合：
+                    </p>
+                    <ul>
+                        <li><strong>第 1 輪</strong>：找到所有「1 跳」可達的最短距離</li>
+                        <li><strong>第 2 輪</strong>：找到所有「2 跳」可達的最短距離</li>
+                        <li><strong>第 k 輪</strong>：找到所有「k 跳」可達的最短距離</li>
+                    </ul>
+                    <p>這種<strong>漸進式探索</strong>確保我們不會錯過任何更短的路徑。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualization-container">
+            <div class="visualization-panel">
+                <h3>圖形視覺化</h3>
+                <div class="graph-container">
+                    <svg id="graph-svg" width="600" height="400"></svg>
+                </div>
+                
+                <div class="controls">
+                    <button id="reset-btn" class="control-button">重設</button>
+                    <button id="next-step-btn" class="control-button primary">下一步</button>
+                    <button id="prev-step-btn" class="control-button">上一步</button>
+                    <button id="auto-play-btn" class="control-button">自動播放</button>
+                </div>
+                
+                <div class="step-info">
+                    <h4>當前步驟：</h4>
+                    <p id="step-description">初始化：設定起點 S 的距離為 0，其他節點距離為無限大</p>
+                </div>
+            </div>
+
+            <div class="table-panel">
+                <h3>距離表格</h3>
+                <div class="round-info">
+                    <p>當前輪數：<span id="current-round">0</span> / <span id="total-rounds">6</span></p>
+                </div>
+                <div class="table-container">
+                    <table id="distance-table" class="algorithm-table">
+                        <thead>
+                            <tr>
+                                <th>節點</th>
+                                <th>距離</th>
+                                <th>前驅</th>
+                                <th>路徑</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-node="S">
+                                <td>S</td>
+                                <td class="distance">0</td>
+                                <td class="predecessor">-</td>
+                                <td class="path">S</td>
+                            </tr>
+                            <tr data-node="A">
+                                <td>A</td>
+                                <td class="distance">∞</td>
+                                <td class="predecessor">-</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="B">
+                                <td>B</td>
+                                <td class="distance">∞</td>
+                                <td class="predecessor">-</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="C">
+                                <td>C</td>
+                                <td class="distance">∞</td>
+                                <td class="predecessor">-</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="D">
+                                <td>D</td>
+                                <td class="distance">∞</td>
+                                <td class="predecessor">-</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="E">
+                                <td>E</td>
+                                <td class="distance">∞</td>
+                                <td class="predecessor">-</td>
+                                <td class="path">-</td>
+                            </tr>
+                            <tr data-node="F">
+                                <td>F</td>
+                                <td class="distance">∞</td>
+                                <td class="predecessor">-</td>
+                                <td class="path">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="legend">
+                    <h4>圖例說明：</h4>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-color start"></div>
+                            <span>起點</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color relaxing"></div>
+                            <span>正在鬆弛</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color updated"></div>
+                            <span>距離已更新</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color negative"></div>
+                            <span>負權重邊</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="complexity-analysis">
+            <h2>時間複雜度分析</h2>
+            <div class="complexity-grid">
+                <div class="complexity-item">
+                    <h4>時間複雜度</h4>
+                    <p><strong>O(VE)</strong></p>
+                    <p>V-1輪鬆弛，每輪檢查所有E條邊</p>
+                </div>
+                <div class="complexity-item">
+                    <h4>空間複雜度</h4>
+                    <p><strong>O(V)</strong></p>
+                    <p>儲存每個節點的距離和前驅</p>
+                </div>
+                <div class="complexity-item">
+                    <h4>負環偵測</h4>
+                    <p><strong>額外一輪</strong></p>
+                    <p>第V輪如果還能更新則有負環</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="algorithm-comparison">
+            <h2>與其他演算法比較</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>適用圖類型</h4>
+                    <div class="comparison-row">
+                        <span>Dijkstra：</span>
+                        <span>非負權重圖</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Bellman-Ford：</span>
+                        <span>任意權重圖（可負）</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Floyd-Warshall：</span>
+                        <span>支援負權重（無負環）</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <h4>時間複雜度</h4>
+                    <div class="comparison-row">
+                        <span>Dijkstra：</span>
+                        <span>O(V²) 或 O((V+E)logV)</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Bellman-Ford：</span>
+                        <span>O(VE)</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Floyd-Warshall：</span>
+                        <span>O(V³)</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <h4>應用場景</h4>
+                    <div class="comparison-row">
+                        <span>Dijkstra：</span>
+                        <span>正權重，單源路徑</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Bellman-Ford：</span>
+                        <span>可能有負權重，單源路徑</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Floyd-Warshall：</span>
+                        <span>全對路徑</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="index.html" class="nav-button">← 回到貪心演算法</a>
+            <a href="floyd_warshall.html" class="nav-button">Floyd-Warshall →</a>
+        </div>
+    </div>
+    
+    <script src="bellman_ford_data.js"></script>
+    <script src="bellman_ford_renderer.js"></script>
+    <script src="bellman_ford_algorithm.js"></script>
+    <script src="bellman_ford_controller.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

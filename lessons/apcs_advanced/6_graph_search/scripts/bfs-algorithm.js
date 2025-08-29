@@ -198,13 +198,6 @@ class BFSAlgorithm {
         // 更新狀態描述
         this.updateStatus(step.description);
 
-        // 重置所有節點狀態
-        this.graph.getNodes().forEach(node => {
-            node.visited = false;
-            node.inQueue = false;
-            node.current = false;
-        });
-
         // 根據步驟更新標籤顯示狀態
         if (step.showLabels) {
             this.graph.getNodes().forEach(node => {
@@ -216,35 +209,49 @@ class BFSAlgorithm {
             });
         }
 
-        // 設置節點狀態
+        // 先收集所有需要設置的節點狀態
+        const nodeStates = new Map();
+        
+        // 設置明確指定的節點狀態
         if (step.nodeState) {
             Object.entries(step.nodeState).forEach(([nodeId, state]) => {
-                this.graph.setNodeState(nodeId, state);
+                nodeStates.set(nodeId, state);
             });
         }
 
-        // 設置所有已訪問的節點
+        // 設置所有已訪問的節點（優先級較低，不覆蓋明確狀態）
         if (step.visitOrder) {
             step.visitOrder.forEach(nodeDisplayName => {
-                // 找到對應的節點 ID
                 const nodeId = this.findNodeIdByDisplayName(nodeDisplayName);
-                if (nodeId && (!step.nodeState || !step.nodeState[nodeId])) {
-                    this.graph.setNodeState(nodeId, 'visited');
+                if (nodeId && !nodeStates.has(nodeId)) {
+                    nodeStates.set(nodeId, 'visited');
                 }
             });
         }
 
-        // 設置佇列中的節點狀態
+        // 設置佇列中的節點狀態（優先級最低）
         if (step.queue) {
             step.queue.forEach(nodeDisplayName => {
                 const nodeId = this.findNodeIdByDisplayName(nodeDisplayName);
-                if (nodeId && (!step.nodeState || !step.nodeState[nodeId])) {
-                    if (!step.visitOrder || !step.visitOrder.includes(nodeDisplayName)) {
-                        this.graph.setNodeState(nodeId, 'inQueue');
+                if (nodeId && !nodeStates.has(nodeId)) {
+                    // 檢查該節點是否已經被訪問過
+                    const isVisited = step.visitOrder && step.visitOrder.includes(nodeDisplayName);
+                    if (!isVisited) {
+                        nodeStates.set(nodeId, 'inQueue');
                     }
                 }
             });
         }
+
+        // 現在一次性更新所有節點狀態
+        this.graph.getNodes().forEach(node => {
+            if (nodeStates.has(node.id)) {
+                this.graph.setNodeState(node.id, nodeStates.get(node.id));
+            } else {
+                // 只有沒有明確狀態的節點才重置為默認狀態
+                this.graph.setNodeState(node.id, 'default');
+            }
+        });
 
         // 更新佇列顯示
         this.queueRenderer.updateQueue(step.queue, step.currentNode);

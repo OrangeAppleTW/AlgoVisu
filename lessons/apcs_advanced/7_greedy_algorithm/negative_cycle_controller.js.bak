@@ -1,0 +1,244 @@
+// Negative Cycle Detection Controller
+class NegativeCycleController {
+    constructor() {
+        this.data = new NegativeCycleData();
+        this.algorithm = new NegativeCycleAlgorithm(this.data);
+        this.renderer = null;
+        this.isAutoPlaying = false;
+        this.init();
+    }
+
+    init() {
+        // 獲取 DOM 元素
+        this.svg = document.getElementById('negative-cycle-svg');
+        this.nextBtn = document.getElementById('neg-next-step-btn');
+        this.prevBtn = document.getElementById('neg-prev-step-btn');
+        this.resetBtn = document.getElementById('neg-reset-btn');
+        this.autoPlayBtn = document.getElementById('neg-auto-play-btn');
+        this.stepDescription = document.getElementById('neg-step-description');
+        this.distanceTable = document.getElementById('negative-cycle-table');
+        this.currentRoundSpan = document.getElementById('neg-current-round');
+        this.totalRoundsSpan = document.getElementById('neg-total-rounds');
+        this.cycleStatus = document.getElementById('cycle-status');
+
+        // 設定總輪數 (V-1 = 4-1 = 3)
+        this.totalRoundsSpan.textContent = this.data.maxRounds;
+
+        // 初始化渲染器
+        this.renderer = new NegativeCycleRenderer(this.svg, this.data);
+
+        // 綁定事件
+        this.bindEvents();
+
+        // 初始化界面
+        this.updateUI();
+    }
+
+    bindEvents() {
+        this.nextBtn.addEventListener('click', () => this.nextStep());
+        this.prevBtn.addEventListener('click', () => this.prevStep());
+        this.resetBtn.addEventListener('click', () => this.reset());
+        this.autoPlayBtn.addEventListener('click', () => this.toggleAutoPlay());
+    }
+
+    nextStep() {
+        if (this.isAutoPlaying) return;
+
+        if (this.algorithm.nextStep()) {
+            this.updateUI();
+            this.animateStep();
+        }
+    }
+
+    prevStep() {
+        if (this.isAutoPlaying) return;
+
+        if (this.algorithm.prevStep()) {
+            this.updateUI();
+        }
+    }
+
+    reset() {
+        this.stopAutoPlay();
+        this.algorithm.reset();
+        this.renderer.clearHighlights();
+        this.updateUI();
+    }
+
+    toggleAutoPlay() {
+        if (this.isAutoPlaying) {
+            this.stopAutoPlay();
+        } else {
+            this.startAutoPlay();
+        }
+    }
+
+    startAutoPlay() {
+        this.isAutoPlaying = true;
+        this.autoPlayBtn.textContent = '停止播放';
+        this.autoPlayBtn.style.background = '#e74c3c';
+        
+        this.nextBtn.disabled = true;
+        this.prevBtn.disabled = true;
+        this.resetBtn.disabled = true;
+
+        this.algorithm.autoPlay = (callback) => {
+            const playStep = () => {
+                if (this.algorithm.nextStep()) {
+                    callback();
+                    if (!this.algorithm.isComplete()) {
+                        setTimeout(playStep, 2000);
+                    } else {
+                        this.stopAutoPlay();
+                    }
+                }
+            };
+            playStep();
+        };
+
+        this.algorithm.autoPlay(() => {
+            this.updateUI();
+            this.animateStep();
+        });
+    }
+
+    stopAutoPlay() {
+        this.isAutoPlaying = false;
+        this.autoPlayBtn.textContent = '自動播放';
+        this.autoPlayBtn.style.background = '#ecf0f1';
+        
+        this.nextBtn.disabled = false;
+        this.prevBtn.disabled = false;
+        this.resetBtn.disabled = false;
+        
+        this.updateControlButtons();
+    }
+
+    updateUI() {
+        this.updateStepDescription();
+        this.updateDistanceTable();
+        this.updateRoundInfo();
+        this.updateControlButtons();
+        this.updateCycleStatus();
+        this.renderer.updateVisualization();
+        this.highlightCurrentEdge();
+    }
+
+    updateStepDescription() {
+        const stepInfo = this.algorithm.getCurrentStepInfo();
+        if (stepInfo) {
+            this.stepDescription.innerHTML = `
+                <strong>步驟 ${stepInfo.stepNumber}/${stepInfo.totalSteps}:</strong> 
+                ${stepInfo.description}
+            `;
+        } else {
+            this.stepDescription.textContent = '點擊「下一步」開始演算法';
+        }
+    }
+
+    updateRoundInfo() {
+        const stepInfo = this.algorithm.getCurrentStepInfo();
+        if (stepInfo) {
+            this.currentRoundSpan.textContent = stepInfo.round;
+        } else {
+            this.currentRoundSpan.textContent = '0';
+        }
+    }
+
+    updateDistanceTable() {
+        const tbody = this.distanceTable.querySelector('tbody');
+        const rows = tbody.querySelectorAll('tr');
+        const stepInfo = this.algorithm.getCurrentStepInfo();
+        
+        rows.forEach(row => {
+            const nodeId = row.getAttribute('data-node');
+            if (!nodeId) return;
+            
+            const distanceCell = row.querySelector('.distance');
+            const predecessorCell = row.querySelector('.predecessor');
+            const pathCell = row.querySelector('.path');
+            
+            // 更新距離
+            const distance = this.data.formatDistance(this.data.distances[nodeId]);
+            distanceCell.textContent = distance;
+            
+            // 更新前驅
+            const predecessor = this.data.predecessors[nodeId];
+            predecessorCell.textContent = predecessor || '-';
+            
+            // 更新路徑
+            pathCell.textContent = this.data.formatPath(nodeId);
+            
+            // 移除所有樣式類別
+            row.classList.remove('start-node', 'updated-node', 'relaxing-node', 'negative-cycle-node');
+            
+            // 添加適當的樣式
+            if (nodeId === this.data.startNode) {
+                row.classList.add('start-node');
+            } else if (this.data.hasNegativeCycle && this.isInNegativeCycle(nodeId)) {
+                row.classList.add('negative-cycle-node');
+            } else if (this.data.isNodeUpdated(nodeId)) {
+                row.classList.add('updated-node');
+            } else if (this.data.relaxingEdge && 
+                      (this.data.relaxingEdge.from === nodeId || this.data.relaxingEdge.to === nodeId)) {
+                row.classList.add('relaxing-node');
+            }
+        });
+    }
+
+    isInNegativeCycle(nodeId) {
+        if (!this.data.negativeCycleEdges) return false;
+        return this.data.negativeCycleEdges.some(edge => 
+            edge.from === nodeId || edge.to === nodeId
+        );
+    }
+
+    updateControlButtons() {
+        if (!this.isAutoPlaying) {
+            this.nextBtn.disabled = !this.algorithm.canGoNext();
+            this.prevBtn.disabled = !this.algorithm.canGoPrev();
+        }
+    }
+
+    updateCycleStatus() {
+        if (this.data.hasNegativeCycle) {
+            this.cycleStatus.textContent = '⚠️ 負環已偵測到！';
+            this.cycleStatus.className = 'cycle-status detected';
+        } else {
+            this.cycleStatus.textContent = '尚未偵測到負環';
+            this.cycleStatus.className = 'cycle-status not-detected';
+        }
+    }
+
+    highlightCurrentEdge() {
+        if (this.data.relaxingEdge) {
+            this.renderer.highlightRelaxingEdge(this.data.relaxingEdge);
+        } else {
+            this.renderer.clearHighlights();
+        }
+    }
+
+    animateStep() {
+        const stepInfo = this.algorithm.getCurrentStepInfo();
+        if (stepInfo && stepInfo.updates && stepInfo.updates.length > 0) {
+            stepInfo.updates.forEach(update => {
+                this.renderer.animateNodeUpdate(update.node);
+            });
+        }
+    }
+}
+
+// 初始化負環偵測控制器
+let negativeCycleController;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 等待一小段時間確保原本的控制器已初始化
+    setTimeout(() => {
+        try {
+            negativeCycleController = new NegativeCycleController();
+            console.log('負環偵測控制器初始化成功');
+        } catch (error) {
+            console.error('負環偵測控制器初始化失敗:', error);
+        }
+    }, 100);
+});

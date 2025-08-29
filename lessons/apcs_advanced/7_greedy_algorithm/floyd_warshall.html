@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floyd-Warshall Algorithm - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="floyd_warshall_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Floyd-Warshall Algorithm 全對最短路徑演算法</h1>
+        
+        <div class="lesson-info">
+            學習 Floyd-Warshall 演算法如何找出圖中所有節點對之間的最短路徑（本範例包含多條負權重邊）
+        </div>
+
+        <div class="algorithm-explanation">
+            <h2>演算法概念</h2>
+            <p>
+                <strong>Floyd-Warshall Algorithm</strong> 是一種用於在加權圖中尋找所有節點對之間最短路徑的動態規劃演算法。
+            </p>
+            <div class="algorithm-steps">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>初始化</h4>
+                        <p>建立距離矩陣，設定直接相鄰的距離，其他設為無限大</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>選擇中繼點</h4>
+                        <p>逐一選擇每個節點作為中繼點（k = 0, 1, 2, ...）</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>更新距離</h4>
+                        <p>對所有節點對(i,j)，檢查是否 distance[i][k] + distance[k][j] < distance[i][j]</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>重複</h4>
+                        <p>重複步驟 2-3 直到所有節點都作為中繼點被考慮過</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualization-container">
+            <div class="visualization-panel">
+                <h3>圖形視覺化</h3>
+                <div class="graph-container">
+                    <svg id="graph-svg" width="600" height="400"></svg>
+                </div>
+                
+                <div class="controls">
+                    <button id="reset-btn" class="control-button">重設</button>
+                    <button id="next-step-btn" class="control-button primary">下一步</button>
+                    <button id="prev-step-btn" class="control-button">上一步</button>
+                    <button id="auto-play-btn" class="control-button">自動播放</button>
+                </div>
+                
+                <div class="step-info">
+                    <h4>當前步驟：</h4>
+                    <p id="step-description">初始化：建立距離矩陣，設定直接相鄰的距離</p>
+                </div>
+            </div>
+
+            <div class="table-panel">
+                <h3>距離矩陣</h3>
+                <div class="current-k-info">
+                    <p>當前中繼點：<span id="current-k">-</span></p>
+                </div>
+                <div class="table-container">
+                    <table id="distance-matrix" class="algorithm-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>A</th>
+                                <th>B</th>
+                                <th>C</th>
+                                <th>D</th>
+                                <th>E</th>
+                                <th>F</th>
+                                <th>G</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 動態生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="legend">
+                    <h4>圖例說明：</h4>
+                    <div class="legend-items">
+                        <div class="legend-item">
+                            <div class="legend-color intermediate"></div>
+                            <span>當前中繼點</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color considering"></div>
+                            <span>正在考慮的路徑</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color updated"></div>
+                            <span>已更新的距離</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color direct"></div>
+                            <span>直接連接</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="complexity-analysis">
+            <h2>時間複雜度分析</h2>
+            <div class="complexity-grid">
+                <div class="complexity-item">
+                    <h4>時間複雜度</h4>
+                    <p><strong>O(V³)</strong></p>
+                    <p>三層巢狀迴圈，V 為節點數量</p>
+                </div>
+                <div class="complexity-item">
+                    <h4>空間複雜度</h4>
+                    <p><strong>O(V²)</strong></p>
+                    <p>需要 V×V 的距離矩陣儲存結果</p>
+                </div>
+            </div>
+        </div>
+        <div class="algorithm-comparison">
+            <h2>與其他演算法比較</h2>
+            <div class="comparison-grid">
+                <div class="comparison-item">
+                    <h4>適用圖類型</h4>
+                    <div class="comparison-row">
+                        <span>Dijkstra：</span>
+                        <span>非負權重圖</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Bellman-Ford：</span>
+                        <span>任意權重圖（可負）</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Floyd-Warshall：</span>
+                        <span>支援負權重（無負環）</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <h4>時間複雜度</h4>
+                    <div class="comparison-row">
+                        <span>Dijkstra：</span>
+                        <span>O(V²) 或 O((V+E)logV)</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Bellman-Ford：</span>
+                        <span>O(VE)</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Floyd-Warshall：</span>
+                        <span>O(V³)</span>
+                    </div>
+                </div>
+                <div class="comparison-item">
+                    <h4>應用場景</h4>
+                    <div class="comparison-row">
+                        <span>Dijkstra：</span>
+                        <span>正權重，單源路徑</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Bellman-Ford：</span>
+                        <span>可能有負權重，單源路徑</span>
+                    </div>
+                    <div class="comparison-row">
+                        <span>Floyd-Warshall：</span>
+                        <span>全對路徑</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="navigation">
+            <a href="bellman_ford.html" class="nav-button">← Bellman-Ford</a>
+            <a href="comparison.html" class="nav-button">策略比較 →</a>
+        </div>
+    </div>
+    
+    <script src="floyd_warshall_data.js"></script>
+    <script src="floyd_warshall_renderer.js"></script>
+    <script src="floyd_warshall_algorithm.js"></script>
+    <script src="floyd_warshall_controller.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

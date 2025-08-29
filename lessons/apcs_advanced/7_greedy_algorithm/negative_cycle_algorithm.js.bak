@@ -1,0 +1,274 @@
+// Negative Cycle Detection Algorithm
+class NegativeCycleAlgorithm {
+    constructor(data) {
+        this.data = data;
+        this.steps = [];
+        this.currentStepIndex = -1;
+        this.generateSteps();
+    }
+
+    generateSteps() {
+        this.steps = [];
+        
+        // 重置數據狀態
+        this.data.reset();
+        
+        // 步驟 0: 初始化
+        this.steps.push({
+            type: 'initialize',
+            description: `初始化：設定起點 ${this.data.startNode} 的距離為 0，其他節點距離為無限大`,
+            round: 0,
+            updates: [],
+            distances: { ...this.data.distances },
+            predecessors: { ...this.data.predecessors },
+            hasNegativeCycle: false
+        });
+
+        // 模擬演算法執行
+        const tempDistances = { ...this.data.distances };
+        const tempPredecessors = { ...this.data.predecessors };
+
+        // V-1 輪鬆弛操作 (3輪)
+        for (let round = 1; round <= this.data.maxRounds; round++) {
+            this.steps.push({
+                type: 'start_round',
+                description: `開始第 ${round} 輪鬆弛操作（共 ${this.data.maxRounds} 輪）`,
+                round: round,
+                updates: [],
+                distances: { ...tempDistances },
+                predecessors: { ...tempPredecessors },
+                hasNegativeCycle: false
+            });
+
+            let roundHasUpdates = false;
+            let roundUpdates = [];
+
+            // 檢查每條邊
+            this.data.edges.forEach((edge, edgeIndex) => {
+                const { from, to, weight } = edge;
+                
+                if (tempDistances[from] !== Infinity) {
+                    const newDistance = tempDistances[from] + weight;
+                    
+                    // 創建考慮邊的步驟
+                    this.steps.push({
+                        type: 'consider_edge',
+                        description: `第 ${round} 輪：考慮邊 ${from} → ${to}（權重 ${weight}）`,
+                        round: round,
+                        relaxingEdge: edge,
+                        updates: [],
+                        distances: { ...tempDistances },
+                        predecessors: { ...tempPredecessors },
+                        calculation: {
+                            from: from,
+                            to: to,
+                            weight: weight,
+                            currentDistance: tempDistances[to],
+                            newDistance: newDistance
+                        },
+                        hasNegativeCycle: false
+                    });
+                    
+                    if (newDistance < tempDistances[to]) {
+                        // 執行更新
+                        const oldDistance = tempDistances[to];
+                        tempDistances[to] = newDistance;
+                        tempPredecessors[to] = from;
+                        roundHasUpdates = true;
+                        
+                        roundUpdates.push({
+                            node: to,
+                            oldDistance: oldDistance,
+                            newDistance: newDistance,
+                            via: from
+                        });
+                        
+                        // 創建更新距離的步驟
+                        this.steps.push({
+                            type: 'update_distance',
+                            description: `✅ 更新成功！${to} = ${newDistance}（經由 ${from}）`,
+                            round: round,
+                            relaxingEdge: edge,
+                            updates: [{
+                                node: to,
+                                oldDistance: oldDistance,
+                                newDistance: newDistance,
+                                via: from
+                            }],
+                            distances: { ...tempDistances },
+                            predecessors: { ...tempPredecessors },
+                            calculation: {
+                                from: from,
+                                to: to,
+                                weight: weight,
+                                currentDistance: oldDistance,
+                                newDistance: newDistance
+                            },
+                            hasNegativeCycle: false
+                        });
+                    } else {
+                        // 無需更新
+                        this.steps.push({
+                            type: 'no_update',
+                            description: `❌ 無法改善：${newDistance} ≥ ${tempDistances[to]}，保持原距離`,
+                            round: round,
+                            relaxingEdge: edge,
+                            updates: [],
+                            distances: { ...tempDistances },
+                            predecessors: { ...tempPredecessors },
+                            calculation: {
+                                from: from,
+                                to: to,
+                                weight: weight,
+                                currentDistance: tempDistances[to],
+                                newDistance: newDistance
+                            },
+                            hasNegativeCycle: false
+                        });
+                    }
+                }
+            });
+
+            // 輪次完成
+            if (roundHasUpdates) {
+                this.steps.push({
+                    type: 'round_complete',
+                    description: `第 ${round} 輪完成：距離持續改善中`,
+                    round: round,
+                    updates: roundUpdates,
+                    distances: { ...tempDistances },
+                    predecessors: { ...tempPredecessors },
+                    hasNegativeCycle: false
+                });
+            } else {
+                this.steps.push({
+                    type: 'round_complete',
+                    description: `第 ${round} 輪完成：沒有更新`,
+                    round: round,
+                    updates: [],
+                    distances: { ...tempDistances },
+                    predecessors: { ...tempPredecessors },
+                    hasNegativeCycle: false
+                });
+            }
+        }
+
+        // 負環檢測（第 V 輪）
+        this.steps.push({
+            type: 'negative_cycle_check',
+            description: '🔍 開始負環檢測：檢查是否還有邊可以被鬆弛...',
+            round: this.data.maxRounds + 1,
+            updates: [],
+            distances: { ...tempDistances },
+            predecessors: { ...tempPredecessors },
+            hasNegativeCycle: false
+        });
+
+        // 檢查負環
+        let hasNegativeCycle = false;
+        const negativeCycleEdges = [];
+
+        this.data.edges.forEach(edge => {
+            const { from, to, weight } = edge;
+            if (tempDistances[from] !== Infinity && tempDistances[from] + weight < tempDistances[to]) {
+                hasNegativeCycle = true;
+                negativeCycleEdges.push(edge);
+            }
+        });
+
+        if (hasNegativeCycle) {
+            this.steps.push({
+                type: 'negative_cycle_detected',
+                description: `🚨 發現負權重環！邊 ${negativeCycleEdges.map(e => `${e.from}→${e.to}`).join(', ')} 仍可被鬆弛`,
+                round: this.data.maxRounds + 1,
+                updates: [],
+                distances: { ...tempDistances },
+                predecessors: { ...tempPredecessors },
+                hasNegativeCycle: true,
+                negativeCycleEdges: negativeCycleEdges
+            });
+        } else {
+            this.steps.push({
+                type: 'algorithm_complete',
+                description: '✅ 檢測完成：沒有發現負權重環',
+                round: this.data.maxRounds + 1,
+                updates: [],
+                distances: { ...tempDistances },
+                predecessors: { ...tempPredecessors },
+                hasNegativeCycle: false
+            });
+        }
+    }
+
+    nextStep() {
+        if (this.currentStepIndex < this.steps.length - 1) {
+            this.currentStepIndex++;
+            this.applyStep(this.steps[this.currentStepIndex]);
+            return true;
+        }
+        return false;
+    }
+
+    prevStep() {
+        if (this.currentStepIndex > -1) {
+            this.currentStepIndex--;
+            if (this.currentStepIndex >= 0) {
+                this.applyStep(this.steps[this.currentStepIndex]);
+            } else {
+                this.data.reset();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    applyStep(step) {
+        this.data.distances = { ...step.distances };
+        this.data.predecessors = { ...step.predecessors };
+        this.data.currentRound = step.round;
+        this.data.relaxingEdge = step.relaxingEdge || null;
+        this.data.hasNegativeCycle = step.hasNegativeCycle || false;
+        this.data.negativeCycleEdges = step.negativeCycleEdges || [];
+        
+        if (step.updates && step.updates.length > 0) {
+            this.data.updatedNodes = new Set(step.updates.map(u => u.node));
+        } else {
+            this.data.updatedNodes = new Set();
+        }
+    }
+
+    reset() {
+        this.currentStepIndex = -1;
+        this.data.reset();
+    }
+
+    getCurrentStepInfo() {
+        if (this.currentStepIndex >= 0 && this.currentStepIndex < this.steps.length) {
+            const step = this.steps[this.currentStepIndex];
+            return {
+                stepNumber: this.currentStepIndex + 1,
+                totalSteps: this.steps.length,
+                description: step.description,
+                type: step.type,
+                round: step.round,
+                relaxingEdge: step.relaxingEdge,
+                updates: step.updates,
+                calculation: step.calculation,
+                hasNegativeCycle: step.hasNegativeCycle || false
+            };
+        }
+        return null;
+    }
+
+    canGoNext() {
+        return this.currentStepIndex < this.steps.length - 1;
+    }
+
+    canGoPrev() {
+        return this.currentStepIndex >= 0;
+    }
+
+    isComplete() {
+        return this.currentStepIndex >= this.steps.length - 1;
+    }
+}

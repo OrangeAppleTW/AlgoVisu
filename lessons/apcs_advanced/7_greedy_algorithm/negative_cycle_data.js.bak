@@ -1,0 +1,99 @@
+// Negative Cycle Detection Demo Data
+class NegativeCycleData {
+    constructor() {
+        // 專門設計用於負環偵測的4節點圖
+        this.nodes = [
+            { id: 'S', x: 100, y: 175, label: 'S' },
+            { id: 'A', x: 250, y: 100, label: 'A' },
+            { id: 'B', x: 400, y: 100, label: 'B' },
+            { id: 'C', x: 325, y: 250, label: 'C' }
+        ];
+
+        this.edges = [
+            { from: 'S', to: 'A', weight: 2 },
+            { from: 'A', to: 'B', weight: 3 },
+            { from: 'B', to: 'C', weight: -1 },
+            { from: 'C', to: 'A', weight: -5 }  // 創造負環的關鍵邊！
+        ];
+
+        this.startNode = 'S';
+        this.distances = {};
+        this.predecessors = {};
+        this.currentRound = 0;
+        this.maxRounds = this.nodes.length - 1; // V-1 = 3 輪
+        this.hasNegativeCycle = false;
+        this.negativeCycleEdges = [];
+        this.relaxingEdge = null;
+        this.updatedNodes = new Set();
+        
+        this.initializeAlgorithm();
+    }
+
+    initializeAlgorithm() {
+        // 初始化距離
+        this.nodes.forEach(node => {
+            this.distances[node.id] = node.id === this.startNode ? 0 : Infinity;
+        });
+
+        // 初始化前驅
+        this.nodes.forEach(node => {
+            this.predecessors[node.id] = null;
+        });
+
+        this.currentRound = 0;
+        this.hasNegativeCycle = false;
+        this.negativeCycleEdges = [];
+        this.relaxingEdge = null;
+        this.updatedNodes = new Set();
+    }
+
+    reset() {
+        this.initializeAlgorithm();
+    }
+
+    getNodeById(id) {
+        return this.nodes.find(node => node.id === id);
+    }
+
+    formatDistance(distance) {
+        return distance === Infinity ? '∞' : distance.toString();
+    }
+
+    formatPath(nodeId) {
+        if (this.distances[nodeId] === Infinity) {
+            return '-';
+        }
+
+        const path = [];
+        let current = nodeId;
+        
+        while (current !== null) {
+            path.unshift(current);
+            current = this.predecessors[current];
+        }
+        
+        return path.join(' → ');
+    }
+
+    isNodeUpdated(nodeId) {
+        return this.updatedNodes.has(nodeId);
+    }
+
+    // 檢查負環的存在
+    checkNegativeCycle() {
+        const negativeCycles = [];
+        
+        this.edges.forEach(edge => {
+            const { from, to, weight } = edge;
+            if (this.distances[from] !== Infinity && 
+                this.distances[from] + weight < this.distances[to]) {
+                negativeCycles.push(edge);
+            }
+        });
+        
+        this.hasNegativeCycle = negativeCycles.length > 0;
+        this.negativeCycleEdges = negativeCycles;
+        
+        return this.hasNegativeCycle;
+    }
+}

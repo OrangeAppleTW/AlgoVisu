@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>機票問題 (Ticket Problem) - APCS進階班</title>
+    <link rel="stylesheet" href="../../../styles/styles.css">
+    <link rel="stylesheet" href="ticket_problem_styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>機票問題 (Ticket Problem)</h1>
+        
+        <div class="lesson-info">
+            透過Floyd-Warshall演算法解決機票問題，找出所有城市間最便宜的機票方案
+        </div>
+
+        <div class="algorithm-explanation">
+            <h2>問題描述</h2>
+            <p>
+                某旅遊公司有多個城市，從城市A到城市B的機票價格已知，
+                乘客從A地到B地可以直接搭乘，也可以轉機到其他城市。
+            </p>
+            <p>
+                <strong>特殊規則：</strong>每次轉機都可以減少50元費用，但一條路徑中每個地方最多只能經過一次。
+                求任意兩城市間的最低機票費用。
+            </p>
+            <div class="algorithm-steps">
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>建立費用矩陣</h4>
+                        <p>設定城市間的直接機票費用，無法直達設為無限大</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>選擇轉機城市</h4>
+                        <p>逐一選擇每個城市作為轉機點（k = A, B, C, ...）</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>更新最低費用</h4>
+                        <p>檢查通過轉機城市k是否能降低從城市i到城市j的費用，轉機可減少50元</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h4>重複計算</h4>
+                        <p>重複步驟2-3直到所有城市都作為轉機點被考慮過</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <h3>輸入機票費用資料</h3>
+            <div class="input-controls">
+                <div class="cities-input">
+                    <label for="city-count">城市數量 (3-10):</label>
+                    <input type="number" id="city-count" min="3" max="10" value="3">
+                    <button id="update-cities-btn" class="control-button">更新城市數量</button>
+                </div>
+                
+                <div class="matrix-input-container">
+                    <h4>機票費用矩陣 (輸入-1表示無直達班機):</h4>
+                    <div id="cost-matrix-input">
+                        <!-- 動態生成輸入表格 -->
+                    </div>
+                    <button id="apply-matrix-btn" class="control-button primary">套用機票費用</button>
+                    <button id="load-example-btn" class="control-button">載入範例</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="visualization-container">
+        <div class="table-panel-main">
+        <h3>機票費用矩陣解題過程</h3>
+        <div class="current-transfer-info">
+        <p>當前轉機城市：<span id="current-transfer">-</span></p>
+        </div>
+        <div class="table-container">
+            <table id="cost-matrix" class="algorithm-table">
+            <thead id="matrix-header">
+                <!-- 動態生成 -->
+            </thead>
+            <tbody id="matrix-body">
+                    <!-- 動態生成 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="controls">
+                <button id="reset-btn" class="control-button">重設</button>
+                    <button id="next-step-btn" class="control-button primary">下一步</button>
+                <button id="prev-step-btn" class="control-button">上一步</button>
+            <button id="auto-play-btn" class="control-button">自動播放</button>
+        </div>
+        
+        <div class="step-info">
+            <h4>當前步驟：</h4>
+        <p id="step-description">請先輸入機票費用資料</p>
+        </div>
+
+        <div class="calculation-info">
+        <h4>計算過程：</h4>
+        <div id="calculation-display" class="calculation-text">-</div>
+        </div>
+                
+                <div class="step-details">
+                    <h4>步驟詳細記錄：</h4>
+                    <div id="step-details-container" class="step-details-container">
+                        <div class="no-steps">還未開始演算法</div>
+                    </div>
+                </div>
+        
+        <div class="legend">
+            <h4>圖例說明：</h4>
+            <div class="legend-items">
+            <div class="legend-item">
+                <div class="legend-color transfer"></div>
+                    <span>轉機城市</span>
+                </div>
+                <div class="legend-item">
+                <div class="legend-color considering"></div>
+                <span>正在考慮的路線</span>
+        </div>
+        <div class="legend-item">
+        <div class="legend-color updated"></div>
+            <span>已更新的費用</span>
+        </div>
+        </div>
+        <div class="transfer-discount-note">
+            <strong>轉機折扣規則：</strong>每次轉機自動減少50元費用，但每個城市最多只能經過一次。
+        </div>
+        </div>
+        </div>
+        </div>
+
+        <div class="result-section">
+            <h3>最終結果</h3>
+            <div class="result-display">
+                <div class="shortest-paths">
+                    <h4>各城市間最低機票費用：</h4>
+                    <div id="result-table-container"></div>
+                </div>
+                
+                <div class="path-query">
+                    <h4>查詢特定路線：</h4>
+                    <div class="query-controls">
+                        <select id="from-city">
+                            <option value="">選擇出發城市</option>
+                        </select>
+                        <span>→</span>
+                        <select id="to-city">
+                            <option value="">選擇目的城市</option>
+                        </select>
+                        <button id="query-path-btn" class="control-button">查詢路線</button>
+                    </div>
+                    <div id="path-result" class="path-result"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="complexity-analysis">
+            <h2>演算法分析</h2>
+            <div class="complexity-grid">
+                <div class="complexity-item">
+                    <h4>時間複雜度</h4>
+                    <p><strong>O(n³)</strong></p>
+                    <p>三層巢狀迴圈，n為城市數量</p>
+                </div>
+                <div class="complexity-item">
+                    <h4>空間複雜度</h4>
+                    <p><strong>O(n²)</strong></p>
+                    <p>需要n×n的費用矩陣儲存結果</p>
+                </div>
+                <div class="complexity-item">
+                    <h4>適用範圍</h4>
+                    <p><strong>所有城市對</strong></p>
+                    <p>一次計算得到所有城市間的最短路徑</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <a href="floyd_warshall.html" class="nav-button">← Floyd-Warshall 演算法</a>
+            <a href="comparison.html" class="nav-button">策略比較 →</a>
+        </div>
+    </div>
+    
+    <script src="ticket_problem_data.js"></script>
+    <script src="ticket_problem_renderer.js"></script>
+    <script src="ticket_problem_algorithm.js"></script>
+    <script src="ticket_problem_controller.js"></script>
+    <script src="../../../components/navbar-loader.js"></script>
+</body>
+</html>

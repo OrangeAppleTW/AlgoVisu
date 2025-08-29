@@ -152,6 +152,7 @@ class BFSGraphStructure {
             else if (state === 'inQueue') node.inQueue = true;
             else if (state === 'inStack') node.inStack = true;
             else if (state === 'current') node.current = true;
+            // 'default' 狀態不需要額外處理，已經重置為 false
         }
     }
 
