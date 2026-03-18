@@ -30,7 +30,7 @@ class TicketProblemAlgorithm {
             updated: false
         });
 
-        // Floyd-Warshall 主要迴圈，加入轉機折扣
+        // Floyd-Warshall 主要迴圈，利用中繼點特性實現轉機折扣
         for (let k = 0; k < n; k++) {
             for (let i = 0; i < n; i++) {
                 for (let j = 0; j < n; j++) {
@@ -40,7 +40,6 @@ class TicketProblemAlgorithm {
                         
                         let calculation = '';
                         let updated = false;
-                        let finalCost = pathCost;
                         
                         calculation = `計算 ${this.data.cities[i]} 到 ${this.data.cities[j]} 的最低費用：\n`;
                         calculation += `目前最低費用: ${this.formatCost(currentCost)}\n`;
@@ -51,17 +50,16 @@ class TicketProblemAlgorithm {
                             calculation += `  ${this.data.cities[k]} → ${this.data.cities[j]}: ${this.formatCost(tempMatrix[k][j])}\n`;
                             calculation += `  小計: ${this.formatCost(tempMatrix[i][k])} + ${this.formatCost(tempMatrix[k][j])} = ${pathCost}\n`;
                             
-                            // 應用轉機折扣
-                            finalCost = pathCost - this.transferDiscount;
-                            calculation += `轉機折扣: ${pathCost} - ${this.transferDiscount} = ${finalCost}\n`;
+                            // 直接計算折扣後的費用並比較
+                            const discountedCost = pathCost - this.transferDiscount;
+                            calculation += `應用轉機折扣: ${pathCost} - ${this.transferDiscount} = ${discountedCost}\n`;
+                            calculation += `比較: min(${this.formatCost(currentCost)}, ${discountedCost})`;
                             
-                            calculation += `比較: min(${this.formatCost(currentCost)}, ${finalCost})`;
-                            
-                            if (finalCost < currentCost) {
-                                tempMatrix[i][j] = finalCost;
+                            if (discountedCost < currentCost) {
+                                tempMatrix[i][j] = discountedCost;
                                 tempPathMatrix[i][j] = k; // 記錄中轉城市
                                 updated = true;
-                                calculation += ` = ${finalCost} → 更新！`;
+                                calculation += ` = ${discountedCost} → 更新！`;
                             } else {
                                 calculation += ` = ${this.formatCost(currentCost)} → 不變`;
                             }
@@ -98,7 +96,7 @@ class TicketProblemAlgorithm {
             k: -1,
             i: -1,
             j: -1,
-            calculation: '所有可能的轉機路線都已檢查完畢，每次轉機都享有50元的折扣優惠。',
+            calculation: '所有可能的轉機路線都已檢查完畢，所有轉機都自動享有50元折扣，只有更便宜的才會被採用。',
             updated: false
         });
     }

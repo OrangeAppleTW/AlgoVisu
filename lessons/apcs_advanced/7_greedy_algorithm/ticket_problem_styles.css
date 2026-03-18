@@ -105,6 +105,55 @@
     margin: 30px 0;
 }
 
+.visualization-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+.table-panel-left {
+    flex: 0 0 50%;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table-panel-left h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+}
+
+.step-details-panel {
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 600px; /* 固定高度 */
+}
+
+.step-details-panel h3 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+}
+
+.step-details-panel .step-details-container {
+    flex: 1;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+    overflow-y: auto; /* 獨立的垂直滾動條 */
+    max-height: 500px; /* 確保不超過面板高度 */
+}
+
 .table-panel-main {
     background: white;
     border-radius: 10px;
@@ -144,38 +193,35 @@
     font-size: 20px;
 }
 
-/* Cost matrix table */
+/* Algorithm table - 方格矩陣樣式 */
 .algorithm-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
-    margin-top: 10px;
+    margin: 15px auto;
+    table-layout: fixed;
 }
 
 .algorithm-table th,
 .algorithm-table td {
-    padding: 12px 10px;
+    width: 45px;
+    height: 45px;
     text-align: center;
-    border: 1px solid #ddd;
-    min-width: 60px;
+    vertical-align: middle;
+    border: 2px solid #2c3e50;
+    font-weight: bold;
+    position: relative;
 }
 
 .algorithm-table th {
-    background: #3498db;
+    background: #34495e;
     color: white;
-    font-weight: bold;
+    font-size: 16px;
 }
 
-.algorithm-table tbody tr:nth-child(odd) {
-    background: #f9f9f9;
-}
-
-.algorithm-table tbody tr:hover {
-    background: #e3f2fd;
-}
-
-.algorithm-table th:first-child {
-    background: #2980b9;
+.algorithm-table td {
+    background: white;
+    font-size: 14px;
 }
 
 .algorithm-table .cell-transfer {
@@ -231,32 +277,35 @@
     100% { background: #d1ecf1; }
 }
 
-/* Calculation display */
+/* Calculation display - 簡化版 */
 .calculation-info {
     background: #f8f9fa;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
-    margin-top: 25px;
+    margin-top: 20px;
     border: 1px solid #e0e0e0;
 }
 
 .calculation-info h4 {
-    margin: 0 0 15px 0;
+    margin: 0 0 10px 0;
     color: #2c3e50;
+    font-size: 14px;
 }
 
 .calculation-text {
     margin: 0;
     color: #34495e;
-    line-height: 1.6;
+    line-height: 1.5;
     font-family: 'Courier New', monospace;
-    font-size: 14px;
+    font-size: 11px;
     background: white;
-    padding: 15px;
+    padding: 12px;
     border-radius: 4px;
     border: 1px solid #ddd;
     white-space: pre-line;
-    min-height: 60px;
+    min-height: 50px;
+    max-height: 120px;
+    overflow-y: auto;
 }
 
 /* Step details */
@@ -411,7 +460,7 @@
     font-weight: bold;
 }
 
-/* Controls */
+/* Controls - 更大的按鈕 */
 .controls {
     display: flex;
     gap: 15px;
@@ -425,11 +474,12 @@
     border: none;
     border-radius: 25px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: bold;
     transition: all 0.3s ease;
     background: #ecf0f1;
     color: #2c3e50;
+    min-width: 80px;
 }
 
 .control-button:hover {
@@ -453,87 +503,29 @@
     box-shadow: none;
 }
 
-/* Step information */
+/* Step information - 簡化版 */
 .step-info {
     background: #f8f9fa;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
-    margin-top: 25px;
+    margin-top: 20px;
     border: 1px solid #e0e0e0;
 }
 
 .step-info h4 {
-    margin: 0 0 10px 0;
+    margin: 0 0 8px 0;
     color: #2c3e50;
+    font-size: 14px;
 }
 
 .step-info p {
     margin: 0;
     color: #34495e;
-    line-height: 1.5;
-    font-size: 15px;
+    line-height: 1.4;
+    font-size: 13px;
 }
 
-/* Legend for ticket problem */
-.legend {
-    margin-top: 25px;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-}
-
-.legend h4 {
-    margin: 0 0 15px 0;
-    color: #2c3e50;
-}
-
-.legend-items {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 14px;
-}
-
-.transfer-discount-note {
-    margin-top: 15px;
-    padding: 10px;
-    background: #e8f4fd;
-    border-left: 4px solid #3498db;
-    border-radius: 0 4px 4px 0;
-    font-size: 14px;
-    color: #2c3e50;
-}
-
-.legend-color {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    border: 2px solid #2c3e50;
-}
-
-.legend-color.transfer {
-    background: #e8dff5;
-    border-color: #9b59b6;
-}
-
-.legend-color.considering {
-    background: #fff3cd;
-    border-color: #f39c12;
-}
-
-.legend-color.updated {
-    background: #d1ecf1;
-    border-color: #0c5460;
-}
-
-/* Responsive design */
+/* Responsive design - 響應式設計 */
 @media (max-width: 992px) {
     .result-display {
         grid-template-columns: 1fr;
@@ -542,6 +534,24 @@
     
     .table-panel-main {
         padding: 20px;
+    }
+    
+    /* 小螢幕時改為垂直布局 */
+    .visualization-layout {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .table-panel-left {
+        flex: none;
+    }
+    
+    .step-details-panel {
+        height: auto; /* 小螢幕時不固定高度 */
+    }
+    
+    .step-details-panel .step-details-container {
+        max-height: 300px; /* 小螢幕時縮小最大高度 */
     }
 }
 
@@ -561,8 +571,8 @@
     
     .algorithm-table th,
     .algorithm-table td {
-        padding: 8px 6px;
-        min-width: 50px;
+        width: 35px;
+        height: 35px;
     }
     
     .cost-input-table th,
@@ -582,6 +592,15 @@
     
     .control-button {
         padding: 10px 15px;
-        font-size: 12px;
+        font-size: 13px;
+        min-width: 70px;
+    }
+    
+    .step-details-panel {
+        height: auto;
+    }
+    
+    .step-details-panel .step-details-container {
+        max-height: 250px;
     }
 }

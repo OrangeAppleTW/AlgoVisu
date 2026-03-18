@@ -107,7 +107,6 @@ class TicketProblemController {
         this.algorithm.reset();
         this.updateDisplay();
         this.updateStepInfo();
-        this.updateCalculationDisplay('');
         this.updateStepDetails(); // 清空步驟記錄
         
         // 清空路線查詢結果
@@ -124,8 +123,8 @@ class TicketProblemController {
         if (this.algorithm.nextStep()) {
             this.updateDisplay();
             this.updateStepInfo();
-            this.updateCalculationDisplay();
             this.updateTransferInfo();
+            this.updateStepDetails(); // 更新步驟記錄
         }
     }
 
@@ -135,8 +134,8 @@ class TicketProblemController {
         if (this.algorithm.prevStep()) {
             this.updateDisplay();
             this.updateStepInfo();
-            this.updateCalculationDisplay();
             this.updateTransferInfo();
+            this.updateStepDetails(); // 更新步驟記錄
         }
     }
 
@@ -161,8 +160,8 @@ class TicketProblemController {
             } else {
                 this.updateDisplay();
                 this.updateStepInfo();
-                this.updateCalculationDisplay();
                 this.updateTransferInfo();
+                this.updateStepDetails(); // 更新步驟記錄
             }
         }, 1500);
     }
@@ -201,26 +200,6 @@ class TicketProblemController {
             stepDescription.textContent = currentStep.description;
         }
     }
-
-    updateCalculationDisplay(customText = null) {
-        const calculationDisplay = document.getElementById('calculation-display');
-        if (!calculationDisplay) return;
-        
-        if (customText !== null) {
-            calculationDisplay.textContent = customText;
-            return;
-        }
-        
-        const currentStep = this.algorithm.getCurrentStep();
-        if (currentStep && currentStep.calculation) {
-            calculationDisplay.textContent = currentStep.calculation;
-        } else {
-            calculationDisplay.textContent = '-';
-        }
-        
-        // 更新步驟詳細記錄
-        this.updateStepDetails();
-    }
     
     updateStepDetails() {
         const container = document.getElementById('step-details-container');
@@ -241,6 +220,7 @@ class TicketProblemController {
             
             const stepDiv = document.createElement('div');
             stepDiv.className = 'step-item-detail';
+            stepDiv.id = `step-${i}`; // 為每個步驟加入ID
             
             if (i === this.algorithm.currentStep) {
                 stepDiv.classList.add('current');
@@ -258,11 +238,26 @@ class TicketProblemController {
             container.appendChild(stepDiv);
         }
         
-        // 滾動到當前步驟
-        const currentStepElement = container.querySelector('.current');
-        if (currentStepElement) {
-            currentStepElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        // 在右側步驟記錄容器內自動滾動到當前步驟，不影響整個網頁
+        setTimeout(() => {
+            const currentStepElement = container.querySelector('.current');
+            if (currentStepElement) {
+                // 使用容器的scrollTop屬性，確保只在容器內滾動，不影響網頁
+                const containerRect = container.getBoundingClientRect();
+                const elementRect = currentStepElement.getBoundingClientRect();
+                const elementTop = currentStepElement.offsetTop;
+                const containerHeight = container.clientHeight;
+                
+                // 計算目標滾動位置（讓當前步驟置中顯示）
+                const targetScrollTop = elementTop - (containerHeight / 2) + (currentStepElement.offsetHeight / 2);
+                
+                // 平滑滾動到目標位置，只影響容器內滾動
+                container.scrollTo({
+                    top: Math.max(0, targetScrollTop),
+                    behavior: 'smooth'
+                });
+            }
+        }, 100); // 小延遲確保DOM更新完成
     }
 
     updateTransferInfo() {

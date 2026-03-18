@@ -22,7 +22,7 @@
                 乘客從A地到B地可以直接搭乘，也可以轉機到其他城市。
             </p>
             <p>
-                <strong>特殊規則：</strong>每次轉機都可以減少50元費用，但一條路徑中每個地方最多只能經過一次。
+                <strong>特殊規則：</strong>所有轉機都享有50元折扣，只有折扣後比目前路徑更便宜的才會被採用。一條路徑中每個地方最多只能經過一次。
                 求任意兩城市間的最低機票費用。
             </p>
             <div class="algorithm-steps">
@@ -78,67 +78,45 @@
         </div>
 
         <div class="visualization-container">
-        <div class="table-panel-main">
-        <h3>機票費用矩陣解題過程</h3>
-        <div class="current-transfer-info">
-        <p>當前轉機城市：<span id="current-transfer">-</span></p>
-        </div>
-        <div class="table-container">
-            <table id="cost-matrix" class="algorithm-table">
-            <thead id="matrix-header">
-                <!-- 動態生成 -->
-            </thead>
-            <tbody id="matrix-body">
-                    <!-- 動態生成 -->
-                </tbody>
-            </table>
-        </div>
-        
-        <div class="controls">
-                <button id="reset-btn" class="control-button">重設</button>
-                    <button id="next-step-btn" class="control-button primary">下一步</button>
-                <button id="prev-step-btn" class="control-button">上一步</button>
-            <button id="auto-play-btn" class="control-button">自動播放</button>
-        </div>
-        
-        <div class="step-info">
-            <h4>當前步驟：</h4>
-        <p id="step-description">請先輸入機票費用資料</p>
-        </div>
-
-        <div class="calculation-info">
-        <h4>計算過程：</h4>
-        <div id="calculation-display" class="calculation-text">-</div>
-        </div>
+            <div class="visualization-layout">
+                <!-- 左側表格區域 -->
+                <div class="table-panel-left">
+                    <h3>機票費用矩陣解題過程</h3>
+                    <div class="current-transfer-info">
+                        <p>當前轉機城市：<span id="current-transfer">-</span></p>
+                    </div>
+                    <div class="table-container">
+                        <table id="cost-matrix" class="algorithm-table">
+                            <thead id="matrix-header">
+                                <!-- 動態生成 -->
+                            </thead>
+                            <tbody id="matrix-body">
+                                <!-- 動態生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="reset-btn" class="control-button">重設</button>
+                        <button id="next-step-btn" class="control-button primary">下一步</button>
+                        <button id="prev-step-btn" class="control-button">上一步</button>
+                        <button id="auto-play-btn" class="control-button">自動播放</button>
+                    </div>
+                    
+                    <div class="step-info">
+                        <h4>當前步驟：</h4>
+                        <p id="step-description">請先輸入機票費用資料</p>
+                    </div>
+                </div>
                 
-                <div class="step-details">
-                    <h4>步驟詳細記錄：</h4>
+                <!-- 右側步驟記錄區域 -->
+                <div class="step-details-panel">
+                    <h3>步驟詳細記錄</h3>
                     <div id="step-details-container" class="step-details-container">
                         <div class="no-steps">還未開始演算法</div>
                     </div>
                 </div>
-        
-        <div class="legend">
-            <h4>圖例說明：</h4>
-            <div class="legend-items">
-            <div class="legend-item">
-                <div class="legend-color transfer"></div>
-                    <span>轉機城市</span>
-                </div>
-                <div class="legend-item">
-                <div class="legend-color considering"></div>
-                <span>正在考慮的路線</span>
-        </div>
-        <div class="legend-item">
-        <div class="legend-color updated"></div>
-            <span>已更新的費用</span>
-        </div>
-        </div>
-        <div class="transfer-discount-note">
-            <strong>轉機折扣規則：</strong>每次轉機自動減少50元費用，但每個城市最多只能經過一次。
-        </div>
-        </div>
-        </div>
+            </div>
         </div>
 
         <div class="result-section">
