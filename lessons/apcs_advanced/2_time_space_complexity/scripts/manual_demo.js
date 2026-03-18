@@ -174,8 +174,6 @@ class ManualDemoController {
     }
     
     nextStep() {
-        if (this.isAutoCompleting) return;
-        
         // 如果可以前進到下一個已記錄的步驟
         if (this.currentStepIndex < this.stepHistory.length - 1) {
             this.currentStepIndex++;
@@ -203,10 +201,11 @@ class ManualDemoController {
             this.addToOperationLog(operationText, this.getLogClass(result.action));
         }
         
+        this.updateStats(this.visualizer.getStats());
         this.updateOperationLog();
         this.updateButtonStates();
     }
-    
+
     prevStep() {
         if (this.currentStepIndex > 0) {
             this.currentStepIndex--;
